@@ -11,6 +11,71 @@ jobs:
   assign_reviewers:
     runs-on: ubuntu-latest
     steps:
+      - name : API log for debugging
+        id: for-debug
+        run : |
+          # Set error handling
+          set -e
+          
+          # Store GitHub API response in a variable and print it for debugging
+          api_response=$(curl -s \
+            -H "Authorization: token $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/2-Docthru-team1/2-Docthru-team1-BE/collaborators?affiliation=direct")
+          
+          echo "API Response:"
+          echo "$api_response"
+          
+          # Check if the response is empty or invalid
+          if [ -z "$api_response" ] || [ "$api_response" = "null" ]; then
+              echo "Error: Empty or invalid response from GitHub API"
+              echo "This might be due to:"
+              echo "1. Repository not found"
+              echo "2. Insufficient permissions"
+              echo "3. Invalid token"
+              exit 1
+          fi
+          
+          # Try to parse collaborators, with error handling
+          collaborators=$(echo "$api_response" | jq -r 'if type == "array" then .[].login else empty end')
+          
+          if [ -z "$collaborators" ]; then
+              echo "Error: Could not parse collaborators from API response"
+              echo "Please check repository permissions and settings"
+              exit 1
+          fi
+          
+          echo "All collaborators: $collaborators"
+          
+          # Convert collaborators to array and remove PR author
+          PR_AUTHOR="csbizz"
+          filtered_members=()
+          for member in $collaborators; do
+              if [ "$member" != "$PR_AUTHOR" ]; then
+                  filtered_members+=("$member")
+              fi
+          done
+          
+          echo "Filtered members (excluding PR author): ${filtered_members[*]}"
+          
+          # Randomly select 2 reviewers
+          if [ ${#filtered_members[@]} -lt 2 ]; then
+              echo "Not enough collaborators to assign reviewers (excluding PR author)"
+              echo "Number of available reviewers: ${#filtered_members[@]}"
+              exit 1
+          fi
+          
+          # Shuffle and select 2 reviewers
+          selected_reviewers=($(printf "%s\n" "${filtered_members[@]}" | shuf -n 2))
+          
+          # Create proper JSON payload with error handling
+          json_payload=$(jq -n --arg r1 "${selected_reviewers[0]}" --arg r2 "${selected_reviewers[1]}" \
+              '{reviewers: [$r1, $r2]}')
+          
+          echo "Selected reviewers: ${selected_reviewers[*]}"
+          echo "json_string<<EOF" >> $GITHUB_OUTPUT
+          echo "$json_payload" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
       - name: Get repository collaborators and assign reviewers
         id: get-members
         run: |
