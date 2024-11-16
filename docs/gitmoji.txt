@@ -1,0 +1,4 @@
+Windows: C:\Users\(사용자명)\.gitmoji
+Linux: ~/.gitmoji
+
+해당 경로 아래의 gitmojis.json을 프로젝트 폴더 내의 .gitmoji/gitmojis.json으로 덮어씌우면 됩니다.

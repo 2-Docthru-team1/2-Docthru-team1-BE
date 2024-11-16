@@ -1,0 +1,83 @@
+[
+  {
+    "emoji": "✨",
+    "entity": "&#x2728;",
+    "code": ":sparkles:",
+    "description": "Feat: 새 기능 추가",
+    "name": "sparkles",
+    "semver": "minor"
+  },
+  { "emoji": "🐛", "entity": "&#x1f41b;", "code": ":bug:", "description": "Fix: 버그 수정", "name": "bug", "semver": "patch" },
+  {
+    "emoji": "♻️",
+    "entity": "&#x267b;",
+    "code": ":recycle:",
+    "description": "Refactor: 코드 리팩토링",
+    "name": "recycle",
+    "semver": null
+  },
+  {
+    "emoji": "📝",
+    "entity": "&#x1f4dd;",
+    "code": ":memo:",
+    "description": "Docs: 문서 추가/수정, 주석 추가/수정",
+    "name": "memo",
+    "semver": null
+  },
+  {
+    "emoji": "⚡️",
+    "entity": "&#x26a1;",
+    "code": ":zap:",
+    "description": "Perf: 성능 개선",
+    "name": "zap",
+    "semver": "patch"
+  },
+  {
+    "emoji": "🚚",
+    "entity": "&#1F69A;",
+    "code": ":truck:",
+    "description": "Rename: 파일의 이름이나 위치를 변경",
+    "name": "truck",
+    "semver": null
+  },
+  {
+    "emoji": "🔥",
+    "entity": "&#x1f525;",
+    "code": ":fire:",
+    "description": "Remove: 파일을 제거",
+    "name": "fire",
+    "semver": null
+  },
+  {
+    "emoji": "⏪️",
+    "entity": "&#9194;",
+    "code": ":rewind:",
+    "description": "Revert: 변경 내용을 되돌림",
+    "name": "rewind",
+    "semver": "patch"
+  },
+  {
+    "emoji": "🔀",
+    "entity": "&#128256;",
+    "code": ":twisted_rightwards_arrows:",
+    "description": "Merge: 브랜치를 합병",
+    "name": "twisted-rightwards-arrows",
+    "semver": null
+  },
+  {
+    "emoji": "🔧",
+    "entity": "&#x1f527;",
+    "code": ":wrench:",
+    "description": "Chore: 설정 파일 추가/수정, 패키지 매니저 수정",
+    "name": "wrench",
+    "semver": "patch"
+  },
+  {
+    "emoji": "🚀",
+    "entity": "&#x1f680;",
+    "code": ":rocket:",
+    "description": "Deploy: 배포 작업",
+    "name": "rocket",
+    "semver": null
+  }
+]
