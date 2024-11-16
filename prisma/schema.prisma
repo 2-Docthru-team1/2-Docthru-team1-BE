@@ -1,0 +1,174 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(uuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deleteAt  DateTime?
+
+  name         String
+  email        String @unique
+  password     String
+  refreshToken String
+  role         Role
+  // TODO 전문가 유저는 랭킹 시스템에 연동되는 고도화 내용
+  // 랭킹 시스템과 연동되기 떄문에 나중에 추천수 필드를 유저에 만들어야됨
+
+  requests      Challenge[]     @relation(name: "reqeusts")
+  participation Challenge[]     @relation(name: "participation")
+  ownWorks      ChallengeWork[] @relation(name: "ownership")
+  likeWorks     ChallengeWork[] @relation(name: "likeRelation")
+  Feedback      Feedback[]
+  abortReasons  AbortReason[] // 관리자 유저에 한함
+}
+
+model Challenge {
+  id        String    @id @default(uuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deleteAt  DateTime?
+
+  title       String
+  description String
+  status      Status
+  deadline    DateTime
+  isHidden    Boolean
+
+  imageUrl  String
+  imageUrl2 String?
+  embedUrl  String
+  mediaType MediaType
+
+  requestUser   User?           @relation(name: "reqeusts", fields: [requestUserId], references: [id], onDelete: SetNull)
+  requestUserId String?
+  participants  User[]          @relation(name: "participation")
+  works         ChallengeWork[]
+  abortReason   AbortReason?
+}
+
+model ChallengeWork {
+  id        String    @id @default(uuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deleteAt  DateTime?
+
+  title     String
+  content   String
+  likeCount Int
+
+  images    WorkImage[]
+  likeUsers User[]      @relation(name: "likeRelation")
+  Feedback  Feedback[]
+
+  owner       User?     @relation(name: "ownership", fields: [ownerId], references: [id], onDelete: SetNull)
+  ownerId     String?
+  challenge   Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  challengeId String
+}
+
+model WorkImage {
+  id        String    @id @default(uuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deleteAt  DateTime?
+
+  imageUrl String
+
+  work   ChallengeWork @relation(fields: [workId], references: [id], onDelete: Cascade)
+  workId String
+}
+
+model Feedback {
+  id        String    @id @default(uuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deleteAt  DateTime?
+
+  content String
+
+  owner   User?         @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+  ownerId String?
+  work    ChallengeWork @relation(fields: [workId], references: [id], onDelete: Cascade)
+  workId  String
+}
+
+model AbortReason {
+  id        String    @id @default(uuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deleteAt  DateTime?
+
+  content String
+
+  admin       User?     @relation(fields: [adminId], references: [id], onDelete: SetNull)
+  adminId     String?
+  challenge   Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  challengeId String    @unique
+}
+
+model Recipe {
+  id        String    @id @default(uuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deleteAt  DateTime?
+
+  title       String
+  ingredients String[]
+  benefits    Json
+  likeCount   Int
+  category    Category
+  direction   String // 조리법: 개행을 어떻게 처리할지 프론트랑 다시 논의해야함
+  servings    Int // 몇인분인가
+  // 아래 정보는 1인분 기준
+  calories    Int
+  carbs       Float // 탄
+  protein     Float // 단
+  fat         Float // 지
+  sugars      Float
+  sodium      Float
+  fiber       Float
+  images      String[]
+}
+
+enum Role {
+  normal
+  admin
+}
+
+// Challenge
+enum Status {
+  pending
+  onGoing
+  finished
+  denied
+  canceled // 유저에 의해서
+  aborted // 관리자에 의해서
+}
+
+enum MediaType {
+  Youtube
+  Blog
+  RecipeWeb
+  SocialMedia
+}
+
+enum Category {
+  Traditional
+  SchoolFood
+  Noodle
+  BanChan
+  Dessert
+}

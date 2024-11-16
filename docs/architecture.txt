@@ -1,0 +1,18 @@
+폴더 아키텍처에 대해 설명하는 문서입니다.
+
+docs: 프로젝트에 관련한 문서입니다. 백엔드 코드에 대해 문서화할 필요가 있는 경우 이 폴더에 작성해주세요.
+@types: 타입스크립트에서 타입모듈을 선언하는 곳입니다. 기본적으로 작성할 일은 없겠지만 작성해야할 경우 공식 문서(https://www.typescriptlang.org/docs/)를 참조해주세요.
+prisma: 프리즈마 스키마 파일과 migration 폴더가 위치합니다. mock data나 seeding에 관련한 파일도 여기에 넣어주세요.
+
+src: 소스 코드가 작성되는 곳입니다. app.ts외에 대부분의 파일은 각 하위 폴더에 작성하는게 좋습니다. 하지만 분류 없이 전역적으로 사용될 파일은 src 루트에 넣어주세요.
+configs: .env 파일에서 환경변수를 불러오는 폴더입니다. 코드 내에 직접 process.env.VARIBLE 형식으로 불러오지 마시고, configs 폴더 내에 파일로 작성한 뒤 export해서 사용해주세요.
+connection: DB client 변수를 선언해서 export하는 곳입니다. prisma client는 여기서 꺼내 쓰시면 됩니다.
+containers: layered 아키텍처의 3계층(controller - service - repository)를 실제로 연결해주는 곳입니다. 여기서 생성된 controller를 route쪽에 import해서 사용해주세요.
+controllers: 외부에서 요청을 받고, 응답을 돌려주는 곳입니다. 외부에서 들어오고 나가는 것에 대한 코드를 작성합니다. 간단한 유효성 검사도 포함될 수 있습니다.
+interfaces: 타입스크립트 인터페이스를 정의하는 곳입니다. 작성 방법은 공식 문서나 구글링, 기존 파일의 구조를 보고 작성해주시면 됩니다.
+middlewares: route단에서 사용할 미들웨어를 작성하는 곳입니다. 주로 유효성 검사와 같은 일들을 여기서 합니다.
+repositories: DB와 직접적으로 통신하는 곳입니다. DB에 CRUD하는 코드들은 여기에 작성됩니다. DB에서 가져온 데이터를 가공하는 것은 여기가 아니라 service에서 해주세요.
+routes: express에서 각 path에 맞게 route하는 곳입니다. example.route.ts일 경우 app.use('/example', exampleRouter)를 app.ts에 작성하고, 그에 맞게 작성하시면 됩니다.
+services: DB에서 가져온 데이터를 가공하는 곳입니다. 응답으로 돌려줄 데이터의 형식에 맞게 가공하거나, DB에서 가져온 두 가지 이상의 정보(ex. userList와 totalCount 등)를 합치는 등의 작업을 여기서 합니다.
+types: 타입스크립트에서 사용하는 타입들을 선언하는 곳입니다. 새로운 types.ts를 작성했다면, index.ts에도 등록해주세요.
+utils: 각종 유틸리티 파일들이 위치합니다. 프로젝트 내 여러 군데에서 사용될 상수나 함수 등이 위치합니다.

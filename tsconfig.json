@@ -1,0 +1,52 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "#configs/*": ["./src/configs/*"],
+      "#connection/*": ["./src/connection/*"],
+      "#containers/*": ["./src/containers/*"],
+      "#controllers/*": ["./src/controllers/*"],
+      "#interfaces/*": ["./src/interfaces/*"],
+      "#repositories/*": ["./src/repositories/*"],
+      "#routes/*": ["./src/routes/*"],
+      "#services/*": ["./src/services/*"],
+      "#types/*": ["./src/types/*"],
+      "#utils/*": ["./src/utils/*"],
+      "@/*": ["./*"]
+    },
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "target": "ESNext",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "esModuleInterop": true,
+    "allowJs": true,
+    // 타입 검사
+    "strict": true,
+    "noImplicitAny": true, // 암시적 any 타입 허용 여부
+    "strictNullChecks": true, // null과 undefined 체크 여부
+    "strictFunctionTypes": true, // 함수 타입 호환성 체크 여부
+    "strictBindCallApply": true, // bind, call, apply 메서드 체크 여부
+    "strictPropertyInitialization": true, // 클래스 프로퍼티 초기화 체크 여부
+    "noImplicitThis": true, // this 타입 체크 여부
+    "alwaysStrict": true, // strict mode 선언 필요없음
+    "suppressImplicitAnyIndexErrors": false, // 암시적 any 인덱스 에러 무시 여부
+    // 빌드 관련
+    "noEmit": false, // 검사 후 js파일 생성 여부
+    "noEmitOnError": false, // 타입 에러 발생 시 빌드 가능
+    "incremental": true,
+    "removeComments": true,
+    "outDir": "./dist",
+    // 기타
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "isolatedModules": true, // 타입스크립트 특유의 구문 방지. 트랜스파일러와 호환성을 위해 사용
+    "verbatimModuleSyntax": true,
+    "allowImportingTsExtensions": false, // .ts 확장자를 명시적으로 표시하는가 여부
+    "allowSyntheticDefaultImports": true, // default export가 없을때 기본 가져오기 구문을 허용하는가 여부
+    "skipLibCheck": true, // 라이브러리 타입 체크 건너뜀
+    "forceConsistentCasingInFileNames": true, // 파일명 대소문자 구분 여부
+    "resolveJsonModule": true // json을 모듈로 import해 json 객체로 사용 가능
+  },
+  "include": ["**/*.ts", "**/*.js"],
+  "exclude": ["node_modules", "dist", "eslint.config.js", "prettier.config.mjs"]
+}
