@@ -1,24 +1,25 @@
+import { Role } from '@prisma/client';
 import isEmail from 'is-email';
 import isUuid from 'is-uuid';
-import { define, object, optional } from 'superstruct';
+import { define, enums, object, optional, string } from 'superstruct';
 
-enum Status {
-  OPEN = 'OPEN',
-  CLOSE = 'CLOSE',
-}
+// prisma의 enum 타입을 js string[]로 변환
+const roleEnumValues = Object.values(Role) as string[];
 
-enum Progress {
-  PENDING = 'PENDING',
-  APPROVED = 'APPROVED',
-  DENIED = 'DENIED',
-  CANCELED = 'CANCELED',
-}
+// js의 배열을 superstruct의 enum으로 변환
+const structRole = enums(roleEnumValues);
 
 export const Uuid = define<string>('Uuid', (value: unknown) => isUuid.v4(value as string));
 export const Email = define<string>('Email', (value: unknown) => isEmail(value as string));
 export const Cursor = optional(Uuid);
 
-export const CreateUser = object({});
+export const CreateUser = object({
+  name: string(),
+  email: Email,
+  password: string(),
+  salt: string(),
+  role: optional(structRole),
+});
 
 export const PatchUser = object({});
 
