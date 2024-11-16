@@ -2,7 +2,7 @@ import { GetObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import fs from 'fs/promises';
 import type { Readable } from 'stream';
 import { awsRegion, bucketName } from '#configs/aws.config.js';
-import { validateDownload } from '#utils/verifyPath.js';
+import { validateDownload } from '#utils/S3/verifyPath.js';
 
 if (!awsRegion || bucketName) {
   throw new Error('필요한 환경변수가 지정되지 않았습니다.');

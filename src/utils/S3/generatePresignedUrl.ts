@@ -1,7 +1,7 @@
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { awsRegion, bucketName } from '#configs/aws.config.js';
-import { type FileUploadConfig, validateFileUpload } from '#utils/verifyPath.js';
+import { type FileUploadConfig, validateFileUpload } from '#utils/S3/verifyPath.js';
 
 if (!awsRegion || !bucketName) {
   throw new Error('Required environment variables are not set');
