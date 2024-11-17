@@ -4,3 +4,5 @@ http
 .env
 dist
 *.csv
+*.pem
+ec2.txt
