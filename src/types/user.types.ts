@@ -8,6 +8,7 @@ export interface User extends BaseModel {
   salt: string;
   refreshToken: string | null;
   role: Role;
+  accessToken?: string;
 }
 
 export interface CreateUserDTO {
