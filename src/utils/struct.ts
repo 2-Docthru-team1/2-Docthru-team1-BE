@@ -21,6 +21,11 @@ export const CreateUser = object({
   role: optional(structRole),
 });
 
+export const SignIn = object({
+  email: Email,
+  password: string(),
+});
+
 export const PatchUser = object({});
 
 export const CreateChallenge = object({});
