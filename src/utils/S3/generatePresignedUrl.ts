@@ -4,7 +4,7 @@ import { awsRegion, bucketName } from '#configs/aws.config.js';
 import { type FileUploadConfig, validateFileUpload } from '#utils/S3/verifyPath.js';
 
 if (!awsRegion || !bucketName) {
-  throw new Error('Required environment variables are not set');
+  throw new Error('필요한 환경변수가 지정되지 않았습니다.');
 }
 
 const s3 = new S3Client({ region: awsRegion });
