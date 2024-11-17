@@ -1,4 +1,4 @@
-name: Assign Random Reviewers
+name: Assign Random Reviewers and PR Author
 on:
   pull_request:
     types: [opened]
@@ -8,7 +8,7 @@ permissions:
   contents: read
 
 jobs:
-  assign_reviewers:
+  assign_reviewers_and_author:
     runs-on: ubuntu-latest
     steps:
       - name: Get repository collaborators and assign reviewers
@@ -43,7 +43,7 @@ jobs:
           # Shuffle and select 2 reviewers
           selected_reviewers=($(printf "%s\n" "${filtered_members[@]}" | shuf -n 2))
 
-          # Create proper JSON payload
+          # Create proper JSON payload for reviewers
           json_payload=$(jq -n --arg r1 "${selected_reviewers[0]}" --arg r2 "${selected_reviewers[1]}" \
             '{reviewers: [$r1, $r2]}')
 
@@ -60,3 +60,17 @@ jobs:
             -H "Authorization: token ${{ secrets.TEAM_ACCESS_TOKEN }}" \
             -H "Accept: application/vnd.github.v3+json" \
             -d '${{ steps.get-members.outputs.json_string }}'
+
+      - name: Assign PR author as assignee
+        if: success()
+        run: |
+          # Create JSON payload for assignee
+          assignee_payload=$(jq -n --arg author "${{ github.event.pull_request.user.login }}" \
+            '{assignees: [$author]}')
+
+          # Assign PR author as assignee
+          curl -X POST \
+            "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/assignees" \
+            -H "Authorization: token ${{ secrets.TEAM_ACCESS_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            -d "$assignee_payload"
