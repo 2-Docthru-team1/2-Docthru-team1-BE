@@ -27,12 +27,13 @@ model User {
   // TODO 전문가 유저는 랭킹 시스템에 연동되는 고도화 내용
   // 랭킹 시스템과 연동되기 떄문에 나중에 추천수 필드를 유저에 만들어야됨
 
-  requests      Challenge[]     @relation(name: "reqeusts")
+  requests      Challenge[]     @relation(name: "requests")
   participation Challenge[]     @relation(name: "participation")
   ownWorks      ChallengeWork[] @relation(name: "ownership")
   likeWorks     ChallengeWork[] @relation(name: "likeRelation")
   Feedback      Feedback[]
   abortReasons  AbortReason[] // 관리자 유저에 한함
+  Challenge     Challenge[]
 }
 
 model Challenge {
@@ -52,11 +53,13 @@ model Challenge {
   embedUrl  String
   mediaType MediaType
 
-  requestUser   User?           @relation(name: "reqeusts", fields: [requestUserId], references: [id], onDelete: SetNull)
+  requestUser   User?           @relation(name: "requests", fields: [requestUserId], references: [id], onDelete: SetNull)
   requestUserId String?
   participants  User[]          @relation(name: "participation")
   works         ChallengeWork[]
   abortReason   AbortReason?
+  User          User?           @relation(fields: [userId], references: [id])
+  userId        String?
 }
 
 model ChallengeWork {
