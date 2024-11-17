@@ -1,7 +1,7 @@
 name: Assign Random Reviewers
 on:
   pull_request:
-    types: [opened, reopened, synchronize]
+    types: [opened]
 
 permissions:
   pull-requests: write
@@ -19,9 +19,9 @@ jobs:
             -H "Authorization: token ${{ secrets.TEAM_ACCESS_TOKEN }}" \
             -H "Accept: application/vnd.github.v3+json" \
             "https://api.github.com/repos/${{ github.repository }}/collaborators?affiliation=direct" | jq -r '.[].login')
-          
+
           echo "All collaborators: $collaborators"
-          
+
           # Convert collaborators to array and remove PR author
           PR_AUTHOR="${{ github.event.pull_request.user.login }}"
           filtered_members=()
@@ -30,23 +30,23 @@ jobs:
               filtered_members+=("$member")
             fi
           done
-          
+
           echo "Filtered members (excluding PR author): ${filtered_members[*]}"
-          
+
           # Randomly select 2 reviewers
           if [ ${#filtered_members[@]} -lt 2 ]; then
             echo "Not enough collaborators to assign reviewers (excluding PR author)"
             echo "Number of available reviewers: ${#filtered_members[@]}"
             exit 1
           fi
-          
+
           # Shuffle and select 2 reviewers
           selected_reviewers=($(printf "%s\n" "${filtered_members[@]}" | shuf -n 2))
-          
+
           # Create proper JSON payload
           json_payload=$(jq -n --arg r1 "${selected_reviewers[0]}" --arg r2 "${selected_reviewers[1]}" \
             '{reviewers: [$r1, $r2]}')
-          
+
           echo "Selected reviewers: ${selected_reviewers[*]}"
           echo "json_string<<EOF" >> $GITHUB_OUTPUT
           echo "$json_payload" >> $GITHUB_OUTPUT
