@@ -10,11 +10,11 @@ class HttpError extends Error {
   }
 }
 
-export class BadRuest extends HttpError {
+export class BadRequest extends HttpError {
   constructor(message: string) {
     super(message, 400);
     this.name = 'BadRequest';
-    Object.setPrototypeOf(this, BadRuest.prototype);
+    Object.setPrototypeOf(this, BadRequest.prototype);
   }
 }
 
