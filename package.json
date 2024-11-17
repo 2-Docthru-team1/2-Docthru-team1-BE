@@ -6,7 +6,9 @@
   "scripts": {
     "start": "node --env-file=.env dist/app.ts",
     "dev": "tsx --env-file=.env --watch src/app.ts",
-    "build": "tsc",
+    "build": "npx tsc",
+    "start:pm2": "pm2 start dist/app.js --name HanCook && pm2 save",
+    "pm2:startup": "pm2 startup",
     "lint": "eslint .",
     "format": "prettier --write .",
     "test": "echo \"Error: no test specified\" && exit 1",
