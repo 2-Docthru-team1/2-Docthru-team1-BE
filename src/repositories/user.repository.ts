@@ -3,11 +3,7 @@ import type { IUserRepository } from '#interfaces/repositories/user.repository.i
 import type { CreateUserDTO, UpdateUserDTO, User } from '#types/user.types.js';
 
 export class UserRepository implements IUserRepository {
-  private user: PrismaClient['user'];
-
-  constructor(client: PrismaClient) {
-    this.user = client.user;
-  }
+  constructor(private user: PrismaClient['user']) {}
 
   findById = async (id: string): Promise<User | null> => {
     const user = await this.user.findUnique({ where: { id } });
