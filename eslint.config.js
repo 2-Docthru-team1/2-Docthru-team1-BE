@@ -39,6 +39,7 @@ export default [
             ['#containers', './src/containers'],
             ['#controllers', './src/controllers'],
             ['#interfaces', './src/interfaces'],
+            ['#middlewares', './src/middlewares'],
             ['#repositories', './src/repositories'],
             ['#routes', './src/routes'],
             ['#services', './src/services'],
@@ -105,6 +106,11 @@ export default [
             },
             {
               pattern: '#interfaces/**',
+              group: 'internal',
+              position: 'before',
+            },
+            {
+              pattern: '#middlewares/**',
               group: 'internal',
               position: 'before',
             },

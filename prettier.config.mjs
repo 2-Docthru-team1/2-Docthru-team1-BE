@@ -16,6 +16,7 @@ export default {
     '^#containers/(.*)$',
     '^#controllers/(.*)$',
     '^#interfaces/(.*)$',
+    '^#middlewares/(.*)$',
     '^#repositories/(.*)$',
     '^#routes/(.*)$',
     '^#services/(.*)$',
