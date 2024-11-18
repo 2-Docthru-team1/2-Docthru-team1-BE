@@ -1,4 +1,5 @@
-import type { ChallengeWork, CreateWorkDTO, UpdateWorkDTO } from '#types/work.types.js';
+import type { ChallengeWork } from '@prisma/client';
+import type { CreateWorkDTO, UpdateWorkDTO } from '#types/work.types.js';
 
 export interface IWorkRepository {
   findMany(options: { orderBy: string; page: number; pageSize: number }): Promise<ChallengeWork[] | null>;
