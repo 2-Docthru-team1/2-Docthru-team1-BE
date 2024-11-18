@@ -2,6 +2,7 @@ import { MediaType, Status } from '@prisma/client';
 import type { IChallengeService } from '#interfaces/services/challenge.service.interface.js';
 import type { ChallengeRepository } from '#repositories/challenge.repository.js';
 import type { Challenge, CreateChallengeDTO, UpdateChallengeDTO } from '#types/challenge.types.js';
+import type { getChallengesOptions } from '#types/challenge.types.js';
 import { Order } from '#utils/constants/enum.js';
 
 export class ChallengeService implements IChallengeService {
@@ -10,14 +11,7 @@ export class ChallengeService implements IChallengeService {
   // 이 아래로 데이터를 가공하는 코드를 작성합니다.
   // 비즈니스 로직, DB에서 가져온 데이터를 가공하는 코드가 주로 작성됩니다.
   // 여기서 가공된 데이터를 controller로 올려줍니다.
-  getChallenges = async (options: {
-    status?: Status;
-    mediaType?: MediaType;
-    order: Order;
-    keyword: string;
-    page: number;
-    pageSize: number;
-  }): Promise<{ list: Challenge[]; totalCount: number }> => {
+  getChallenges = async (options: getChallengesOptions): Promise<{ list: Challenge[]; totalCount: number }> => {
     const list = (await this.challengeRepository.findMany(options)) || [];
     const totalCount = (await this.challengeRepository.totalCount(options)) || 0;
     return { list, totalCount };

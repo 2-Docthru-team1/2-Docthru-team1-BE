@@ -1,6 +1,7 @@
 import type { MediaType, PrismaClient, Status } from '@prisma/client';
 import type { IChallengeRepository } from '#interfaces/repositories/challenge.repository.interface.js';
 import type { Challenge, CreateChallengeDTO, UpdateChallengeDTO } from '#types/challenge.types.js';
+import type { getChallengesOptions } from '#types/challenge.types.js';
 import { Order } from '#utils/constants/enum.js';
 
 export class ChallengeRepository implements IChallengeRepository {
@@ -12,26 +13,25 @@ export class ChallengeRepository implements IChallengeRepository {
 
   // 이 아래로 직접 DB와 통신하는 코드를 작성합니다.
   // 여기서 DB와 통신해 받아온 데이터를 위로(service로) 올려줍니다.
-  findMany = async (options: {
-    status?: Status;
-    mediaType?: MediaType;
-    order: Order;
-    keyword: string;
-    page: number;
-    pageSize: number;
-  }): Promise<Challenge[] | null> => {
+  findMany = async (options: getChallengesOptions): Promise<Challenge[] | null> => {
     const { status, mediaType, order, keyword, page, pageSize } = options;
     const orderBy: {
       deadline?: 'asc' | 'desc';
       createdAt?: 'asc' | 'desc';
-    } =
-      order === Order.deadlineEarliest
-        ? { deadline: 'asc' }
-        : order === Order.deadlineLatest
-          ? { deadline: 'desc' }
-          : order === Order.earliestFirst
-            ? { createdAt: 'asc' }
-            : { createdAt: 'desc' };
+    } = {};
+    switch (order) {
+      case Order.deadlineEarliest:
+        orderBy.deadline = 'asc';
+        break;
+      case Order.deadlineLatest:
+        orderBy.deadline = 'desc';
+        break;
+      case Order.earliestFirst:
+        orderBy.createdAt = 'asc';
+        break;
+      default:
+        orderBy.createdAt = 'desc';
+    }
     const whereCondition: {
       mediaType?: MediaType;
       status?: Status;
@@ -59,14 +59,7 @@ export class ChallengeRepository implements IChallengeRepository {
     });
     return challenges;
   };
-  totalCount = async (options: {
-    status?: Status;
-    mediaType?: MediaType;
-    order: Order;
-    keyword: string;
-    page: number;
-    pageSize: number;
-  }): Promise<number | null> => {
+  totalCount = async (options: getChallengesOptions): Promise<number | null> => {
     const { status, mediaType, keyword } = options;
     const whereCondition: {
       mediaType?: MediaType;

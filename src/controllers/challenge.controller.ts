@@ -25,7 +25,7 @@ export class ChallengeController {
   // 간단한 유효성 검사라면 이곳에 작성해도 됩니다.
   // 응답의 status를 지정하고, body를 전달합니다.
   getChallenges = async (req: Request<{}, {}, {}, GetChallengesQuery>, res: Response, next: NextFunction) => {
-    const { status = 'latestFirst', mediaType, order, keyword = '', page = '1', pageSize = '10' } = req.query;
+    const { status, mediaType, order = 'latestFirst', keyword = '', page = '1', pageSize = '10' } = req.query;
     const statusEnum = status ? (status as Status) : undefined;
     const mediaTypeEnum = mediaType ? (mediaType as MediaType) : undefined;
     const orderEnum = order as Order;
