@@ -160,10 +160,10 @@ enum Status {
 }
 
 enum MediaType {
-  Youtube
-  Blog
-  RecipeWeb
-  SocialMedia
+  youtube
+  blog
+  recipeWeb
+  socialMedia
 }
 
 enum Category {

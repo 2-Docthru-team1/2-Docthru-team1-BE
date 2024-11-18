@@ -1,23 +1,6 @@
-export enum openStatus {
-  onGoing = 'onGoing',
-  closed = 'closed',
-}
-export enum mediaType {
-  youtube = 'youtube',
-  blog = 'blog',
-  recipeWeb = 'recipeWeb',
-  socialMeida = ' socialMedia',
-}
-export enum approvalStatus {
-  pending = 'pending',
-  approved = 'approved',
-  denied = 'denied',
-}
-export enum submitOrder {
-  eariestFirst = 'earitestFirst',
-  latest = 'latest',
-}
-export enum deadlineOrder {
-  deadlineEarliest = 'deadlineEarliest',
-  deadlineLatest = 'deadlineLatest',
+export enum Order {
+  earliestFirst = 'earliestFirst', // 생성 순 - 빠른 순
+  latestFirst = 'latestFirst', // 생성 순 - 느린 순
+  deadlineEarliest = 'deadlineEarliest', // 마감 기한 순 - 빠른 순
+  deadlineLatest = 'deadlineLatest', // 마감 기한 순 - 느린 순
 }

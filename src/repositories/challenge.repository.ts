@@ -1,12 +1,8 @@
-import type { PrismaClient } from '@prisma/client';
+import type { MediaType, PrismaClient, Status } from '@prisma/client';
 import type { IChallengeRepository } from '#interfaces/repositories/challenge.repository.interface.js';
 import type { Challenge, CreateChallengeDTO, UpdateChallengeDTO } from '#types/challenge.types.js';
-import { deadlineOrder, submitOrder } from '#utils/constants/enum.js';
+import { Order } from '#utils/constants/enum.js';
 
-interface ChallengesResponse {
-  list: Challenge[];
-  totalCount: number;
-}
 export class ChallengeRepository implements IChallengeRepository {
   private challenge: PrismaClient['challenge'];
 
@@ -16,14 +12,70 @@ export class ChallengeRepository implements IChallengeRepository {
 
   // 이 아래로 직접 DB와 통신하는 코드를 작성합니다.
   // 여기서 DB와 통신해 받아온 데이터를 위로(service로) 올려줍니다.
-  findMany = async (options: any): Promise<ChallengesResponse | null> => {
-    const { status, mediaType, submitOrder, deadlineOrder, keyword, page, pageSize } = options;
-    const submitOrderBy =
-      submitOrder === submitOrder?.eariestFirst ? { createdAt: 'asc' } : submitOrder.latestFirst ? { createdAt: 'desc' } : {};
-    const deadlineOrderBy =
-      deadlineOrder === deadlineOrder?.eariestFirst ? { deadline: 'asc' } : deadlineOrder.latest ? { deadline: 'desc' } : {};
-    const orderBy = submitOrder ? submitOrderBy : deadlineOrder ? deadlineOrderBy : { createdAt: 'desc' };
-    const whereCondition: any = {
+  findMany = async (options: {
+    status?: Status;
+    mediaType?: MediaType;
+    order: Order;
+    keyword: string;
+    page: number;
+    pageSize: number;
+  }): Promise<Challenge[] | null> => {
+    const { status, mediaType, order, keyword, page, pageSize } = options;
+    const orderBy: {
+      deadline?: 'asc' | 'desc';
+      createdAt?: 'asc' | 'desc';
+    } =
+      order === Order.deadlineEarliest
+        ? { deadline: 'asc' }
+        : order === Order.deadlineLatest
+          ? { deadline: 'desc' }
+          : order === Order.earliestFirst
+            ? { createdAt: 'asc' }
+            : { createdAt: 'desc' };
+    const whereCondition: {
+      mediaType?: MediaType;
+      status?: Status;
+      OR?: Array<{
+        title?: { contains: string; mode: 'insensitive' };
+        description?: { contains: string; mode: 'insensitive' };
+      }>;
+    } = {
+      ...(mediaType ? { mediaType } : {}),
+      ...(status ? { status } : {}),
+      ...(keyword
+        ? {
+            OR: [
+              { title: { contains: keyword, mode: 'insensitive' } }, // title에서 키워드 검색
+              { description: { contains: keyword, mode: 'insensitive' } }, // description에서 키워드 검색
+            ],
+          }
+        : {}),
+    };
+    const challenges = await this.challenge.findMany({
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+      where: whereCondition,
+      orderBy,
+    });
+    return challenges;
+  };
+  totalCount = async (options: {
+    status?: Status;
+    mediaType?: MediaType;
+    order: Order;
+    keyword: string;
+    page: number;
+    pageSize: number;
+  }): Promise<number | null> => {
+    const { status, mediaType, keyword } = options;
+    const whereCondition: {
+      mediaType?: MediaType;
+      status?: Status;
+      OR?: Array<{
+        title?: { contains: string; mode: 'insensitive' };
+        description?: { contains: string; mode: 'insensitive' };
+      }>;
+    } = {
       ...(mediaType ? { mediaType } : {}),
       ...(status ? { status } : {}),
       ...(keyword && {
@@ -33,18 +85,9 @@ export class ChallengeRepository implements IChallengeRepository {
         ],
       }),
     };
-    const [challenges, totalCount] = await Promise.all([
-      this.challenge.findMany({
-        skip: (page - 1) * pageSize,
-        take: pageSize,
-        where: whereCondition,
-        orderBy,
-      }),
-      this.challenge.count({ where: whereCondition }),
-    ]);
-    return { list: challenges, totalCount };
+    const totalCount = await this.challenge.count({ where: whereCondition });
+    return totalCount;
   };
-
   findById = async (id: string): Promise<Challenge | null> => {
     const challenge = await this.challenge.findUnique({ where: { id } });
 
