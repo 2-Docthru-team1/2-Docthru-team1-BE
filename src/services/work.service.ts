@@ -1,6 +1,7 @@
+import type { ChallengeWork } from '@prisma/client';
 import type { IWorkService } from '#interfaces/services/work.service.interface.js';
 import type { WorkRepository } from '#repositories/work.repository.js';
-import type { ChallengeWork, CreateWorkDTO, UpdateWorkDTO } from '#types/work.types.js';
+import type { CreateWorkDTO, UpdateWorkDTO } from '#types/work.types.js';
 
 export class WorkService implements IWorkService {
   constructor(private WorkRepository: WorkRepository) {} // 이 부분에 Repository를 연결합니다.

@@ -1,4 +1,5 @@
-import type { CreateFeedbackDTO, Feedback, UpdateFeedbackDTO } from '#types/work.types.js';
+import type { Feedback } from '@prisma/client';
+import type { CreateFeedbackDTO, UpdateFeedbackDTO } from '#types/feedback.types.js';
 
 export interface IFeedbackRepository {
   findMany(options: { orderBy: string; page: number; pageSize: number }): Promise<Feedback[] | null>;

@@ -1,13 +1,8 @@
-import type { Role } from '@prisma/client';
-import type { BaseModel } from './common.types.js';
 
-export interface User extends BaseModel {
-  name: string;
-  email: string;
-  password: string;
-  salt: string;
-  refreshToken: string | null;
-  role: Role;
+import type { User as PrismaUser, Role } from '@prisma/client';
+
+export interface User extends PrismaUser {
+  accessToken?: string;
 }
 
 export interface CreateUserDTO {
