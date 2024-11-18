@@ -24,9 +24,6 @@ export class ChallengeController {
   getChallengeById = async (req: Request, res: Response): Promise<any> => {
     const { id } = req.params;
     const product = await this.challengeService.getChallengeById(id);
-    if (!product) {
-      return res.status(404).json({ message: 'Not Found' });
-    }
     res.json(product);
   };
 
