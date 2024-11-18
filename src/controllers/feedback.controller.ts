@@ -1,33 +1,24 @@
-import type { FeedbackService } from '#services/feedback.service.js';
-import MESSAGES from '#utils/constants/messages.js';
-import { CreateFeedback, PatchFeedback, Uuid } from '#utils/struct.js';
 import type { NextFunction, Request, Response } from 'express';
 import { assert } from 'superstruct';
+import type { FeedbackService } from '#services/feedback.service.js';
+import type { CreateFeedbackDTO } from '#types/feedback.types.js';
+import MESSAGES from '#utils/constants/messages.js';
+import { CreateFeedback, PatchFeedback, Uuid } from '#utils/struct.js';
 
 export class FeedbackController {
-  constructor(private FeedbackService: FeedbackService) {} // 이 부분에서 service에 연결합니다.
+  constructor(private FeedbackService: FeedbackService) {}
 
-  // 여기서 api로써 통신합니다.
-  // 요청을 받아오는 부분이자, 응답을 전달하는 부분입니다.
-  // 받아온 요청을 분해해서 service에서 요구하는 형식에 맞게 수정해줍니다.
-  // 요청의 유효성 검사는 middleware를 작성해 route단에서 하는 것이 좋습니다.
-  // 간단한 유효성 검사라면 이곳에 작성해도 됩니다.
-  // 응답의 status를 지정하고, body를 전달합니다.
-  getFeedbacks = async (
-    req: Request<{}, {}, {}, { orderBy: string; page: string; pageSize: string }>,
-    res: Response,
-    next: NextFunction,
-  ) => {
+  getFeedbacks = async (req: Request, res: Response, next: NextFunction) => {
     const { orderBy, page, pageSize } = req.query;
 
     const options: { orderBy: string; page: number; pageSize: number } = {
-      orderBy,
-      page: Number(page),
-      pageSize: Number(pageSize),
+      orderBy: orderBy as string,
+      page: Number(page) ?? 1,
+      pageSize: Number(pageSize) ?? 10,
     };
-    const Feedback = await this.FeedbackService.getFeedbacks(options);
+    const Feedbacks = await this.FeedbackService.getFeedbacks(options);
 
-    res.json(Feedback);
+    res.json(Feedbacks);
   };
 
   getFeedbackById = async (req: Request, res: Response, next: NextFunction) => {
@@ -42,7 +33,7 @@ export class FeedbackController {
   postFeedback = async (req: Request, res: Response, next: NextFunction) => {
     assert(req.body, CreateFeedback, MESSAGES.WRONG_FORMAT);
 
-    const user = await this.FeedbackService.createFeedback(req.body);
+    const user = await this.FeedbackService.createFeedback(req.body as CreateFeedbackDTO);
 
     res.json(user);
   };
