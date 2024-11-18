@@ -18,27 +18,39 @@ jobs:
     steps:
       - name: Reviewers Assigned Notification
         if: github.event_name == 'pull_request' && github.event.action == 'review_requested'
-        uses: Laurenfrost/mention-to-slack@latest
+        uses: 8398a7/action-slack@v3
         with:
-          configuration-path: .github/mention-to-slack.yml
-          repo-token: ${{ secrets.GH_TOKEN }}
-          slack-webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
-          mentioned-users: '${{ toJSON(github.event.pull_request.requested_reviewers.*.login) }}'
+          status: custom
+          custom_payload: |
+            {
+              "text": "리뷰어 할당 알림: <@${{ github.event.pull_request.requested_reviewers[0].login }}>",
+              "mention": "${{ github.event.pull_request.requested_reviewers[0].login }}"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
       - name: Review Comment Notification
         if: github.event_name == 'pull_request_review_comment'
-        uses: Laurenfrost/mention-to-slack@latest
+        uses: 8398a7/action-slack@v3
         with:
-          configuration-path: .github/mention-to-slack.yml
-          repo-token: ${{ secrets.GH_TOKEN }}
-          slack-webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
-          mentioned-users: '${{ github.event.pull_request.user.login }}'
+          status: custom
+          custom_payload: |
+            {
+              "text": "PR 코멘트 알림: <@${{ github.event.pull_request.user.login }}>",
+              "mention": "${{ github.event.pull_request.user.login }}"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
       - name: PR Synchronize Notification
         if: github.event_name == 'pull_request' && github.event.action == 'synchronize'
-        uses: Laurenfrost/mention-to-slack@latest
+        uses: 8398a7/action-slack@v3
         with:
-          configuration-path: .github/mention-to-slack.yml
-          repo-token: ${{ secrets.GH_TOKEN }}
-          slack-webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
-          mentioned-users: '${{ toJSON(github.event.pull_request.requested_reviewers.*.login) }}'
+          status: custom
+          custom_payload: |
+            {
+              "text": "PR 변경사항 알림: <@${{ github.event.pull_request.requested_reviewers[0].login }}>",
+              "mention": "${{ github.event.pull_request.requested_reviewers[0].login }}"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
