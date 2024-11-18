@@ -9,6 +9,7 @@ export const USERS = [
     name: 'Mock User',
     email: 'mockuser@example.com',
     password: 'hashed_password',
+    salt: 'fffff',
     refreshToken: '',
     role: Role.normal,
     requests: [
