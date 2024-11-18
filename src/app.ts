@@ -8,8 +8,8 @@ import validatePaginationOptions from '#middlewares/pagination.validation.js';
 import authRouter from '#routes/auth.route.js';
 import challengeRouter from '#routes/challenge.route.js';
 import feedbackRouter from '#routes/feedback.route.js';
-import requestRouter from '#routes/request.route.js';
 import userRouter from '#routes/user.route.js';
+import workRouter from '#routes/work.route.js';
 
 const app = express();
 
@@ -22,9 +22,9 @@ app.use(validatePaginationOptions);
 /*********************************************************************************** routes **********************************************************************************************/
 app.use('/auth', authRouter);
 app.use('/challenge', challengeRouter);
-app.use('/request', requestRouter);
 app.use('/user', userRouter);
 app.use('/feedback', feedbackRouter);
+app.use('/work', workRouter);
 
 /*********************************************************************************** handler **********************************************************************************************/
 app.use(errorHandler);
