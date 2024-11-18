@@ -1,12 +1,13 @@
-import errorHandler from '#middlewares/error-handler.js';
-import validatePaginationOptions from '#middlewares/pagination.validation.js';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express from 'express';
 import 'express-async-errors';
 import { port } from '#configs/common.config.js';
+import errorHandler from '#middlewares/error-handler.js';
+import validatePaginationOptions from '#middlewares/pagination.validation.js';
 import authRouter from '#routes/auth.route.js';
 import challengeRouter from '#routes/challenge.route.js';
+import feedbackRouter from '#routes/feedback.route.js';
 import requestRouter from '#routes/request.route.js';
 import userRouter from '#routes/user.route.js';
 
@@ -23,6 +24,7 @@ app.use('/auth', authRouter);
 app.use('/challenge', challengeRouter);
 app.use('/request', requestRouter);
 app.use('/user', userRouter);
+app.use('/feedback', feedbackRouter);
 
 /*********************************************************************************** handler **********************************************************************************************/
 app.use(errorHandler);
