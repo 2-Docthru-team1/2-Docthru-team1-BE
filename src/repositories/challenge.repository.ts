@@ -1,20 +1,48 @@
+import type { PrismaClient } from '@prisma/client';
 import type { IChallengeRepository } from '#interfaces/repositories/challenge.repository.interface.js';
 import type { Challenge, CreateChallengeDTO, UpdateChallengeDTO } from '#types/challenge.types.js';
-import type { PrismaClient } from '@prisma/client';
+import { deadlineOrder, submitOrder } from '#utils/constants/enum.js';
 
+interface ChallengesResponse {
+  list: Challenge[];
+  totalCount: number;
+}
 export class ChallengeRepository implements IChallengeRepository {
   private challenge: PrismaClient['challenge'];
-  
+
   constructor(client: PrismaClient) {
     this.challenge = client.challenge; // 이 부분에 각 모델(스키마)를 연결합니다.
   }
 
   // 이 아래로 직접 DB와 통신하는 코드를 작성합니다.
   // 여기서 DB와 통신해 받아온 데이터를 위로(service로) 올려줍니다.
-  findMany = async (options: { orderBy: string; page: number; pageSize: number }): Promise<Challenge[] | null> => {
-    const challenges = await this.challenge.findMany();
-
-    return challenges;
+  findMany = async (options: any): Promise<ChallengesResponse | null> => {
+    const { status, mediaType, submitOrder, deadlineOrder, keyword, page, pageSize } = options;
+    const submitOrderBy =
+      submitOrder === submitOrder?.eariestFirst ? { createdAt: 'asc' } : submitOrder.latestFirst ? { createdAt: 'desc' } : {};
+    const deadlineOrderBy =
+      deadlineOrder === deadlineOrder?.eariestFirst ? { deadline: 'asc' } : deadlineOrder.latest ? { deadline: 'desc' } : {};
+    const orderBy = submitOrder ? submitOrderBy : deadlineOrder ? deadlineOrderBy : { createdAt: 'desc' };
+    const whereCondition: any = {
+      ...(mediaType ? { mediaType } : {}),
+      ...(status ? { status } : {}),
+      ...(keyword && {
+        OR: [
+          { title: { contains: options.keyword, mode: 'insensitive' } }, // title에서 키워드 검색
+          { description: { contains: options.keyword, mode: 'insensitive' } }, // description에서 키워드 검색
+        ],
+      }),
+    };
+    const [challenges, totalCount] = await Promise.all([
+      this.challenge.findMany({
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+        where: whereCondition,
+        orderBy,
+      }),
+      this.challenge.count({ where: whereCondition }),
+    ]);
+    return { list: challenges, totalCount };
   };
 
   findById = async (id: string): Promise<Challenge | null> => {

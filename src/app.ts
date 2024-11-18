@@ -1,10 +1,10 @@
-import errorHandler from '#middlewares/error-handler.js';
-import validatePaginationOptions from '#middlewares/pagination.validation.js';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express from 'express';
 import 'express-async-errors';
 import { port } from '#configs/common.config.js';
+import errorHandler from '#middlewares/error-handler.js';
+import validatePaginationOptions from '#middlewares/pagination.validation.js';
 import authRouter from '#routes/auth.route.js';
 import challengeRouter from '#routes/challenge.route.js';
 import requestRouter from '#routes/request.route.js';
@@ -26,7 +26,6 @@ app.use('/user', userRouter);
 
 /*********************************************************************************** handler **********************************************************************************************/
 app.use(errorHandler);
-
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });

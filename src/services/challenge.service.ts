@@ -8,10 +8,9 @@ export class ChallengeService implements IChallengeService {
   // 이 아래로 데이터를 가공하는 코드를 작성합니다.
   // 비즈니스 로직, DB에서 가져온 데이터를 가공하는 코드가 주로 작성됩니다.
   // 여기서 가공된 데이터를 controller로 올려줍니다.
-  getChallenges = async (options: { orderBy: string; page: number; pageSize: number }): Promise<Challenge[] | null> => {
-    const challenges = await this.challengeRepository.findMany(options);
-
-    return challenges;
+  getChallenges = async (options: any): Promise<any | null> => {
+    const { list, totalCount } = await this.challengeRepository.findMany(options);
+    return { list, totalCount };
   };
 
   getChallengeById = async (id: string): Promise<Challenge | null> => {
