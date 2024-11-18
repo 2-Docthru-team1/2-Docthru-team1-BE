@@ -16,38 +16,25 @@ jobs:
   slack_notification:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
+
       - name: Reviewers Assigned Notification
         if: github.event_name == 'pull_request' && github.event.action == 'review_requested'
-        uses: 8398a7/action-slack@v3
-        with:
-          status: custom
-          custom_payload: |
-            {
-              "text": "리뷰어 할당 알림:\n${{ join(github.event.pull_request.requested_reviewers.*.login, ', ') }}\n\nPR 링크: ${{ github.event.pull_request.html_url }}"
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-
-      - name: Review Comment Notification
-        if: github.event_name == 'pull_request_review_comment'
-        uses: 8398a7/action-slack@v3
-        with:
-          status: custom
-          custom_payload: |
-            {
-              "text": "PR 코멘트 알림: <@${{ github.event.pull_request.user.login }}>\n\nPR 링크: ${{ github.event.pull_request.html_url }}"
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+          --data "{\"text\":\"리뷰어 할당 알림:\n${{ join(github.event.pull_request.requested_reviewers.*.login, ', ') }}\n\nPR 링크: ${{ github.event.pull_request.html_url }}\"}" \
+          ${{ secrets.SLACK_WEBHOOK_URL }}
 
       - name: PR Synchronize Notification
         if: github.event_name == 'pull_request' && github.event.action == 'synchronize'
-        uses: 8398a7/action-slack@v3
-        with:
-          status: custom
-          custom_payload: |
-            {
-              "text": "PR 변경사항 알림:\n${{ join(github.event.pull_request.requested_reviewers.*.login, ', ') }}\n\nPR 링크: ${{ github.event.pull_request.html_url }}"
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+          --data "{\"text\":\"PR 변경사항 알림:\n${{ join(github.event.pull_request.requested_reviewers.*.login, ', ') }}\n\nPR 링크: ${{ github.event.pull_request.html_url }}\"}" \
+          ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Review Comment Notification
+        if: github.event_name == 'pull_request_review_comment'
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+          --data "{\"text\":\"PR 코멘트 알림: ${{ github.event.pull_request.user.login }}\n\nPR 링크: ${{ github.event.pull_request.html_url }}\"}" \
+          ${{ secrets.SLACK_WEBHOOK_URL }}
