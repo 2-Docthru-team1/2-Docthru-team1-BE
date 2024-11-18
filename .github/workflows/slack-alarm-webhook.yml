@@ -23,13 +23,12 @@ jobs:
         run: |
           REVIEWERS=""
           for reviewer in $(echo '${{ toJson(github.event.pull_request.requested_reviewers) }}' | jq -r '.[].login'); do
-            SLACK_ID=$(grep -P "^$reviewer:" .github/mention-to-slack.yml | cut -d ':' -f2 | tr -d ' \'\\"')
-            if [ ! -z "$SLACK_ID" ]; then
-              REVIEWERS+="<@$SLACK_ID> "
-            fi
+              SLACK_ID=$(grep -P "^$reviewer:" .github/mention-to-slack.yml | cut -d ':' -f2 | tr -d ' \'\\"')
+              if [ -n "$SLACK_ID" ]; then
+                  REVIEWERS+="<@$SLACK_ID> "
+              fi
           done
           echo "mentions=$REVIEWERS" >> $GITHUB_OUTPUT
-
       - name: PR Synchronize Notification
         if: github.event_name == 'pull_request' && github.event.action == 'synchronize'
         run: |
