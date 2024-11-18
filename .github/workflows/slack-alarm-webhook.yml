@@ -23,19 +23,17 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
-          # 리뷰어 Slack ID 추출
           REVIEWERS=""
-          reviewers=$(gh pr view ${{ github.event.pull_request.number }} --json reviewers --jq '.reviewers[].login')
+          reviewers=$(gh pr view 56 --json reviewRequests --jq '.reviewRequests.[].login')
 
           for reviewer in $reviewers; do
-            SLACK_ID=$(grep -P "^$reviewer:" .github/mention-to-slack.yml | cut -d ':' -f2 | tr -d ' \'\\"')
-            if [ -n "$SLACK_ID" ]; then
-              REVIEWERS+="<@$SLACK_ID> "
-            fi
+              SLACK_ID=$(grep -P "^$reviewer:" .github/mention-to-slack.yml | cut -d ':' -f2 | tr -d ' \'\\"')
+              if [ -n "$SLACK_ID" ]; then
+                  REVIEWERS+="<@$SLACK_ID> "
+              fi
           done
 
-          # PR 작성자 Slack ID 추출
-          PR_AUTHOR=$(gh pr view ${{ github.event.pull_request.number }} --json author --jq '.author.login')
+          PR_AUTHOR=$(gh pr view 56 --json author --jq '.author.login')
           PR_AUTHOR_SLACK_ID=$(grep -P "^$PR_AUTHOR:" .github/mention-to-slack.yml | cut -d ':' -f2 | tr -d ' \'\\"')
 
           echo "reviewers_mentions=$REVIEWERS" >> $GITHUB_OUTPUT
