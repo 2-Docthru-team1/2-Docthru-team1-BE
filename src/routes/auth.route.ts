@@ -1,6 +1,8 @@
 import express from 'express';
 import authController from '#containers/auth.container.js';
 import hashPassword from '#middlewares/hashPassword.js';
+import { verifyAccessToken } from '#middlewares/jwtValidation.js';
+import HTTP_STATUS from '#utils/constants/http-status.js';
 
 export const authRouter = express.Router();
 
@@ -10,6 +12,10 @@ export const authRouter = express.Router();
 
 authRouter.post('/signUp', hashPassword, authController.signUp);
 authRouter.post('/signIn', authController.signIn);
+
+// 로그인한 사용자만 접근 가능
+// authRouter.get('/profile', verifyAccessToken, authController.getProfile);
+// authRouter.get('/settings', verifyAccessToken, authController.getSettings);
 
 // app에서 사용할 수 있도록 export 해주어야 합니다.
 export default authRouter;

@@ -1,4 +1,4 @@
-import type { NextFunction, Request, Response } from 'express';
+import type { NextFunction, Response } from 'express';
 import { assert } from 'superstruct';
 import type { AuthService } from '#services/auth.service.js';
 import type { RequestBody } from '#types/common.types.js';
@@ -22,10 +22,10 @@ export class AuthController {
     const { email, password } = req.body;
 
     // 로그인 서비스 호출 (email, password로 인증)
-    const user = await this.authService.signIn(email, password);
+    const { user, accessToken } = await this.authService.signIn(email, password);
 
     // 성공 시 사용자 정보와 JWT 토큰 반환
-    res.json(user);
+    res.json({ user, accessToken });
   };
 }
 

@@ -14,7 +14,7 @@ export class AuthService implements IAuthService {
     return user;
   };
 
-  signIn = async (email: string, password: string): Promise<{ accessToken: string }> => {
+  signIn = async (email: string, password: string): Promise<{ user: User; accessToken: string }> => {
     const user = await this.userRepository.findByEmail(email);
     if (!user) {
       throw new Error(MESSAGES.INVALID_CREDENTIALS);
@@ -25,6 +25,6 @@ export class AuthService implements IAuthService {
     }
 
     const accessToken = generateAccessToken(user);
-    return { accessToken };
+    return { user, accessToken };
   };
 }
