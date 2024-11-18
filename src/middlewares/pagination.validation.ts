@@ -5,9 +5,9 @@ export default function validatePaginationOptions(req: Request, res: Response, n
   const pageSize = req.query.pageSize;
   const limit = req.query.limit;
 
-  if (page && isNaN(Number(page))) throw new TypeError('page should be an integer');
-  if (pageSize && isNaN(Number(pageSize))) throw new TypeError('pageSize should be an integer');
-  if (limit && isNaN(Number(limit))) throw new TypeError('limit should be an integer');
+  if (page && isNaN(Number(page))) throw new TypeError('page는 정수여야 합니다');
+  if (pageSize && isNaN(Number(pageSize))) throw new TypeError('pageSize는 정수여야 합니다');
+  if (limit && isNaN(Number(limit))) throw new TypeError('limit은 정수여야 합니다');
 
   next();
 }
