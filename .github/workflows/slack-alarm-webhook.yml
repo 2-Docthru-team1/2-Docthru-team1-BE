@@ -1,10 +1,10 @@
-name: Slack Notification Workflow
+name: Slack PR Notification Workflow
 
 on:
   pull_request:
     types:
-      - synchronize
       - review_requested
+      - synchronize
   pull_request_review:
     types:
       - submitted
@@ -18,35 +18,46 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Get Slack Mentions
+      - name: Get PR Reviewers and Author Slack IDs
         id: get_mentions
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
+          # 리뷰어 Slack ID 추출
           REVIEWERS=""
-          for reviewer in $(echo '${{ toJson(github.event.pull_request.requested_reviewers) }}' | jq -r '.[].login'); do
-              SLACK_ID=$(grep -P "^$reviewer:" .github/mention-to-slack.yml | cut -d ':' -f2 | tr -d ' \'\\"')
-              if [ -n "$SLACK_ID" ]; then
-                  REVIEWERS+="<@$SLACK_ID> "
-              fi
+          reviewers=$(gh pr view ${{ github.event.pull_request.number }} --json reviewers --jq '.reviewers[].login')
+
+          for reviewer in $reviewers; do
+            SLACK_ID=$(grep -P "^$reviewer:" .github/mention-to-slack.yml | cut -d ':' -f2 | tr -d ' \'\\"')
+            if [ -n "$SLACK_ID" ]; then
+              REVIEWERS+="<@$SLACK_ID> "
+            fi
           done
-          echo "mentions=$REVIEWERS" >> $GITHUB_OUTPUT
-      - name: PR Synchronize Notification
-        if: github.event_name == 'pull_request' && github.event.action == 'synchronize'
-        run: |
-          curl -X POST -H 'Content-type: application/json' \
-          --data "{\"text\":\"PR 변경사항 알림:\n${{ steps.get_mentions.outputs.mentions }}\n\nPR 링크: ${{ github.event.pull_request.html_url }}\"}" \
-          ${{ secrets.SLACK_WEBHOOK_URL }}
+
+          # PR 작성자 Slack ID 추출
+          PR_AUTHOR=$(gh pr view ${{ github.event.pull_request.number }} --json author --jq '.author.login')
+          PR_AUTHOR_SLACK_ID=$(grep -P "^$PR_AUTHOR:" .github/mention-to-slack.yml | cut -d ':' -f2 | tr -d ' \'\\"')
+
+          echo "reviewers_mentions=$REVIEWERS" >> $GITHUB_OUTPUT
+          echo "author_mention=<@$PR_AUTHOR_SLACK_ID>" >> $GITHUB_OUTPUT
 
       - name: Reviewers Assigned Notification
         if: github.event_name == 'pull_request' && github.event.action == 'review_requested'
         run: |
           curl -X POST -H 'Content-type: application/json' \
-          --data "{\"text\":\"리뷰어 할당 알림:\n${{ steps.get_mentions.outputs.mentions }}\n\nPR 링크: ${{ github.event.pull_request.html_url }}\"}" \
+          --data "{\"text\":\"리뷰어 할당 알림:\n${{ steps.get_mentions.outputs.reviewers_mentions }}\n\nPR 링크: ${{ github.event.pull_request.html_url }}\"}" \
           ${{ secrets.SLACK_WEBHOOK_URL }}
 
-      - name: Review Comment Notification
-        if: github.event_name == 'pull_request_review_comment'
+      - name: PR Synchronize Notification
+        if: github.event_name == 'pull_request' && github.event.action == 'synchronize'
         run: |
-          AUTHOR_SLACK_ID=$(grep -P "^${{ github.event.pull_request.user.login }}:" .github/mention-to-slack.yml | cut -d ':' -f2 | tr -d ' \'\\"')
           curl -X POST -H 'Content-type: application/json' \
-          --data "{\"text\":\"PR 코멘트 알림: <@$AUTHOR_SLACK_ID>\n\nPR 링크: ${{ github.event.pull_request.html_url }}\"}" \
+          --data "{\"text\":\"PR 변경사항 알림:\n${{ steps.get_mentions.outputs.reviewers_mentions }}\n\nPR 링크: ${{ github.event.pull_request.html_url }}\"}" \
+          ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Review Submission Notification
+        if: github.event_name == 'pull_request_review' && github.event.action == 'submitted'
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+          --data "{\"text\":\"PR 리뷰 알림:\n${{ steps.get_mentions.outputs.author_mention }}\n\nPR 링크: ${{ github.event.pull_request.html_url }}\"}" \
           ${{ secrets.SLACK_WEBHOOK_URL }}
