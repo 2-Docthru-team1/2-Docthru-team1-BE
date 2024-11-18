@@ -21,7 +21,7 @@ export class ChallengeController {
   //   res.json(challenge);
   // };
 
-  getChallengeById = async (req: Request, res: Response): Promise<any> => {
+  getChallengeById = async (req: Request, res: Response) => {
     const { id } = req.params;
     const product = await this.challengeService.getChallengeById(id);
     res.json(product);
