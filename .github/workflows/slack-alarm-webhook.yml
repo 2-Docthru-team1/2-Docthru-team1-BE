@@ -23,8 +23,7 @@ jobs:
           status: custom
           custom_payload: |
             {
-              "text": "리뷰어 할당 알림: <@${{ github.event.pull_request.requested_reviewers[0].login }}>",
-              "mention": "${{ github.event.pull_request.requested_reviewers[0].login }}"
+              "text": "리뷰어 할당 알림:\n${{ join(github.event.pull_request.requested_reviewers.*.login, ', ') }}\n\nPR 링크: ${{ github.event.pull_request.html_url }}"
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
@@ -36,8 +35,7 @@ jobs:
           status: custom
           custom_payload: |
             {
-              "text": "PR 코멘트 알림: <@${{ github.event.pull_request.user.login }}>",
-              "mention": "${{ github.event.pull_request.user.login }}"
+              "text": "PR 코멘트 알림: <@${{ github.event.pull_request.user.login }}>\n\nPR 링크: ${{ github.event.pull_request.html_url }}"
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
@@ -49,8 +47,7 @@ jobs:
           status: custom
           custom_payload: |
             {
-              "text": "PR 변경사항 알림: <@${{ github.event.pull_request.requested_reviewers[0].login }}>",
-              "mention": "${{ github.event.pull_request.requested_reviewers[0].login }}"
+              "text": "PR 변경사항 알림:\n${{ join(github.event.pull_request.requested_reviewers.*.login, ', ') }}\n\nPR 링크: ${{ github.event.pull_request.html_url }}"
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
