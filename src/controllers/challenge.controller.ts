@@ -23,6 +23,7 @@ export class ChallengeController {
       deadlineOrder,
       page: Number(page),
       pageSize: Number(pageSize),
+      keyword,
     };
     const { list, totalCount } = await this.challengeService.getChallenges(options);
     res.json({ list, totalCount });
