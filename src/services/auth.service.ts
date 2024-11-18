@@ -3,6 +3,7 @@ import type { UserRepository } from '#repositories/user.repository.js';
 import type { CreateUserDTO, User } from '#types/user.types.js';
 import MESSAGES from '#utils/constants/messages.js';
 import hashingPassword from '#utils/hashingPassword.js';
+import { generateAccessToken } from '#utils/jwt.js';
 
 export class AuthService implements IAuthService {
   constructor(private userRepository: UserRepository) {}
@@ -13,7 +14,7 @@ export class AuthService implements IAuthService {
     return user;
   };
 
-  singIn = async (email: string, password: string): Promise<{ user: User; accessToken: string }> => {
+  signIn = async (email: string, password: string): Promise<{ accessToken: string }> => {
     const user = await this.userRepository.findByEmail(email);
     if (!user) {
       throw new Error(MESSAGES.INVALID_CREDENTIALS);
@@ -23,7 +24,7 @@ export class AuthService implements IAuthService {
       throw new Error(MESSAGES.INVALID_CREDENTIALS);
     }
 
-    const accessToken = generateAccessToken({ userId: user.id });
-    return { user, accessToken };
+    const accessToken = generateAccessToken(user);
+    return { accessToken };
   };
 }
