@@ -1,4 +1,4 @@
-import type { NextFunction, Response } from 'express';
+import type { NextFunction, Request, Response } from 'express';
 import { assert } from 'superstruct';
 import type { AuthService } from '#services/auth.service.js';
 import type { RequestBody } from '#types/common.types.js';
@@ -12,6 +12,17 @@ export class AuthController {
   signUp = async (req: RequestBody<CreateUserDTO>, res: Response, next: NextFunction) => {
     assert(req.body, CreateUser, MESSAGES.WRONG_FORMAT);
     const user = await this.authService.createUser(req.body);
+
+    res.json(user);
+  };
+
+  refreshToken = async (req: Request, res: Response, next: NextFunction) => {
+    const { refreshToken } = req.cookies;
+    if (refreshToken === undefined) throw new Error(MESSAGES.NO_REFRESH_TOKEN);
+    if (!req.user || !req.user.userId) throw new Error(MESSAGES.UNAUTHORIZED);
+
+    const user = await this.authService.getNewToken(req.user, refreshToken);
+    if (!user) res.status(404).json();
 
     res.json(user);
   };
