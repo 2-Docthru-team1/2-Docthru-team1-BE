@@ -4,4 +4,6 @@ export interface RequestBody<T> extends Request {
   body: T;
 }
 
-export interface IStorage {}
+export interface IStorage {
+  [key: string]: any;
+}
