@@ -1,16 +1,30 @@
 name: Slack Alarm Webhook
 
 on:
-  pull_request:
-    types: [opened]
   pull_request_review:
     types: [submitted]
-  pull_request_review_comment:
-    types: [created, edited]
 
 jobs:
+  get-reviewers:
+    runs-on: ubuntu-latest
+    outputs:
+      reviewers: ${{ steps.get-reviewers.outputs.reviewers }}
+    steps:
+      - uses: actions/github-script@v6
+        id: get-reviewers
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const reviewers = await github.rest.pulls.listRequestedReviewers({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number
+            });
+            const reviewerLogins = reviewers.data.users.map(user => `<@${user.login}>`).join(' ');
+            core.setOutput('reviewers', reviewerLogins);
+
   mention_notification:
-    name: Mention Notification
+    needs: get-reviewers
     runs-on: ubuntu-latest
     steps:
       - uses: Laurenfrost/mention-to-slack@latest
@@ -18,3 +32,4 @@ jobs:
           configuration-path: .github/mention-to-slack.yml
           repo-token: ${{ secrets.GH_TOKEN }}
           slack-webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          additional-message: '리뷰어 ${{ needs.get-reviewers.outputs.reviewers }} 멘션'
