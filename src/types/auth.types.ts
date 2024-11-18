@@ -1,4 +1,4 @@
-export interface userToken {
+export interface UserToken {
   userId: string;
   iat: number;
   exp: number;

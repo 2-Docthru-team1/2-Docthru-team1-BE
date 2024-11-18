@@ -1,7 +1,7 @@
+import type { Feedback } from '@prisma/client';
 import type { IFeedbackService } from '#interfaces/services/feedback.service.interface.js';
 import type { FeedbackRepository } from '#repositories/feedback.repository.js';
-import type { CreateFeedbackDTO, UpdateFeedbackDTO } from '#types/work.types.js';
-import type { Feedback } from '@prisma/client';
+import type { CreateFeedbackDTO, UpdateFeedbackDTO } from '#types/feedback.types.js';
 
 export class FeedbackService implements IFeedbackService {
   constructor(private FeedbackRepository: FeedbackRepository) {} // 이 부분에 Repository를 연결합니다.
