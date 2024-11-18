@@ -1,10 +1,12 @@
 import type { IAuthService } from '#interfaces/services/auth.service.interface.js';
 import type { UserRepository } from '#repositories/user.repository.js';
-import type { userToken } from '#types/auth.types.js';
+import type { UserToken } from '#types/auth.types.js';
 import type { CreateUserDTO, User } from '#types/user.types.js';
 import MESSAGES from '#utils/constants/messages.js';
 import createToken from '#utils/createToken.js';
 import filterSensitiveData from '#utils/filterSensitiveData.js';
+import hashingPassword from '#utils/hashingPassword.js';
+import { generateAccessToken } from '#utils/jwt.js';
 import remainingTime from '#utils/remainingTime.js';
 
 export class AuthService implements IAuthService {
@@ -16,7 +18,7 @@ export class AuthService implements IAuthService {
     return user;
   };
 
-  getNewToken = async (userToken: userToken, refreshToken: string) => {
+  getNewToken = async (userToken: UserToken, refreshToken: string) => {
     const user = await this.userRepository.findById(userToken.userId);
     if (!user) throw new Error(MESSAGES.BAD_REQUEST);
     if (user.refreshToken !== refreshToken) throw new Error(MESSAGES.UNAUTHORIZED);
@@ -34,5 +36,19 @@ export class AuthService implements IAuthService {
     user.accessToken = accessToken;
 
     return filterSensitiveData(user);
+  };
+
+  signIn = async (email: string, password: string): Promise<{ user: User; accessToken: string }> => {
+    const user = await this.userRepository.findByEmail(email);
+    if (!user) {
+      throw new Error(MESSAGES.INVALID_CREDENTIALS);
+    }
+    const hashedInputPassword = hashingPassword(password, user.salt);
+    if (hashedInputPassword !== user.password) {
+      throw new Error(MESSAGES.INVALID_CREDENTIALS);
+    }
+
+    const accessToken = generateAccessToken(user);
+    return { user, accessToken };
   };
 }
