@@ -1,23 +1,42 @@
-import type { NextFunction, Request, Response } from 'express';
+import type { NextFunction, Response } from 'express';
 import { assert } from 'superstruct';
 import type { AuthService } from '#services/auth.service.js';
+import type { Request } from '#types/common.types.js';
+import type { CreateUserDTO, SignInDTO } from '#types/user.types.js';
 import MESSAGES from '#utils/constants/messages.js';
-import { CreateUser } from '#utils/struct.js';
+import { CreateUser, SignIn } from '#utils/struct.js';
 
 export class AuthController {
-  constructor(private authService: AuthService) {} // 이 부분에서 service에 연결합니다.
+  constructor(private authService: AuthService) {}
 
-  // 여기서 api로써 통신합니다.
-  // 요청을 받아오는 부분이자, 응답을 전달하는 부분입니다.
-  // 받아온 요청을 분해해서 service에서 요구하는 형식에 맞게 수정해줍니다.
-  // 요청의 유효성 검사는 middleware를 작성해 route단에서 하는 것이 좋습니다.
-  // 간단한 유효성 검사라면 이곳에 작성해도 됩니다.
-  // 응답의 status를 지정하고, body를 전달합니다.
-  signUp = async (req: Request, res: Response, next: NextFunction) => {
+  signUp = async (req: Request<{ body: CreateUserDTO }>, res: Response, next: NextFunction) => {
     assert(req.body, CreateUser, MESSAGES.WRONG_FORMAT);
     const user = await this.authService.createUser(req.body);
 
     res.json(user);
+  };
+
+  refreshToken = async (req: Request, res: Response, next: NextFunction) => {
+    const { refreshToken } = req.cookies;
+    if (refreshToken === undefined) throw new Error(MESSAGES.NO_REFRESH_TOKEN);
+    if (!req.user || !req.user.userId) throw new Error(MESSAGES.UNAUTHORIZED);
+
+    const user = await this.authService.getNewToken(req.user, refreshToken);
+    if (!user) res.status(404).json();
+
+    res.json(user);
+  };
+
+  // 로그인
+  signIn = async (req: Request<{ body: SignInDTO }>, res: Response, next: NextFunction) => {
+    assert(req.body, SignIn, MESSAGES.WRONG_FORMAT);
+    const { email, password } = req.body;
+
+    // 로그인 서비스 호출 (email, password로 인증)
+    const { user, accessToken } = await this.authService.signIn(email, password);
+
+    // 성공 시 사용자 정보와 JWT 토큰 반환
+    res.json({ user, accessToken });
   };
 }
 

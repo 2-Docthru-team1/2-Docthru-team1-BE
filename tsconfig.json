@@ -7,6 +7,7 @@
       "#containers/*": ["./src/containers/*"],
       "#controllers/*": ["./src/controllers/*"],
       "#interfaces/*": ["./src/interfaces/*"],
+      "#middlewares/*": ["./src/middlewares/*"],
       "#repositories/*": ["./src/repositories/*"],
       "#routes/*": ["./src/routes/*"],
       "#services/*": ["./src/services/*"],

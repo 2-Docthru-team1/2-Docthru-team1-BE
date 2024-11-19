@@ -1,23 +1,20 @@
-import type { Request, Response } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import { ErrorMessages } from '#utils/constants/messages.js';
 import RecipeService from '#services/recipe.service.js';
 import { Category } from '#utils/constants/recipe.enum.js';
 
 class RecipeController {
-  private recipeService: RecipeService;
+  constructor(private recipeService: RecipeService) {}
 
-  constructor(recipeService: RecipeService) {
-    this.recipeService = recipeService;
-  }
-
-  async getRecipes(req: Request, res: Response) {
+  // 레시피 목록 조회
+  getRecipes = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { page = '1', limit = '10', category, sortBy = 'likes', order = 'asc' } = req.query;
 
       const pageInt = parseInt(page as string, 10);
       const limitInt = parseInt(limit as string, 10);
 
-      // 카테고리 값이 있는 경우 enum으로 변환
+      
       let categoryEnum: Category | undefined;
       if (category) {
         if (Object.values(Category).includes(category as Category)) {
@@ -27,18 +24,27 @@ class RecipeController {
         }
       }
 
-      // 서비스 호출
       const recipes = await this.recipeService.getRecipes(pageInt, limitInt, sortBy as string, order as string, categoryEnum);
       res.status(200).json(recipes);
     } catch (error) {
-      console.error(ErrorMessages.ERROR_FETCHING_RECIPES, error);
-      res.status(500).json({ message: ErrorMessages.ERROR_FETCHING_RECIPES });
+      next(error); 
     }
-  }
+  };
+
+  // 레시피 개별 조회
+  getRecipeById = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { id } = req.params;
+      const recipe = await this.recipeService.getRecipeById(id);
+      if (recipe) {
+        res.status(200).json(recipe);
+      } else {
+        res.status(404).json({ message: ErrorMessages.RECIPE_NOT_FOUND });
+      }
+    } catch (error) {
+      next(error); 
+    }
+  };
 }
 
 export default RecipeController;
-
-
-
-
