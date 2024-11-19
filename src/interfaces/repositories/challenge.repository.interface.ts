@@ -1,5 +1,5 @@
-import { MediaType, Status } from '@prisma/client';
-import type { Challenge, CreateChallengeDTO, UpdateChallengeDTO } from '#types/challenge.types.js';
+import type { Challenge, MediaType, Status } from '@prisma/client';
+import type { CreateChallengeDTO, UpdateChallengeDTO } from '#types/challenge.types.js';
 import { Order } from '#utils/constants/enum.js';
 
 export interface IChallengeRepository {
@@ -18,8 +18,9 @@ export interface IChallengeRepository {
     page: number;
     pageSize: number;
   }): Promise<number | null>;
+
   findById(id: string): Promise<Challenge | null>;
-  create(userData: CreateChallengeDTO): Promise<Challenge>;
-  update(id: string, userData: UpdateChallengeDTO): Promise<Challenge>;
-  delete(id: string): Promise<Challenge>;
+  // create(userData: CreateChallengeDTO): Promise<Challenge>;
+  // update(id: string, userData: UpdateChallengeDTO): Promise<Challenge>;
+  // delete(id: string): Promise<Challenge>;
 }

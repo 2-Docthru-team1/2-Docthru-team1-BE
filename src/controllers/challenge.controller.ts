@@ -1,6 +1,5 @@
 import type { MediaType, Status } from '@prisma/client';
 import type { NextFunction, Request, Response } from 'express';
-import { assert } from 'superstruct';
 import type { ChallengeService } from '#services/challenge.service.js';
 import { Order } from '#utils/constants/enum.js';
 import MESSAGES from '#utils/constants/messages.js';
@@ -15,6 +14,7 @@ interface GetChallengesQuery {
   pageSize?: string; // 마찬가지로 문자열
   isHidden?: string; // 'true' 또는 'false' 문자열로 받아올 수 있습니다.
 }
+
 export class ChallengeController {
   constructor(private challengeService: ChallengeService) {} // 이 부분에서 service에 연결합니다.
 
@@ -41,45 +41,34 @@ export class ChallengeController {
     res.json({ list, totalCount });
   };
 
-  getChallengeById = async (req: Request, res: Response, next: NextFunction) => {
+  getChallengeById = async (req: Request, res: Response) => {
     const { id } = req.params;
-    assert(id, Uuid, MESSAGES.WRONG_ID_FORMAT);
-
-    const challenge = await this.challengeService.getChallengeById(id);
-
-    res.json(challenge);
+    const product = await this.challengeService.getChallengeById(id);
+    res.json(product);
   };
 
-  postChallenge = async (req: Request, res: Response, next: NextFunction) => {
-    assert(req.body, CreateChallenge, MESSAGES.WRONG_FORMAT);
+  // postChallenge = async (req: Request, res: Response, next: NextFunction) => {
+  //   assert(req.body, CreateChallenge, MESSAGES.WRONG_FORMAT);
 
-    const user = await this.challengeService.createChallenge(req.body);
+  //   const user = await this.challengeService.createChallenge(req.body);
 
-    res.json(user);
-  };
+  //   res.json(user);
+  // };
 
-  patchChallenge = async (req: Request, res: Response, next: NextFunction) => {
-    const { id } = req.params;
-    assert(req.body, PatchChallenge, MESSAGES.WRONG_FORMAT);
+  // patchChallenge = async (req: Request, res: Response, next: NextFunction) => {
+  //   const { id } = req.params;
+  //   assert(req.body, PatchChallenge, MESSAGES.WRONG_FORMAT);
 
-    const user = await this.challengeService.updateChallenge(id, req.body);
+  //   const user = await this.challengeService.updateChallenge(id, req.body);
 
-    res.json(user);
-  };
+  //   res.json(user);
+  // };
 
-  deleteChallege = async (req: Request, res: Response, next: NextFunction) => {
-    const { id } = req.params;
+  //   deleteChallenge = async (req: Request, res: Response, next: NextFunction) => {
+  //     const { id } = req.params;
 
-    const user = await this.challengeService.deleteChallenge(id);
+  //     const user = await this.challengeService.deleteChallenge(id);
 
-    res.json(user);
-  };
+  //     res.json(user);
+  //   };
 }
-
-// 챌린지, 작업물 등 관련된 것들
-
-// Challenge, Work, Feedback WorkImage
-// 경호님
-// 태연님
-
-// User팀이 도와줌

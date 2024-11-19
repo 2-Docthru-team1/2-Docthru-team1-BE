@@ -1,3 +1,4 @@
+
 import type { User as PrismaUser, Role } from '@prisma/client';
 
 export interface User extends PrismaUser {
