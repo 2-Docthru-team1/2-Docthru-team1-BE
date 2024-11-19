@@ -74,3 +74,14 @@ jobs:
             -H "Authorization: token ${{ secrets.TEAM_ACCESS_TOKEN }}" \
             -H "Accept: application/vnd.github.v3+json" \
             -d "$assignee_payload"
+
+  trigger-next:
+    runs-on: ubuntu-latest
+    needs: assign_reviewers_and_author
+    steps:
+      - name: Trigger Slack Alarm
+        run: |
+          curl -X POST -H "Authorization: token ${{ secrets.GH_TOKEN }}" \
+          -H "Accept: application/vnd.github.v3+json" \
+          https://api.github.com/repos/${{ github.repository }}/dispatches \
+          -d '{"event_type":"slack-alarm-trigger"}'

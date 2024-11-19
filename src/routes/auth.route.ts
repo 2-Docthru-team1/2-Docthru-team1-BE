@@ -1,7 +1,10 @@
-import express from 'express';
+import { PrismaClient } from '@prisma/client';
+import express, { type NextFunction, type Response } from 'express';
 import authController from '#containers/auth.container.js';
 import hashPassword from '#middlewares/hashPassword.js';
 import { verifyRefreshToken } from '#middlewares/verifyTokens.js';
+import type { Request } from '#types/common.types.js';
+import createToken from '#utils/createToken.js';
 
 export const authRouter = express.Router();
 
@@ -10,7 +13,7 @@ export const authRouter = express.Router();
 // app.method로 입력하지 않도록 주의해주세요. router.method입니다.
 
 authRouter.post('/signUp', hashPassword, authController.signUp);
-authRouter.post('/signIn', authController.signIn);
+// authRouter.post('/signIn', authController.signIn);
 
 // 로그인한 사용자만 접근 가능
 // authRouter.get('/profile', verifyAccessToken, authController.getProfile);
@@ -19,15 +22,15 @@ authRouter.post('/signIn', authController.signIn);
 authRouter.post('/refresh', verifyRefreshToken, authController.refreshToken);
 
 /*********************************************************************************** test **********************************************************************************************/
-// authRouter.get('/test/createToken', async (req: Request, res: Response, next: NextFunction) => {
-//   const prisma = new PrismaClient();
+authRouter.get('/test/createToken', async (req: Request, res: Response, next: NextFunction) => {
+  const prisma = new PrismaClient();
 
-//   const [user] = await prisma.user.findMany({ take: 1 });
-//   const refreshToken = createToken(user, 'refresh');
-//   const accessToken = createToken(user, 'access');
+  const [user] = await prisma.user.findMany({ take: 1 });
+  const refreshToken = createToken(user, 'refresh');
+  const accessToken = createToken(user, 'access');
 
-//   res.json({ refreshToken, accessToken });
-// });
+  res.json({ id: user.id, refreshToken, accessToken });
+});
 
 // app에서 사용할 수 있도록 export 해주어야 합니다.
 export default authRouter;
