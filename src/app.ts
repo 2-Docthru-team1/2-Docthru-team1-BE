@@ -26,6 +26,10 @@ app.use('/user', userRouter);
 app.use('/feedback', feedbackRouter);
 app.use('/work', workRouter);
 
+app.get('/hello', (req, res) => {
+  res.send('Hello World');
+});
+
 /*********************************************************************************** handler **********************************************************************************************/
 app.use(errorHandler);
 app.listen(port, () => {
