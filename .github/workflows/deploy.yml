@@ -45,6 +45,6 @@ jobs:
               authbind --deep pm2 reload "HanCook" --update-env
             else
               authbind --deep pm2 start dist/src/app.js --name "HanCook" --update-env
-            fi 
+            fi
 
             pm2 status
