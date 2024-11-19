@@ -8,13 +8,51 @@ on:
   pull_request_review_comment:
     types: [created, edited]
 
+# jobs:
+#   mention_notification:
+#     name: Mention Notification
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: Laurenfrost/mention-to-slack@latest
+#         with:
+#           configuration-path: .github/mention-to-slack.yml
+#           repo-token: ${{ secrets.GH_TOKEN }}
+#           slack-webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
 jobs:
   mention_notification:
     name: Mention Notification
     runs-on: ubuntu-latest
     steps:
-      - uses: Laurenfrost/mention-to-slack@latest
+      - uses: actions/checkout@v4
+      - uses: actions/github-script@v6
         with:
-          configuration-path: .github/mention-to-slack.yml
-          repo-token: ${{ secrets.GH_TOKEN }}
-          slack-webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          script: |
+            const yaml = require('yaml');
+            const fs = require('fs');
+
+            // 매핑 파일 읽기
+            const mappingFile = fs.readFileSync('.github/mention-to-slack.yml', 'utf8');
+            const mapping = yaml.parse(mappingFile);
+
+            // PR 정보 가져오기
+            const reviewers = context.payload.pull_request.requested_reviewers
+              .map(r => mapping[r.login] || r.login)
+              .map(id => id.startsWith('<@') ? id : `<@${id}>`)
+              .join(', ');
+
+            const prUrl = context.payload.pull_request.html_url;
+            const prTitle = context.payload.pull_request.title;
+            const sender = context.payload.sender.login;
+
+            const message = {
+              text: `*PR 알림*\n>제목: ${prTitle}\n>작성자: ${sender}\n>리뷰어: ${reviewers}\n>${prUrl}`
+            };
+
+            await fetch(process.env.SLACK_WEBHOOK_URL, {
+              method: 'POST',
+              headers: {'Content-Type': 'application/json'},
+              body: JSON.stringify(message)
+            });
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
