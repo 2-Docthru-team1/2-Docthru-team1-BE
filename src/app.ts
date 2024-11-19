@@ -1,4 +1,5 @@
-import express, { type Request, type Response } from 'express';
+
+import express, { type Request, type Response, type NextFunction } from 'express';
 import 'express-async-errors';
 import { port } from '#configs/common.config.js';
 import authRouter from '#routes/auth.route.js';
@@ -22,6 +23,11 @@ app.use('/recipes', recipeRouter);
 
 app.get('/', (req: Request, res: Response) => {
   res.json({ message: 'Hello, TypeScript with Express!' });
+});
+
+app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
+  console.error('Error:', error.message);
+  res.status(500).json({ message: '서버 에러가 발생했습니다.' });
 });
 
 app.listen(port, () => {
