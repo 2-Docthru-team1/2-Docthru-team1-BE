@@ -3,7 +3,7 @@ name: Deploy to EC2
 on:
   push:
     branches:
-      - dev
+      - main
 
 jobs:
   deploy:
@@ -28,15 +28,14 @@ jobs:
           port: 22
           script: |
             cd ~/2-Docthru-team1-BE
-            git fetch origin dev
-            git reset --hard origin/dev
+            git fetch origin main
+            git reset --hard origin/main
 
             # 환경 변수 파일 로드
             source /etc/profile.d/HanCook-env.sh
 
             npm install
-            # npx prisma migrate dev
-            export DATABASE_URL="$DATABASE_URL" && npx prisma migrate dev
+            export DATABASE_URL="$DATABASE_URL" && npx prisma migrate production
             npx tsc
 
             # 기존 프로세스가 있으면 재시작, 없으면 새로 시작
