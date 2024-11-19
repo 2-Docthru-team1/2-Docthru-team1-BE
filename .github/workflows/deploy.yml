@@ -21,7 +21,7 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           port: 22
           script: |
-            cd ~/HanCook
+            cd ~/2-Docthru-team1-BE
             git pull origin dev
             npm install
             npx tsc
