@@ -1,19 +1,42 @@
-import type { Feedback, PrismaClient } from '@prisma/client';
+import { type Feedback, Prisma, type PrismaClient } from '@prisma/client';
 import type { IFeedbackRepository } from '#interfaces/repositories/feedback.repository.interface.js';
 import type { CreateFeedbackDTO, UpdateFeedbackDTO } from '#types/feedback.types.js';
 
 export class FeedbackRepository implements IFeedbackRepository {
   constructor(private feedback: PrismaClient['feedback']) {}
 
-  // 이 아래로 직접 DB와 통신하는 코드를 작성합니다.
-  // 여기서 DB와 통신해 받아온 데이터를 위로(service로) 올려줍니다.
+  getCount = async (): Promise<number> => {
+    const count = await this.feedback.count();
+
+    return count;
+  };
+
   findMany = async (options: { orderBy: string; page: number; pageSize: number }): Promise<Feedback[] | null> => {
-    const feedbacks = await this.feedback.findMany();
+    const { orderBy, page, pageSize } = options;
+
+    let orderOptions;
+    switch (orderBy) {
+      case 'latest':
+      default:
+        // NOTE orderBy는 Prisma SortOrder 타입을 사용해야 함
+        orderOptions = { createdAt: Prisma.SortOrder.desc };
+    }
+
+    const feedbacks = await this.feedback.findMany({ orderBy: orderOptions, skip: (page - 1) * pageSize, take: pageSize });
 
     return feedbacks;
   };
 
   findById = async (id: string): Promise<Feedback | null> => {
+    return {
+      id,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      deleteAt: null,
+      content: '',
+      ownerId: null,
+      workId: '',
+    };
     const feedback = await this.feedback.findUnique({ where: { id } });
 
     return feedback;

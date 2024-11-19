@@ -1,10 +1,10 @@
-import type { NextFunction, Response } from 'express';
+import type { NextFunction, Request, Response } from 'express';
 import { assert } from 'superstruct';
 import type { AuthService } from '#services/auth.service.js';
 import type { RequestBody } from '#types/common.types.js';
-import type { CreateUserDTO } from '#types/user.types.js';
+import type { CreateUserDTO, SignInDTO } from '#types/user.types.js';
 import MESSAGES from '#utils/constants/messages.js';
-import { CreateUser } from '#utils/struct.js';
+import { CreateUser, SignIn } from '#utils/struct.js';
 
 export class AuthController {
   constructor(private authService: AuthService) {}
@@ -14,6 +14,29 @@ export class AuthController {
     const user = await this.authService.createUser(req.body);
 
     res.json(user);
+  };
+
+  refreshToken = async (req: Request, res: Response, next: NextFunction) => {
+    const { refreshToken } = req.cookies;
+    if (refreshToken === undefined) throw new Error(MESSAGES.NO_REFRESH_TOKEN);
+    if (!req.user || !req.user.userId) throw new Error(MESSAGES.UNAUTHORIZED);
+
+    const user = await this.authService.getNewToken(req.user, refreshToken);
+    if (!user) res.status(404).json();
+
+    res.json(user);
+  };
+
+  // 로그인
+  signIn = async (req: RequestBody<SignInDTO>, res: Response, next: NextFunction) => {
+    assert(req.body, SignIn, MESSAGES.WRONG_FORMAT);
+    const { email, password } = req.body;
+
+    // 로그인 서비스 호출 (email, password로 인증)
+    const { user, accessToken } = await this.authService.signIn(email, password);
+
+    // 성공 시 사용자 정보와 JWT 토큰 반환
+    res.json({ user, accessToken });
   };
 }
 

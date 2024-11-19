@@ -32,7 +32,7 @@ model User {
   participation Challenge[]     @relation(name: "participation")
   ownWorks      ChallengeWork[] @relation(name: "ownership")
   likeWorks     ChallengeWork[] @relation(name: "likeRelation")
-  Feedback      Feedback[]
+  feedbacks     Feedback[]
   abortReasons  AbortReason[] // 관리자 유저에 한함
   Challenge     Challenge[]
 }
@@ -49,9 +49,9 @@ model Challenge {
   deadline    DateTime
   isHidden    Boolean
 
+  embedUrl  String
   imageUrl  String
   imageUrl2 String?
-  embedUrl  String
   mediaType MediaType
 
   requestUser   User?           @relation(name: "requests", fields: [requestUserId], references: [id], onDelete: SetNull)
@@ -75,7 +75,7 @@ model ChallengeWork {
 
   images    WorkImage[]
   likeUsers User[]      @relation(name: "likeRelation")
-  Feedback  Feedback[]
+  feedbacks Feedback[]
 
   owner       User?     @relation(name: "ownership", fields: [ownerId], references: [id], onDelete: SetNull)
   ownerId     String?
@@ -163,15 +163,15 @@ enum Status {
 }
 
 enum MediaType {
-  Youtube
-  Blog
-  RecipeWeb
-  SocialMedia
+  youtube
+  blog
+  recipeWeb
+  socialMedia
 }
 
 enum Category {
   Traditional
-  SchoolFood
+  Bunsik
   Noodle
   BanChan
   Dessert
