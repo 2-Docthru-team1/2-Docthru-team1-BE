@@ -1,6 +1,6 @@
 import type { Challenge, MediaType, PrismaClient, Status } from '@prisma/client';
 import type { IChallengeRepository } from '#interfaces/repositories/challenge.repository.interface.js';
-import type { CreateChallengeDTO, UpdateChallengeDTO, getChallengesOptions  } from '#types/challenge.types.js';
+import type { CreateChallengeDTO, UpdateChallengeDTO, getChallengesOptions } from '#types/challenge.types.js';
 import { Order } from '#utils/constants/enum.js';
 import prismaClient from '../connection/postgres.connection.js';
 
@@ -87,21 +87,21 @@ export class ChallengeRepository implements IChallengeRepository {
     return await prismaClient.challenge.findUnique({ where: { id } });
   };
 
-  create = async (data: CreateChallengeDTO): Promise<Challenge> => {
-    const challenge = await this.challenge.create({ data });
+  // create = async (data: CreateChallengeDTO): Promise<Challenge> => {
+  //   const challenge = await this.challenge.create({ data });
 
-    return challenge;
-  };
+  //   return challenge;
+  // };
 
-  update = async (id: string, data: UpdateChallengeDTO): Promise<Challenge> => {
-    const challenge = await this.challenge.update({ where: { id }, data });
+  // update = async (id: string, data: UpdateChallengeDTO): Promise<Challenge> => {
+  //   const challenge = await this.challenge.update({ where: { id }, data });
 
-    return challenge;
-  };
+  //   return challenge;
+  // };
 
-  delete = async (id: string): Promise<Challenge> => {
-    const challenge = await this.challenge.delete({ where: { id } });
+  // delete = async (id: string): Promise<Challenge> => {
+  //   const challenge = await this.challenge.delete({ where: { id } });
 
-    return challenge;
-  };
+  //   return challenge;
+  // };
 }

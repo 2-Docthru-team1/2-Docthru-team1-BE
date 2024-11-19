@@ -1,8 +1,7 @@
-import type { Challenge, MediaType, Status } from '@prisma/client';
+import type { Challenge } from '@prisma/client';
 import type { IChallengeService } from '#interfaces/services/challenge.service.interface.js';
 import type { ChallengeRepository } from '#repositories/challenge.repository.js';
 import type { CreateChallengeDTO, UpdateChallengeDTO, getChallengesOptions } from '#types/challenge.types.js';
-import { Order } from '#utils/constants/enum.js';
 
 export class ChallengeService implements IChallengeService {
   constructor(private challengeRepository: ChallengeRepository) {} // 이 부분에 Repository를 연결합니다.
@@ -21,20 +20,20 @@ export class ChallengeService implements IChallengeService {
     return await this.challengeRepository.findById(id);
   };
 
-  createChallenge = async (challengeData: CreateChallengeDTO): Promise<Challenge> => {
-    const challenge = await this.challengeRepository.create(challengeData);
+  // createChallenge = async (challengeData: CreateChallengeDTO): Promise<Challenge> => {
+  //   const challenge = await this.challengeRepository.create(challengeData);
 
-    return challenge;
-  };
+  //   return challenge;
+  // };
 
-  updateChallenge = async (id: string, challengeData: UpdateChallengeDTO): Promise<Challenge> => {
-    const challenge = await this.challengeRepository.update(id, challengeData);
-    return challenge;
-  };
+  // updateChallenge = async (id: string, challengeData: UpdateChallengeDTO): Promise<Challenge> => {
+  //   const challenge = await this.challengeRepository.update(id, challengeData);
+  //   return challenge;
+  // };
 
-  deleteChallenge = async (id: string): Promise<Challenge> => {
-    const challenge = await this.challengeRepository.delete(id);
+  // deleteChallenge = async (id: string): Promise<Challenge> => {
+  //   const challenge = await this.challengeRepository.delete(id);
 
-    return challenge;
-  };
+  //   return challenge;
+  // };
 }

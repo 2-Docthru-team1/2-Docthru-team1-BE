@@ -1,7 +1,6 @@
 import type { Status } from '@prisma/client';
 import { MediaType } from '@prisma/client';
 import { Order } from '#utils/constants/enum.js';
-import type { BaseModel } from './common.types.js';
 
 export interface CreateChallengeDTO {
   title: string;

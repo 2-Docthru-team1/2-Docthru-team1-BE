@@ -47,28 +47,28 @@ export class ChallengeController {
     res.json(product);
   };
 
-  postChallenge = async (req: Request, res: Response, next: NextFunction) => {
-    assert(req.body, CreateChallenge, MESSAGES.WRONG_FORMAT);
+  // postChallenge = async (req: Request, res: Response, next: NextFunction) => {
+  //   assert(req.body, CreateChallenge, MESSAGES.WRONG_FORMAT);
 
-    const user = await this.challengeService.createChallenge(req.body);
+  //   const user = await this.challengeService.createChallenge(req.body);
 
-    res.json(user);
-  };
+  //   res.json(user);
+  // };
 
-  patchChallenge = async (req: Request, res: Response, next: NextFunction) => {
-    const { id } = req.params;
-    assert(req.body, PatchChallenge, MESSAGES.WRONG_FORMAT);
+  // patchChallenge = async (req: Request, res: Response, next: NextFunction) => {
+  //   const { id } = req.params;
+  //   assert(req.body, PatchChallenge, MESSAGES.WRONG_FORMAT);
 
-    const user = await this.challengeService.updateChallenge(id, req.body);
+  //   const user = await this.challengeService.updateChallenge(id, req.body);
 
-    res.json(user);
-  };
+  //   res.json(user);
+  // };
 
-    deleteChallenge = async (req: Request, res: Response, next: NextFunction) => {
-      const { id } = req.params;
+  //   deleteChallenge = async (req: Request, res: Response, next: NextFunction) => {
+  //     const { id } = req.params;
 
-      const user = await this.challengeService.deleteChallenge(id);
+  //     const user = await this.challengeService.deleteChallenge(id);
 
-      res.json(user);
-    };
+  //     res.json(user);
+  //   };
 }
