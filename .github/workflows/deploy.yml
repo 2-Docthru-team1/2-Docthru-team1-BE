@@ -35,9 +35,5 @@ jobs:
             npx prisma migrate dev
             npx tsc
 
-            # GitHub Secrets에서 환경변수 설정
-            export DATABASE_URL='${{ secrets.DATABASE_URL }}'
-            export JWT_SECRET='${{ secrets.JWT_SECRET }}'
-
             authbind --deep pm2 reload HanCook || authbind --deep pm2 start dist/src/app.js --name "HanCook"
             pm2 status
