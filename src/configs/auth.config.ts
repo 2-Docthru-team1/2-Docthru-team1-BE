@@ -3,3 +3,5 @@ if (!process.env.JWT_SECRET) {
 }
 
 export const jwtSecret = process.env.JWT_SECRET;
+export const jwtAccessExpiration = process.env.JWT_ACCESS_EXPIRATION || '1h';
+export const jwtRefreshExpiration = process.env.JWT_REFRESH_EXPIRATION || '2w';

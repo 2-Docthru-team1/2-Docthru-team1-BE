@@ -6,11 +6,26 @@ import MESSAGES from '#utils/constants/messages.js';
 import createToken from '#utils/createToken.js';
 import filterSensitiveData from '#utils/filterSensitiveData.js';
 import hashingPassword from '#utils/hashingPassword.js';
-import { generateAccessToken } from '#utils/jwt.js';
+// import { generateAccessToken } from '#utils/jwt.js';
 import remainingTime from '#utils/remainingTime.js';
 
 export class AuthService implements IAuthService {
   constructor(private userRepository: UserRepository) {}
+
+  signIn = async (email: string, password: string): Promise<User> => {
+    const user = await this.userRepository.findByEmail(email);
+    if (!user) {
+      throw new Error(MESSAGES.INVALID_CREDENTIALS);
+    }
+    const hashedInputPassword = hashingPassword(password, user.salt);
+    if (hashedInputPassword !== user.password) {
+      throw new Error(MESSAGES.INVALID_CREDENTIALS);
+    }
+
+    // const accessToken = generateAccessToken(user);
+    // user.accessToken = accessToken;
+    return user;
+  };
 
   createUser = async (data: CreateUserDTO): Promise<User> => {
     const user = await this.userRepository.create(data);
@@ -20,8 +35,12 @@ export class AuthService implements IAuthService {
 
   getNewToken = async (userToken: UserToken, refreshToken: string) => {
     const user = await this.userRepository.findById(userToken.userId);
-    if (!user) throw new Error(MESSAGES.BAD_REQUEST);
-    if (user.refreshToken !== refreshToken) throw new Error(MESSAGES.UNAUTHORIZED);
+    if (!user) {
+      throw new Error(MESSAGES.BAD_REQUEST);
+    }
+    if (user.refreshToken !== refreshToken) {
+      throw new Error(MESSAGES.UNAUTHORIZED);
+    }
 
     // NOTE 리프레시 토큰의 남은 시간이 2시간 이내일경우
     const timeRemaining = remainingTime(userToken.exp);
@@ -36,19 +55,5 @@ export class AuthService implements IAuthService {
     user.accessToken = accessToken;
 
     return filterSensitiveData(user);
-  };
-
-  signIn = async (email: string, password: string): Promise<{ user: User; accessToken: string }> => {
-    const user = await this.userRepository.findByEmail(email);
-    if (!user) {
-      throw new Error(MESSAGES.INVALID_CREDENTIALS);
-    }
-    const hashedInputPassword = hashingPassword(password, user.salt);
-    if (hashedInputPassword !== user.password) {
-      throw new Error(MESSAGES.INVALID_CREDENTIALS);
-    }
-
-    const accessToken = generateAccessToken(user);
-    return { user, accessToken };
   };
 }
