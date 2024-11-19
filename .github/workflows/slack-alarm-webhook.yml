@@ -2,7 +2,7 @@ name: Slack Alarm Webhook
 
 on:
   pull_request:
-    types: [review_requested, synchronize]
+    types: [synchronize]
   pull_request_review:
     types: [submitted]
   pull_request_review_comment:
@@ -32,11 +32,60 @@ jobs:
           echo "$MAPPING" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
+      - name: Download previous notification history
+        continue-on-error: true
+        uses: actions/download-artifact@v3
+        with:
+          name: notification-history
+          path: ./history
+
       - uses: actions/github-script@v6
         with:
           script: |
             const yaml = require('yaml');
             const fs = require('fs');
+
+            // 알림 히스토리 로드
+            let notificationHistory = {};
+            try {
+              if (fs.existsSync('./history/notifications.json')) {
+                notificationHistory = JSON.parse(fs.readFileSync('./history/notifications.json', 'utf8'));
+              }
+            } catch (error) {
+              console.log('No previous notification history found');
+            }
+
+            // 현재 이벤트의 키 생성
+            const prNumber = context.payload.pull_request?.number || context.payload.client_payload?.pr_url;
+            const eventType = context.eventName;
+            const eventKey = `${eventType}-${prNumber}`;
+            const currentTime = Date.now();
+
+            // 3분(180000ms) 이내에 동일한 알림이 있었는지 확인
+            if (notificationHistory[eventKey] && 
+                (currentTime - notificationHistory[eventKey]) < 180000) {
+              console.log(`Skipping notification for ${eventKey} - Last notification was sent less than 3 minutes ago`);
+              return;
+            }
+
+
+            // 알림 타입 결정
+            let alarmType = '';
+            let headerText = '';
+
+            if (context.eventName === 'repository_dispatch') {
+              alarmType = '🎯 새로운 PR 리뷰 요청';
+              headerText = '리뷰어가 선정되었습니다';
+            } else if (context.eventName === 'pull_request' && context.payload.action === 'synchronize') {
+              alarmType = '🔄 PR 업데이트';
+              headerText = '새로운 커밋이 푸시되었습니다';
+            } else if (context.eventName === 'pull_request_review') {
+              alarmType = '✍️ 새로운 리뷰';
+              headerText = '새로운 리뷰가 등록되었습니다';
+            } else if (context.eventName === 'pull_request_review_comment') {
+              alarmType = '💬 새로운 리뷰 코멘트';
+              headerText = '새로운 리뷰 코멘트가 작성되었습니다';
+            }
 
             // PR 작성자의 댓글인 경우 스킵
             if (context.eventName === 'pull_request_review_comment') {
@@ -66,7 +115,7 @@ jobs:
               prTitle = context.payload.pull_request.title;
               prUrl = context.payload.pull_request.html_url;
               
-              // 리뷰어 목록 가져오기
+              // 리뷰어 목록 가져오기 (pending 상태 체크 제거)
               const { data: reviewData } = await github.rest.pulls.listRequestedReviewers({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
@@ -90,8 +139,15 @@ jobs:
                   type: "header",
                   text: {
                     type: "plain_text",
-                    text: "🔍 새로운 PR 리뷰 요청",
+                    text: alarmType,
                     emoji: true
+                  }
+                },
+                {
+                  type: "section",
+                  text: {
+                    type: "mrkdwn",
+                    text: `*${headerText}*`
                   }
                 },
                 {
@@ -126,11 +182,35 @@ jobs:
               ]
             };
 
+            // Slack에 메시지 전송
             await fetch(process.env.SLACK_WEBHOOK_URL, {
               method: 'POST',
               headers: {'Content-Type': 'application/json'},
               body: JSON.stringify(message)
             });
+
+            // 알림 히스토리 업데이트
+            notificationHistory[eventKey] = currentTime;
+
+            // 3분이 지난 이벤트들은 제거
+            for (const key in notificationHistory) {
+              if (currentTime - notificationHistory[key] > 180000) {
+                delete notificationHistory[key];
+              }
+            }
+
+            // 히스토리 저장
+            if (!fs.existsSync('./history')) {
+              fs.mkdirSync('./history');
+            }
+            fs.writeFileSync('./history/notifications.json', JSON.stringify(notificationHistory));
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+
+      - name: Upload notification history
+        uses: actions/upload-artifact@v3
+        with:
+          name: notification-history
+          path: ./history/notifications.json
+          retention-days: 1
