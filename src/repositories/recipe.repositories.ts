@@ -1,38 +1,39 @@
-import prismaClient from '#connection/postgres.connection.js';
-import { Category } from '#utils/constants/recipe.enum.js';
 import type { PrismaClient } from '@prisma/client';
 
 class RecipeRepository {
-  private prisma: PrismaClient;
+  private recipe; // Prisma의 recipe 모델을 명확히 선언합니다.
 
-  // 생성자에서 prismaClient를 받아옴
   constructor(prisma: PrismaClient) {
-    this.prisma = prisma;
+    this.recipe = prisma.recipe;  // Prisma Client의 recipe 모델을 직접 할당합니다.
   }
 
-  async getRecipes(skip: number, limit: number, sortBy: string, order: string, category?: Category) {
-    return await this.prisma.recipe.findMany({
+  async getRecipes(skip: number, take: number, sortBy: string, order: string, category?: string) {
+    return await this.recipe.findMany({
       skip,
-      take: limit,
-      where: category ? { category } : undefined,
+      take,
       orderBy: {
         [sortBy]: order,
       },
+      where: category ? { category } : {},
     });
   }
 
   async getRecipeById(id: string) {
-    return await this.prisma.recipe.findUnique({
+    return await this.recipe.findUnique({
       where: { id },
     });
   }
 
-  async getTotalCount() {
-    return await this.prisma.recipe.count();
+  async getTotalCount(category?: string) {
+    return await this.recipe.count({
+      where: category ? { category } : {},
+    });
   }
 }
 
 export default RecipeRepository;
+
+
 
 
 
