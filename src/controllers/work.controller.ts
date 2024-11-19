@@ -42,18 +42,18 @@ export class WorkController {
   postWork = async (req: Request, res: Response, next: NextFunction) => {
     assert(req.body, CreateWork, MESSAGES.WRONG_FORMAT);
 
-    const user = await this.WorkService.createWork(req.body);
+    // const user = await this.WorkService.createWork(req.body);
 
-    res.json(user);
+    // res.json(user);
   };
 
   patchWork = async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
     assert(req.body, PatchWork, MESSAGES.WRONG_FORMAT);
 
-    const user = await this.WorkService.updateWork(id, req.body);
+    // const user = await this.WorkService.updateWork(id, req.body);
 
-    res.json(user);
+    // res.json(user);
   };
 
   deleteChallege = async (req: Request, res: Response, next: NextFunction) => {
