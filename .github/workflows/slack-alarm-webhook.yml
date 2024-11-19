@@ -8,88 +8,123 @@ on:
   pull_request_review_comment:
     types: [created]
   repository_dispatch:
-    types:
-      - slack-alarm-trigger
+    types: [pr_review_request]
 jobs:
   mention_notification:
     name: Mention Notification
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '16'
+
       - name: Install dependencies
         run: npm install yaml
+
+      - name: Read Slack mapping
+        id: slack-mapping
+        run: |
+          MAPPING=$(cat .github/mention-to-slack.yml)
+          echo "mapping<<EOF" >> $GITHUB_OUTPUT
+          echo "$MAPPING" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
       - uses: actions/github-script@v6
         with:
           script: |
             const yaml = require('yaml');
             const fs = require('fs');
 
-            // 매핑 파일 읽기
+            // PR 작성자의 댓글인 경우 스킵
+            if (context.eventName === 'pull_request_review_comment') {
+              const commentAuthor = context.payload.comment.user.login;
+              const prAuthor = context.payload.pull_request.user.login;
+              if (commentAuthor === prAuthor) {
+                console.log('PR 작성자의 댓글이므로 알림을 보내지 않습니다.');
+                return;
+              }
+            }
+
             const mappingFile = fs.readFileSync('.github/mention-to-slack.yml', 'utf8');
             const mapping = yaml.parse(mappingFile);
 
-            // 요청된 리뷰어와 승인한 리뷰어 모두 가져오기
-            const requestedReviewers = context.payload.pull_request.requested_reviewers
-              .map(r => mapping[r.login] || r.login);
+            let prAuthor, prTitle, prUrl, reviewers;
 
-            // PR의 리뷰 정보 가져오기
-            const { data: reviews } = await github.rest.pulls.listReviews({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: context.payload.pull_request.number
-            });
+            // 이벤트 타입에 따라 다른 방식으로 데이터 추출
+            if (context.eventName === 'repository_dispatch') {
+              // repository_dispatch 이벤트 처리
+              prAuthor = context.payload.client_payload.pr_author;
+              prTitle = context.payload.client_payload.pr_title;
+              prUrl = context.payload.client_payload.pr_url;
+              reviewers = context.payload.client_payload.reviewers.reviewers;
+            } else {
+              // pull_request 관련 이벤트 처리
+              prAuthor = context.payload.pull_request.user.login;
+              prTitle = context.payload.pull_request.title;
+              prUrl = context.payload.pull_request.html_url;
+              
+              // 리뷰어 목록 가져오기
+              const { data: reviewData } = await github.rest.pulls.listRequestedReviewers({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: context.payload.pull_request.number
+              });
+              reviewers = reviewData.users.map(user => user.login);
+            }
 
-            // 리뷰어 목록 합치기 (중복 제거)
-            const allReviewers = [...new Set([
-              ...requestedReviewers,
-              ...reviews.map(review => mapping[review.user.login] || review.user.login)
-            ])]
+            // Slack ID 변환
+            const authorSlackId = mapping[prAuthor] || prAuthor;
+            const formattedAuthor = authorSlackId.startsWith('<@') ? authorSlackId : `<@${authorSlackId}>`;
+
+            const slackReviewers = reviewers
+              .map(reviewer => mapping[reviewer] || reviewer)
               .map(id => id.startsWith('<@') ? id : `<@${id}>`)
               .join(', ');
 
-            const prUrl = context.payload.pull_request.html_url;
-            const prTitle = context.payload.pull_request.title;
-            const sender = context.payload.sender.login;
-
-            // sender(작성자)의 GitHub ID를 Slack ID로 매핑
-            const senderSlackId = mapping[sender] || sender;
-            const formattedSender = senderSlackId.startsWith('<@') ? senderSlackId : `<@${senderSlackId}>`;
-
-            let message;
-
-            // PR에 새 커밋이 푸시된 경우 (synchronize)
-            if (context.payload.action === 'synchronize') {
-              message = {
-                text: `*PR 업데이트 알림*\n>제목: ${prTitle}\n>작성자: ${formattedSender}\n>리뷰어: ${allReviewers}\n>${prUrl}`
-              };
-            }
-            // 리뷰나 코멘트가 달린 경우
-            else if (['submitted', 'created', 'edited'].includes(context.payload.action)) {
-              const prAuthor = context.payload.pull_request.user.login;
-              const authorSlackId = mapping[prAuthor] || prAuthor;
-              const formattedAuthor = authorSlackId.startsWith('<@') ? authorSlackId : `<@${authorSlackId}>`; 
-              
-              const reviewerGithubId = context.payload.sender.login;
-              const reviewerSlackId = mapping[reviewerGithubId] || reviewerGithubId;
-              const formattedReviewer = reviewerSlackId.startsWith('<@') ? reviewerSlackId : `<@${reviewerSlackId}>`;
-
-              let actionText = '';
-              if (context.payload.review?.state === 'approved') {
-                actionText = '승인';
-              } else if (context.payload.review?.state === 'changes_requested') {
-                actionText = '변경 요청';
-              } else {
-                actionText = '새 코멘트';
-              }
-
-              message = {
-                text: `*PR 리뷰 알림*\n>제목: ${prTitle}\n>${formattedReviewer}님이 ${actionText}을(를) 남겼습니다\n>작성자: ${formattedAuthor}\n>${prUrl}`
-              };
-            }
+            const message = {
+              blocks: [
+                {
+                  type: "header",
+                  text: {
+                    type: "plain_text",
+                    text: "🔍 새로운 PR 리뷰 요청",
+                    emoji: true
+                  }
+                },
+                {
+                  type: "section",
+                  fields: [
+                    {
+                      type: "mrkdwn",
+                      text: `*제목:*\n${prTitle}`
+                    },
+                    {
+                      type: "mrkdwn",
+                      text: `*작성자:*\n${formattedAuthor}`
+                    }
+                  ]
+                },
+                {
+                  type: "section",
+                  fields: [
+                    {
+                      type: "mrkdwn",
+                      text: `*리뷰어:*\n${slackReviewers}`
+                    }
+                  ]
+                },
+                {
+                  type: "section",
+                  text: {
+                    type: "mrkdwn",
+                    text: `*PR 링크:*\n${prUrl}`
+                  }
+                }
+              ]
+            };
 
             await fetch(process.env.SLACK_WEBHOOK_URL, {
               method: 'POST',

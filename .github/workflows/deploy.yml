@@ -16,7 +16,7 @@ jobs:
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v0.1.8
         with:
-          host: 15.165.235.207
+          host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           port: 22
@@ -25,4 +25,4 @@ jobs:
             git pull origin dev
             npm install
             npx tsc
-            pm2 restart HanCook
+            authbind --deep pm2 reload HanCook || (authbind --deep pm2 start dist/src/app.js --name "HanCook")
