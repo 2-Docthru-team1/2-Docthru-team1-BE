@@ -16,11 +16,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
           cache: 'npm'
-
-      - name: Install Dependencies
-        run: npm ci
 
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.0.3
@@ -34,7 +31,7 @@ jobs:
             git fetch origin dev
             git reset --hard origin/dev
 
-            npm ci
+            npm install
             npx prisma migrate dev
             npx tsc
 
