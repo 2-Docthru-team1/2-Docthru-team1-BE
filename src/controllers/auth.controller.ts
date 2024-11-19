@@ -1,7 +1,7 @@
-import type { NextFunction, Request, Response } from 'express';
+import type { NextFunction, Response } from 'express';
 import { assert } from 'superstruct';
 import type { AuthService } from '#services/auth.service.js';
-import type { RequestBody } from '#types/common.types.js';
+import type { Request } from '#types/common.types.js';
 import type { CreateUserDTO, SignInDTO } from '#types/user.types.js';
 import MESSAGES from '#utils/constants/messages.js';
 import { CreateUser, SignIn } from '#utils/struct.js';
@@ -9,7 +9,7 @@ import { CreateUser, SignIn } from '#utils/struct.js';
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  signUp = async (req: RequestBody<CreateUserDTO>, res: Response, next: NextFunction) => {
+  signUp = async (req: Request<{ body: CreateUserDTO }>, res: Response, next: NextFunction) => {
     assert(req.body, CreateUser, MESSAGES.WRONG_FORMAT);
     const user = await this.authService.createUser(req.body);
 
@@ -28,7 +28,7 @@ export class AuthController {
   };
 
   // 로그인
-  signIn = async (req: RequestBody<SignInDTO>, res: Response, next: NextFunction) => {
+  signIn = async (req: Request<{ body: SignInDTO }>, res: Response, next: NextFunction) => {
     assert(req.body, SignIn, MESSAGES.WRONG_FORMAT);
     const { email, password } = req.body;
 
