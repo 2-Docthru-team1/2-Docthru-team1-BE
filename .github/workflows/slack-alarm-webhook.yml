@@ -23,10 +23,11 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '16'
+          node-version: '20'
+          cache: 'npm'
 
-      - name: Install dependencies
-        run: npm install yaml
+      - name: Install yaml package
+        run: npm install --no-package-lock yaml
 
       - name: Read Slack mapping
         id: slack-mapping
