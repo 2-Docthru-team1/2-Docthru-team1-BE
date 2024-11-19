@@ -14,7 +14,7 @@ export interface CreateUserDTO {
   password: string;
   salt: string;
   role?: Role;
-  refreshToken?: string;
+  refreshToken: string | '';
 }
 
 export interface UpdateUserDTO {
