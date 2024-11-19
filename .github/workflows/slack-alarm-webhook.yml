@@ -12,6 +12,12 @@ jobs:
     name: Mention Notification
     runs-on: ubuntu-latest
     steps:
+      - name: Debug Event
+        run: |
+          echo "Event name: ${{ github.event_name }}"
+          echo "Event action: ${{ github.event.action }}"
+          echo "Triggered by: ${{ github.actor }}"
+
       - uses: actions/checkout@v4
 
       - name: Setup Node.js
