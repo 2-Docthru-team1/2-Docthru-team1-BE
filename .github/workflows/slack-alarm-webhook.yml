@@ -2,7 +2,7 @@ name: Slack Alarm Webhook
 
 on:
   pull_request:
-    types: [opened]
+    types: [review_requested, synchronize]
   pull_request_review:
     types: [submitted]
   pull_request_review_comment:
