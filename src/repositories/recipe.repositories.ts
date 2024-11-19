@@ -1,39 +1,42 @@
 import prismaClient from '#connection/postgres.connection.js';
+import { Category } from '#utils/constants/recipe.enum.js';
+import type { PrismaClient } from '@prisma/client';
 
 class RecipeRepository {
-  constructor() {
-    
+  private prisma: PrismaClient;
+
+  // 생성자에서 prismaClient를 받아옴
+  constructor(prisma: PrismaClient) {
+    this.prisma = prisma;
   }
 
-  async getRecipes(skip: number, take: number, sortBy: string = 'category', order: string = 'asc') {
-    let orderBy;
-
-    if (sortBy === 'likes') {
-      orderBy = { likeCount: order }; // 좋아요 수
-    } else if (sortBy === 'category') {
-      orderBy = { category: order }; // 카테고리
-    }
-
-    return await prismaClient.recipe.findMany({
+  async getRecipes(skip: number, limit: number, sortBy: string, order: string, category?: Category) {
+    return await this.prisma.recipe.findMany({
       skip,
-      take,
-      orderBy,
+      take: limit,
+      where: category ? { category } : undefined,
+      orderBy: {
+        [sortBy]: order,
+      },
     });
   }
 
   async getRecipeById(id: string) {
-    return await prismaClient.recipe.findUnique({
+    return await this.prisma.recipe.findUnique({
       where: { id },
     });
   }
 
   async getTotalCount() {
-    // 전체 레시피 개수
-    return await prismaClient.recipe.count();
+    return await this.prisma.recipe.count();
   }
 }
 
 export default RecipeRepository;
+
+
+
+
 
 
 
