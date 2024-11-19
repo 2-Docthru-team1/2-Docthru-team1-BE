@@ -38,17 +38,47 @@ jobs:
             const yaml = require('yaml');
             const fs = require('fs');
 
-            // 매핑 파일 읽기
+            // PR 작성자의 댓글인 경우 스킵
+            if (context.eventName === 'pull_request_review_comment') {
+              const commentAuthor = context.payload.comment.user.login;
+              const prAuthor = context.payload.pull_request.user.login;
+              if (commentAuthor === prAuthor) {
+                console.log('PR 작성자의 댓글이므로 알림을 보내지 않습니다.');
+                return;
+              }
+            }
+
             const mappingFile = fs.readFileSync('.github/mention-to-slack.yml', 'utf8');
             const mapping = yaml.parse(mappingFile);
 
-            // PR 작성자의 Slack ID 변환
-            const prAuthor = context.payload.client_payload.pr_author;
+            let prAuthor, prTitle, prUrl, reviewers;
+
+            // 이벤트 타입에 따라 다른 방식으로 데이터 추출
+            if (context.eventName === 'repository_dispatch') {
+              // repository_dispatch 이벤트 처리
+              prAuthor = context.payload.client_payload.pr_author;
+              prTitle = context.payload.client_payload.pr_title;
+              prUrl = context.payload.client_payload.pr_url;
+              reviewers = context.payload.client_payload.reviewers.reviewers;
+            } else {
+              // pull_request 관련 이벤트 처리
+              prAuthor = context.payload.pull_request.user.login;
+              prTitle = context.payload.pull_request.title;
+              prUrl = context.payload.pull_request.html_url;
+              
+              // 리뷰어 목록 가져오기
+              const { data: reviewData } = await github.rest.pulls.listRequestedReviewers({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: context.payload.pull_request.number
+              });
+              reviewers = reviewData.users.map(user => user.login);
+            }
+
+            // Slack ID 변환
             const authorSlackId = mapping[prAuthor] || prAuthor;
             const formattedAuthor = authorSlackId.startsWith('<@') ? authorSlackId : `<@${authorSlackId}>`;
 
-            // 리뷰어들의 Slack ID 변환
-            const reviewers = context.payload.client_payload.reviewers.reviewers;
             const slackReviewers = reviewers
               .map(reviewer => mapping[reviewer] || reviewer)
               .map(id => id.startsWith('<@') ? id : `<@${id}>`)
@@ -69,7 +99,7 @@ jobs:
                   fields: [
                     {
                       type: "mrkdwn",
-                      text: `*제목:*\n${context.payload.client_payload.pr_title}`
+                      text: `*제목:*\n${prTitle}`
                     },
                     {
                       type: "mrkdwn",
@@ -90,7 +120,7 @@ jobs:
                   type: "section",
                   text: {
                     type: "mrkdwn",
-                    text: `*PR 링크:*\n${context.payload.client_payload.pr_url}`
+                    text: `*PR 링크:*\n${prUrl}`
                   }
                 }
               ]
