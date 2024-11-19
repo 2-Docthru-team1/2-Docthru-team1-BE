@@ -24,5 +24,6 @@ jobs:
             cd ~/2-Docthru-team1-BE
             git pull origin dev
             npm install
+            npx prisma migrate dev --name init
             npx tsc
             authbind --deep pm2 reload HanCook || (authbind --deep pm2 start dist/src/app.js --name "HanCook")
