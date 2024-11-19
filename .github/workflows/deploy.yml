@@ -33,7 +33,7 @@ jobs:
 
             npm install
             npx prisma migrate dev
-            npx tsc
+            npx tsc 
 
             # GitHub Secrets에서 환경변수 설정
             export DATABASE_URL='${{ secrets.DATABASE_URL }}'
