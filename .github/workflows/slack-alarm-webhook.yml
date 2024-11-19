@@ -5,8 +5,6 @@ on:
     types: [synchronize]
   pull_request_review:
     types: [submitted]
-  pull_request_review_comment:
-    types: [created]
   repository_dispatch:
     types: [pr_review_request]
 jobs:
@@ -14,15 +12,21 @@ jobs:
     name: Mention Notification
     runs-on: ubuntu-latest
     steps:
+      - name: Debug Event
+        run: |
+          echo "Event name: ${{ github.event_name }}"
+          echo "Event action: ${{ github.event.action }}"
+          echo "Triggered by: ${{ github.actor }}"
+
       - uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '16'
+          node-version: '20'
 
-      - name: Install dependencies
-        run: npm install yaml
+      - name: Install yaml package
+        run: npm install --no-package-lock yaml
 
       - name: Read Slack mapping
         id: slack-mapping
@@ -45,7 +49,6 @@ jobs:
             const yaml = require('yaml');
             const fs = require('fs');
 
-            // 알림 히스토리 로드
             let notificationHistory = {};
             try {
               if (fs.existsSync('./history/notifications.json')) {
@@ -55,21 +58,17 @@ jobs:
               console.log('No previous notification history found');
             }
 
-            // 현재 이벤트의 키 생성
             const prNumber = context.payload.pull_request?.number || context.payload.client_payload?.pr_url;
             const eventType = context.eventName;
             const eventKey = `${eventType}-${prNumber}`;
             const currentTime = Date.now();
 
-            // 3분(180000ms) 이내에 동일한 알림이 있었는지 확인
             if (notificationHistory[eventKey] && 
                 (currentTime - notificationHistory[eventKey]) < 180000) {
               console.log(`Skipping notification for ${eventKey} - Last notification was sent less than 3 minutes ago`);
               return;
             }
 
-
-            // 알림 타입 결정
             let alarmType = '';
             let headerText = '';
 
@@ -82,19 +81,6 @@ jobs:
             } else if (context.eventName === 'pull_request_review') {
               alarmType = '✍️ 새로운 리뷰';
               headerText = '새로운 리뷰가 등록되었습니다';
-            } else if (context.eventName === 'pull_request_review_comment') {
-              alarmType = '💬 새로운 리뷰 코멘트';
-              headerText = '새로운 리뷰 코멘트가 작성되었습니다';
-            }
-
-            // PR 작성자의 댓글인 경우 스킵
-            if (context.eventName === 'pull_request_review_comment') {
-              const commentAuthor = context.payload.comment.user.login;
-              const prAuthor = context.payload.pull_request.user.login;
-              if (commentAuthor === prAuthor) {
-                console.log('PR 작성자의 댓글이므로 알림을 보내지 않습니다.');
-                return;
-              }
             }
 
             const mappingFile = fs.readFileSync('.github/mention-to-slack.yml', 'utf8');
@@ -102,20 +88,16 @@ jobs:
 
             let prAuthor, prTitle, prUrl, reviewers;
 
-            // 이벤트 타입에 따라 다른 방식으로 데이터 추출
             if (context.eventName === 'repository_dispatch') {
-              // repository_dispatch 이벤트 처리
               prAuthor = context.payload.client_payload.pr_author;
               prTitle = context.payload.client_payload.pr_title;
               prUrl = context.payload.client_payload.pr_url;
               reviewers = context.payload.client_payload.reviewers.reviewers;
             } else {
-              // pull_request 관련 이벤트 처리
               prAuthor = context.payload.pull_request.user.login;
               prTitle = context.payload.pull_request.title;
               prUrl = context.payload.pull_request.html_url;
               
-              // 리뷰어 목록 가져오기 (pending 상태 체크 제거)
               const { data: reviewData } = await github.rest.pulls.listRequestedReviewers({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
@@ -124,7 +106,6 @@ jobs:
               reviewers = reviewData.users.map(user => user.login);
             }
 
-            // Slack ID 변환
             const authorSlackId = mapping[prAuthor] || prAuthor;
             const formattedAuthor = authorSlackId.startsWith('<@') ? authorSlackId : `<@${authorSlackId}>`;
 
@@ -182,24 +163,20 @@ jobs:
               ]
             };
 
-            // Slack에 메시지 전송
             await fetch(process.env.SLACK_WEBHOOK_URL, {
               method: 'POST',
               headers: {'Content-Type': 'application/json'},
               body: JSON.stringify(message)
             });
 
-            // 알림 히스토리 업데이트
             notificationHistory[eventKey] = currentTime;
 
-            // 3분이 지난 이벤트들은 제거
             for (const key in notificationHistory) {
               if (currentTime - notificationHistory[key] > 180000) {
                 delete notificationHistory[key];
               }
             }
 
-            // 히스토리 저장
             if (!fs.existsSync('./history')) {
               fs.mkdirSync('./history');
             }
