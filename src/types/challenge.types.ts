@@ -2,18 +2,14 @@ import type { Status } from '@prisma/client';
 import { MediaType } from '@prisma/client';
 import { Order } from '#utils/constants/enum.js';
 
-export interface CreateChallengeDTO {
-  title: string;
-  description: string;
-  status: string;
-  deadline: Date;
-}
-
-export interface UpdateChallengeDTO {
-  title?: string;
-  description?: string;
+export interface GetChallengesQuery {
   status?: string;
-  deadline?: Date;
+  mediaType?: string;
+  order?: string;
+  keyword?: string;
+  page?: string;
+  pageSize?: string;
+  isHidden?: string;
 }
 
 export interface getChallengesOptions {
@@ -24,3 +20,17 @@ export interface getChallengesOptions {
   page: number;
   pageSize: number;
 }
+
+// export interface CreateChallengeDTO {
+//   title: string;
+//   description: string;
+//   status: string;
+//   deadline: Date;
+// }
+
+// export interface UpdateChallengeDTO {
+//   title?: string;
+//   description?: string;
+//   status?: string;
+//   deadline?: Date;
+// }
