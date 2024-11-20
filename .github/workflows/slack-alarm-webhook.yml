@@ -129,6 +129,7 @@ jobs:
                 ...requestedReviewers.data.users.map(user => user.login),
                 ...completedReviews.data
                   .map(review => review.user.login)
+                  .filter(reviewer => reviewer !== prAuthor)
               ]);
               
               reviewers = Array.from(allReviewers);
