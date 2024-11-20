@@ -1,4 +1,4 @@
-import { MediaType, Status } from '@prisma/client';
+import type { Challenge, MediaType, Role, Status } from '@prisma/client';
 import { Order } from '#utils/constants/enum.js';
 
 export interface GetChallengesQuery {
@@ -44,9 +44,33 @@ export interface ChallengeInput {
   participants: { id: string }[];
 }
 
-// export interface UpdateChallengeDTO {
-//   title?: string;
-//   description?: string;
-//   status?: string;
-//   deadline?: Date;
-// }
+export interface UpdateChallengeDTO {
+  title?: string;
+  description?: string;
+  deadline?: Date;
+  embedUrl?: string;
+  imageUrl?: string;
+  imageUrl2?: string;
+  mediaType?: MediaType;
+}
+
+export interface UpdateChallengeStatusDTO {
+  status: Status;
+  abortReason?: string;
+}
+
+export interface ChallengeStatusInput {
+  challengeId: string;
+  status: Status;
+  abortReason?: string;
+  userId: string;
+  userRole?: Role;
+}
+
+export interface ValidateUpdateStatusInput {
+  challenge: Challenge | null;
+  status: Status;
+  abortReason?: string;
+  userId: string;
+  userRole?: Role;
+}

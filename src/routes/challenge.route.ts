@@ -1,7 +1,7 @@
 import express from 'express';
 import challengeController from '#containers/challenge.container.js';
 import validatePaginationOptions from '#middlewares/pagination.validation.js';
-import { validateCreateChallenge } from '#middlewares/validateChallenge.js';
+import { validateCreateChallenge, validateUpdateChallenge } from '#middlewares/validateChallenge.js';
 
 export const challengeRouter = express.Router();
 // 여기서 controller의 method를 불러줍니다.
@@ -11,7 +11,12 @@ challengeRouter
   .route('/')
   .get(validatePaginationOptions, challengeController.getChallenges)
   .post(validateCreateChallenge, challengeController.postChallenge);
-challengeRouter.route('/:id').get(challengeController.getChallengeById);
 
-// app에서 사용할 수 있도록 export 해주어야 합니다.
+challengeRouter
+  .route('/:id')
+  .get(challengeController.getChallengeById)
+  .patch(validateUpdateChallenge, challengeController.patchChallenge);
+
+challengeRouter.patch('/:id/status', challengeController.patchChallengeStatus);
+
 export default challengeRouter;

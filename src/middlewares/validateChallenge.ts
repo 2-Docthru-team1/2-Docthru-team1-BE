@@ -7,3 +7,8 @@ export const validateCreateChallenge = (req: Request, res: Response, next: NextF
   assert(req.body, CreateChallenge, MESSAGES.WRONG_FORMAT);
   next();
 };
+
+export const validateUpdateChallenge = (req: Request, res: Response, next: NextFunction) => {
+  assert(req.body, PatchChallenge, MESSAGES.WRONG_FORMAT);
+  next();
+};
