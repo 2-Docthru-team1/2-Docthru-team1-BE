@@ -1,9 +1,14 @@
 import type { Role } from '@prisma/client';
+import type { SafeUser } from '#types/user.types.js';
 
 export interface UserToken {
   userId: string;
   iat: number;
   exp: number;
+}
+
+export interface SigninResponse extends SafeUser {
+  refreshToken: string;
 }
 
 export interface CreateUserDTO {
