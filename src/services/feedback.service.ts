@@ -35,7 +35,13 @@ export class FeedbackService implements IFeedbackService {
   };
 
   updateFeedback = async (id: string, FeedbackData: UpdateFeedbackDTO): Promise<Feedback> => {
+    const isExist = !!(await this.feedbackRepository.findById(id));
+    if (!isExist) {
+      throw new NotFound(MESSAGES.NOT_FOUND);
+    }
+
     const Feedback = await this.feedbackRepository.update(id, FeedbackData);
+
     return Feedback;
   };
 
