@@ -1,6 +1,14 @@
 import type RecipeRepository from '#repositories/recipe.repositories.js';
 import { Category, SortBy, Order } from '#utils/constants/enum.js';
 
+interface GetRecipeParams {
+  page: number;
+  limit: number;
+  sortBy: SortBy;
+  order: Order;
+  category?: Category;
+}
+
 class RecipeService {
   private recipeRepository: RecipeRepository;
 
@@ -8,11 +16,13 @@ class RecipeService {
     this.recipeRepository = recipeRepository;
   }
 
-  // 총 5개의 매개변수를 받을 수 있도록 수정
-  async getRecipes(page: number, limit: number, sortBy: SortBy, order: Order, category?: Category) {
+  // 레시피 목록 조회 
+  async getRecipes(params: GetRecipeParams) {
+    const { page, limit, sortBy, order, category } = params;
+
     const skip = (page - 1) * limit;
 
-    // 레포지토리에서 레시피 목록과 총 개수 조회
+    
     const [recipes, totalCount] = await Promise.all([
       this.recipeRepository.getRecipes(skip, limit, sortBy, order, category),
       this.recipeRepository.getTotalCount(category),
@@ -24,12 +34,14 @@ class RecipeService {
     };
   }
 
+  // 레시피 개별 조회
   async getRecipeById(id: string) {
     return await this.recipeRepository.getRecipeById(id);
   }
 }
 
 export default RecipeService;
+
 
 
 

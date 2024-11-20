@@ -2,6 +2,7 @@ import type { Request, Response, NextFunction } from 'express';
 import { ErrorMessages } from '#utils/constants/messages.js';
 import RecipeService from '#services/recipe.service.js';
 import { Category, SortBy, Order } from '#utils/constants/enum.js';
+import { validatePaginationParams } from '#utils/validators/pagination.js';
 
 class RecipeController {
   constructor(private recipeService: RecipeService) {}
@@ -11,8 +12,8 @@ class RecipeController {
     try {
       const { page = '1', limit = '10', category, sortBy = SortBy.LIKES, order = Order.latestFirst } = req.query;
 
-      const pageInt = parseInt(page as string, 10);
-      const limitInt = parseInt(limit as string, 10);
+      // 페이지네이션 유효성 검증
+      const { pageInt, limitInt } = validatePaginationParams(page as string, limit as string);
 
       // 카테고리 값 검증 및 변환
       let categoryEnum: Category | undefined;
@@ -20,12 +21,11 @@ class RecipeController {
         if (Object.values(Category).includes(category as Category)) {
           categoryEnum = category as Category;
         } else {
-          // 에러 핸들러
           return next(new Error(ErrorMessages.INVALID_CATEGORY));
         }
       }
 
-      
+      // sortBy와 order 값 검증
       if (!Object.values(SortBy).includes(sortBy as SortBy)) {
         return next(new Error(ErrorMessages.INVALID_SORT_BY));
       }
@@ -34,15 +34,33 @@ class RecipeController {
         return next(new Error(ErrorMessages.INVALID_ORDER));
       }
 
-      const recipes = await this.recipeService.getRecipes(
-        pageInt,
-        limitInt,
-        sortBy as SortBy,
-        order as Order,
-        categoryEnum
-      );
+      // 서비스 호출 시 파라미터를 객체로 전달
+      const recipes = await this.recipeService.getRecipes({
+        page: pageInt,
+        limit: limitInt,
+        sortBy: sortBy as SortBy,
+        order: order as Order,
+        category: categoryEnum,
+      });
 
       res.status(200).json(recipes);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  // 레시피 개별 조회
+  getRecipeById = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { id } = req.params;
+
+      const recipe = await this.recipeService.getRecipeById(id);
+
+      if (recipe) {
+        res.status(200).json(recipe);
+      } else {
+        return next(new Error(ErrorMessages.RECIPE_NOT_FOUND));
+      }
     } catch (error) {
       next(error);
     }
@@ -50,3 +68,7 @@ class RecipeController {
 }
 
 export default RecipeController;
+
+
+
+

@@ -1,13 +1,14 @@
 import type { PrismaClient } from '@prisma/client';
+import { SortBy, Order } from '#utils/constants/enum.js';
 
 class RecipeRepository {
-  private recipe; // Prisma의 recipe 모델을 명확히 선언합니다.
+  private recipe;
 
   constructor(prisma: PrismaClient) {
-    this.recipe = prisma.recipe;  // Prisma Client의 recipe 모델을 직접 할당합니다.
+    this.recipe = prisma.recipe;
   }
 
-  async getRecipes(skip: number, take: number, sortBy: string, order: string, category?: string) {
+  async getRecipes(skip: number, take: number, sortBy: SortBy, order: Order, category?: string) {
     return await this.recipe.findMany({
       skip,
       take,
@@ -32,6 +33,7 @@ class RecipeRepository {
 }
 
 export default RecipeRepository;
+
 
 
 
