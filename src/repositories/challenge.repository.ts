@@ -82,7 +82,14 @@ export class ChallengeRepository implements IChallengeRepository {
   };
 
   findById = async (id: string): Promise<Challenge | null> => {
-    return await prismaClient.challenge.findUnique({ where: { id }, include: { works: true } });
+    return await prismaClient.challenge.findUnique({
+      where: { id },
+      include: {
+        participants: true,
+        works: true,
+        abortReason: true,
+      },
+    });
   };
 
   create = async (data: ChallengeInput): Promise<Challenge> => {
