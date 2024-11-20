@@ -30,8 +30,8 @@ export class ChallengeController {
     res.json(challenge);
   };
 
-  postChallenge = async (req: Request, res: Response) => {
-    const challengeData: CreateChallengeDTO = req.body;
+  postChallenge = async (req: Request<{ body: CreateChallengeDTO }>, res: Response) => {
+    const challengeData = req.body;
     const userId = '029dc2ea-93d1-4c8d-844e-07fd9c87d23e'; // 인증 관련 기능이 완료되면 req.user.userId로 바꿀거예요!
     const newChallenge = await this.challengeService.createChallenge(challengeData, userId);
     res.json(newChallenge);
