@@ -20,25 +20,26 @@ class RecipeController {
         if (Object.values(Category).includes(category as Category)) {
           categoryEnum = category as Category;
         } else {
-          return res.status(400).json({ message: ErrorMessages.INVALID_CATEGORY });
+          // 에러 핸들러
+          return next(new Error(ErrorMessages.INVALID_CATEGORY));
         }
       }
 
-      // sortBy와 order 값 검증
+      
       if (!Object.values(SortBy).includes(sortBy as SortBy)) {
-        return res.status(400).json({ message: ErrorMessages.INVALID_SORT_BY });
+        return next(new Error(ErrorMessages.INVALID_SORT_BY));
       }
 
       if (!Object.values(Order).includes(order as Order)) {
-        return res.status(400).json({ message: ErrorMessages.INVALID_ORDER });
+        return next(new Error(ErrorMessages.INVALID_ORDER));
       }
 
       const recipes = await this.recipeService.getRecipes(
-        pageInt,      
-        limitInt,      
-        sortBy as SortBy, 
-        order as Order,   
-        categoryEnum  
+        pageInt,
+        limitInt,
+        sortBy as SortBy,
+        order as Order,
+        categoryEnum
       );
 
       res.status(200).json(recipes);
