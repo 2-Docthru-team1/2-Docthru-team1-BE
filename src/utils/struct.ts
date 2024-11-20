@@ -1,7 +1,7 @@
 import { Role } from '@prisma/client';
 import isEmail from 'is-email';
 import isUuid from 'is-uuid';
-import { coerce, date, define, enums, object, optional, string } from 'superstruct';
+import { define, enums, object, optional, string } from 'superstruct';
 
 // prisma의 enum 타입을 js string[]로 변환
 const roleEnumValues = Object.values(Role) as string[];
