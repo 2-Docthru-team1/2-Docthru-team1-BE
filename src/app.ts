@@ -25,11 +25,11 @@ app.use(runAsyncLocalStorage);
 
 /*********************************************************************************** routes **********************************************************************************************/
 app.use('/auth', authRouter);
-app.use('/challenge', challengeRouter);
-app.use('/user', userRouter);
+app.use('/challenges', challengeRouter);
+app.use('/users', userRouter);
+app.use('/feedbacks', feedbackRouter);
+app.use('/works', workRouter);
 app.use('/recipes', recipeRouter);
-app.use('/feedback', feedbackRouter);
-app.use('/work', workRouter);
 
 app.get('/hello', (req, res) => {
   res.send('Hello World');
