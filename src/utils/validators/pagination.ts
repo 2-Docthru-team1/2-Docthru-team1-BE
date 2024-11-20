@@ -7,7 +7,7 @@ export function validatePaginationParams(page: string, limit: string) {
 
   
   return {
-    pageInt: isNaN(pageInt) || pageInt < 1 ? 1 : pageInt,
-    limitInt: isNaN(limitInt) || limitInt < 1 ? 10 : limitInt,
+    pageInt: Number.isNaN(pageInt) || pageInt < 1 ? 1 : pageInt,
+    limitInt: Number.isNaN(limitInt) || limitInt < 1 ? 10 : limitInt,
   };
-}
+}  
