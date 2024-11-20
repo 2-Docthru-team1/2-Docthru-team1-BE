@@ -4,6 +4,7 @@ const MESSAGES = Object.freeze({
   UNAUTHORIZED: '로그인이 필요합니다.',
   INTERNAL_ERROR: '서버 내부 오류가 발생했습니다.',
   FORBIDDEN: '토큰이 유효하지 않습니다.',
+  NOT_FOUND: '찾을 수 없는 리소스입니다.',
 
   WRONG_ID_FORMAT: 'ID 형식이 잘못되었습니다.',
   WRONG_EMAIL_FORMAT: 'Email 형식이 잘못되었습니다.',

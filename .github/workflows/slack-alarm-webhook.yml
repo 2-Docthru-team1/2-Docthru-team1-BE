@@ -98,12 +98,27 @@ jobs:
               prTitle = context.payload.pull_request.title;
               prUrl = context.payload.pull_request.html_url;
               
-              const { data: reviewData } = await github.rest.pulls.listRequestedReviewers({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                pull_number: context.payload.pull_request.number
-              });
-              reviewers = reviewData.users.map(user => user.login);
+              const [requestedReviewers, completedReviews] = await Promise.all([
+                github.rest.pulls.listRequestedReviewers({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  pull_number: context.payload.pull_request.number
+                }),
+                github.rest.pulls.listReviews({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  pull_number: context.payload.pull_request.number
+                })
+              ]);
+
+              const allReviewers = new Set([
+                ...requestedReviewers.data.users.map(user => user.login),
+                ...completedReviews.data
+                  .filter(review => review.state !== 'COMMENTED')
+                  .map(review => review.user.login)
+              ]);
+              
+              reviewers = Array.from(allReviewers);
             }
 
             const authorSlackId = mapping[prAuthor] || prAuthor;

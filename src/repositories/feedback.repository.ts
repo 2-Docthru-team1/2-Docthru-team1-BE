@@ -16,6 +16,9 @@ export class FeedbackRepository implements IFeedbackRepository {
 
     let orderOptions;
     switch (orderBy) {
+      case 'oldest':
+        orderOptions = { createdAt: Prisma.SortOrder.asc };
+        break;
       case 'latest':
       default:
         // NOTE orderBy는 Prisma SortOrder 타입을 사용해야 함
@@ -28,15 +31,6 @@ export class FeedbackRepository implements IFeedbackRepository {
   };
 
   findById = async (id: string): Promise<Feedback | null> => {
-    return {
-      id,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      deleteAt: null,
-      content: '',
-      ownerId: null,
-      workId: '',
-    };
     const feedback = await this.feedback.findUnique({ where: { id } });
 
     return feedback;
