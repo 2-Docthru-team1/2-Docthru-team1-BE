@@ -34,7 +34,6 @@ model User {
   likeWorks     ChallengeWork[] @relation(name: "likeRelation")
   feedbacks     Feedback[]
   abortReasons  AbortReason[] // 관리자 유저에 한함
-  Challenge     Challenge[]
 }
 
 model Challenge {
@@ -59,8 +58,6 @@ model Challenge {
   participants  User[]          @relation(name: "participation")
   works         ChallengeWork[]
   abortReason   AbortReason?
-  User          User?           @relation(fields: [userId], references: [id])
-  userId        String?
 }
 
 model ChallengeWork {
