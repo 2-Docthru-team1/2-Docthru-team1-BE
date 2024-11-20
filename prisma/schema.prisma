@@ -17,7 +17,7 @@ model User {
   id        String    @id @default(uuid())
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  deleteAt  DateTime?
+  deletedAt DateTime?
 
   name         String
   email        String @unique
@@ -34,14 +34,13 @@ model User {
   likeWorks     ChallengeWork[] @relation(name: "likeRelation")
   feedbacks     Feedback[]
   abortReasons  AbortReason[] // 관리자 유저에 한함
-  Challenge     Challenge[]
 }
 
 model Challenge {
   id        String    @id @default(uuid())
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  deleteAt  DateTime?
+  deletedAt DateTime?
 
   title       String
   description String
@@ -59,15 +58,13 @@ model Challenge {
   participants  User[]          @relation(name: "participation")
   works         ChallengeWork[]
   abortReason   AbortReason?
-  User          User?           @relation(fields: [userId], references: [id])
-  userId        String?
 }
 
 model ChallengeWork {
   id        String    @id @default(uuid())
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  deleteAt  DateTime?
+  deletedAt DateTime?
 
   title     String
   content   String
@@ -87,7 +84,7 @@ model WorkImage {
   id        String    @id @default(uuid())
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  deleteAt  DateTime?
+  deletedAt DateTime?
 
   imageUrl String
 
@@ -99,7 +96,7 @@ model Feedback {
   id        String    @id @default(uuid())
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  deleteAt  DateTime?
+  deletedAt DateTime?
 
   content String
 
@@ -113,7 +110,7 @@ model AbortReason {
   id        String    @id @default(uuid())
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  deleteAt  DateTime?
+  deletedAt DateTime?
 
   content String
 
@@ -127,7 +124,7 @@ model Recipe {
   id        String    @id @default(uuid())
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  deleteAt  DateTime?
+  deletedAt DateTime?
 
   title       String
   ingredients String[]
