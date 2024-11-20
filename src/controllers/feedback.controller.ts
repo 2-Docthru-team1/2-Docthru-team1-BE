@@ -6,7 +6,7 @@ import MESSAGES from '#utils/constants/messages.js';
 import { CreateFeedback, PatchFeedback, Uuid } from '#utils/struct.js';
 
 export class FeedbackController {
-  constructor(private FeedbackService: FeedbackService) {}
+  constructor(private feedbackService: FeedbackService) {}
 
   getFeedbacks = async (req: Request, res: Response, next: NextFunction) => {
     const { orderBy, page, pageSize } = req.query;
@@ -16,7 +16,7 @@ export class FeedbackController {
       page: Number(page) ?? 1,
       pageSize: Number(pageSize) ?? 10,
     };
-    const Feedbacks = await this.FeedbackService.getFeedbacks(options);
+    const Feedbacks = await this.feedbackService.getFeedbacks(options);
 
     res.json(Feedbacks);
   };
@@ -25,7 +25,7 @@ export class FeedbackController {
     const { id } = req.params;
     assert(id, Uuid, MESSAGES.WRONG_ID_FORMAT);
 
-    const Feedback = await this.FeedbackService.getFeedbackById(id);
+    const Feedback = await this.feedbackService.getFeedbackById(id);
 
     res.json(Feedback);
   };
@@ -33,7 +33,7 @@ export class FeedbackController {
   postFeedback = async (req: Request, res: Response, next: NextFunction) => {
     assert(req.body, CreateFeedback, MESSAGES.WRONG_FORMAT);
 
-    const user = await this.FeedbackService.createFeedback(req.body as CreateFeedbackDTO);
+    const user = await this.feedbackService.createFeedback(req.body as CreateFeedbackDTO);
 
     res.json(user);
   };
@@ -42,7 +42,7 @@ export class FeedbackController {
     const { id } = req.params;
     assert(req.body, PatchFeedback, MESSAGES.WRONG_FORMAT);
 
-    const user = await this.FeedbackService.updateFeedback(id, req.body);
+    const user = await this.feedbackService.updateFeedback(id, req.body);
 
     res.json(user);
   };
@@ -50,7 +50,7 @@ export class FeedbackController {
   deleteChallege = async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
 
-    const user = await this.FeedbackService.deleteFeedback(id);
+    const user = await this.feedbackService.deleteFeedback(id);
 
     res.json(user);
   };

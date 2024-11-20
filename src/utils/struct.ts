@@ -66,6 +66,10 @@ export const CreateWork = object({});
 
 export const PatchWork = object({});
 
-export const CreateFeedback = object({});
+export const CreateFeedback = object({
+  content: string(),
+  ownerId: Uuid,
+  workId: Uuid,
+});
 
 export const PatchFeedback = object({});

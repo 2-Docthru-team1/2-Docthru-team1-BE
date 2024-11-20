@@ -18,15 +18,24 @@ jobs:
           echo "Event action: ${{ github.event.action }}"
           echo "Triggered by: ${{ github.actor }}"
 
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
 
+      - name: Cache npm packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-yaml-${{ hashFiles('**/js-yaml/**') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-yaml-
+
       - name: Install yaml package
-        run: npm install --no-package-lock yaml
+        run: npm install yaml
 
       - name: Read Slack mapping
         id: slack-mapping
