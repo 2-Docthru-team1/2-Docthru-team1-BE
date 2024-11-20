@@ -81,6 +81,12 @@ jobs:
     steps:
       - name: Trigger Slack Alarm
         run: |
+          # 리뷰어 정보 가져오기
+          reviewers=$(curl -s \
+            -H "Authorization: token ${{ secrets.TEAM_ACCESS_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/requested_reviewers" | jq -c '{reviewers: [.users[].login]}')
+
           curl -X POST \
           -H "Content-Type: application/json" \
           -d '{
@@ -89,7 +95,7 @@ jobs:
               "pr_title": "${{ github.event.pull_request.title }}",
               "pr_url": "${{ github.event.pull_request.html_url }}",
               "pr_author": "${{ github.event.pull_request.user.login }}",
-              "reviewers": ${{ steps.get-members.outputs.json_string }}
+              "reviewers": '"$reviewers"'
             }
           }' \
           -H "Authorization: token ${{ secrets.GH_TOKEN }}" \

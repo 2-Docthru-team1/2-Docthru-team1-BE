@@ -13,7 +13,8 @@ export class UserRepository implements IUserRepository {
 
   findByEmail = async (email: string): Promise<User | null> => {
     const user = await this.user.findUnique({ where: { email } });
-    return user as User | null; // 타입 매핑
+
+    return user;
   };
 
   create = async (data: CreateUserDTO): Promise<User> => {
