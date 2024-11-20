@@ -4,7 +4,7 @@ import { Order } from '#utils/constants/enum.js';
 export interface GetChallengesQuery {
   status?: string;
   mediaType?: string;
-  order?: string;
+  orderBy?: string;
   keyword?: string;
   page?: string;
   pageSize?: string;
@@ -14,7 +14,7 @@ export interface GetChallengesQuery {
 export interface getChallengesOptions {
   status?: Status;
   mediaType?: MediaType;
-  order: Order;
+  orderBy: Order;
   keyword: string;
   page: number;
   pageSize: number;

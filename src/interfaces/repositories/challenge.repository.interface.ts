@@ -6,7 +6,7 @@ export interface IChallengeRepository {
   findMany(options: {
     status?: Status;
     mediaType?: MediaType;
-    order: Order;
+    orderBy: Order;
     keyword: string;
     page: Number;
     pageSize: Number;

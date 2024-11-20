@@ -8,14 +8,14 @@ export class ChallengeController {
   constructor(private challengeService: ChallengeService) {}
 
   getChallenges = async (req: Request<{}, {}, {}, GetChallengesQuery>, res: Response, next: NextFunction) => {
-    const { status, mediaType, order = 'latestFirst', keyword = '', page = '1', pageSize = '10' } = req.query;
+    const { status, mediaType, orderBy = 'latestFirst', keyword = '', page = '1', pageSize = '10' } = req.query;
     const statusEnum = status ? (status as Status) : undefined;
     const mediaTypeEnum = mediaType ? (mediaType as MediaType) : undefined;
-    const orderEnum = order as Order;
+    const orderEnum = orderBy as Order;
     const options = {
       status: statusEnum,
       mediaType: mediaTypeEnum,
-      order: orderEnum,
+      orderBy: orderEnum,
       page: Number(page),
       pageSize: Number(pageSize),
       keyword,

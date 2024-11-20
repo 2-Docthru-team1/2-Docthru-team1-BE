@@ -26,3 +26,13 @@ export interface CreateImageDTO {
 export interface UpdateWorkDTO {
   image: string;
 }
+export interface GetWorksOptions {
+  challengeId: string;
+  orderBy: WorkOrder;
+  page: number;
+  pageSize: number;
+}
+export enum WorkOrder {
+  recent = 'recent',
+  favoritest = 'favoritest',
+}

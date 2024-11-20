@@ -12,23 +12,23 @@ export class ChallengeRepository implements IChallengeRepository {
   }
 
   findMany = async (options: getChallengesOptions): Promise<Challenge[] | null> => {
-    const { status, mediaType, order, keyword, page, pageSize } = options;
-    const orderBy: {
+    const { status, mediaType, orderBy, keyword, page, pageSize } = options;
+    const applyOrderBy: {
       deadline?: 'asc' | 'desc';
       createdAt?: 'asc' | 'desc';
     } = {};
-    switch (order) {
+    switch (orderBy) {
       case Order.deadlineEarliest:
-        orderBy.deadline = 'asc';
+        applyOrderBy.deadline = 'asc';
         break;
       case Order.deadlineLatest:
-        orderBy.deadline = 'desc';
+        applyOrderBy.deadline = 'desc';
         break;
       case Order.earliestFirst:
-        orderBy.createdAt = 'asc';
+        applyOrderBy.createdAt = 'asc';
         break;
       default:
-        orderBy.createdAt = 'desc';
+        applyOrderBy.createdAt = 'desc';
     }
     const whereCondition: {
       mediaType?: MediaType;
@@ -53,7 +53,7 @@ export class ChallengeRepository implements IChallengeRepository {
       skip: (page - 1) * pageSize,
       take: pageSize,
       where: whereCondition,
-      orderBy,
+      orderBy: applyOrderBy,
     });
     return challenges;
   };

@@ -1,6 +1,9 @@
 import type { NextFunction, Request, Response } from 'express';
 import { assert } from 'superstruct';
 import type { WorkService } from '#services/work.service.js';
+import { NotFound } from '#types/http-error.type.js';
+import { WorkOrder } from '#types/work.types.js';
+import { Order } from '#utils/constants/enum.js';
 import MESSAGES from '#utils/constants/messages.js';
 import { CreateWork, PatchWork, Uuid } from '#utils/struct.js';
 
@@ -14,29 +17,33 @@ export class WorkController {
   // 간단한 유효성 검사라면 이곳에 작성해도 됩니다.
   // 응답의 status를 지정하고, body를 전달합니다.
   getWorks = async (
-    req: Request<{}, {}, {}, { orderBy: string; page: string; pageSize: string }>,
+    req: Request<{ id: string }, {}, {}, { orderBy: string; page: string; pageSize: string }>,
     res: Response,
     next: NextFunction,
   ) => {
-    const { orderBy, page, pageSize } = req.query;
-
-    const options: { orderBy: string; page: number; pageSize: number } = {
-      orderBy,
-      page: Number(page),
-      pageSize: Number(pageSize),
+    const { id } = req.params;
+    const { orderBy = 'favoritest', page = '1', pageSize = '4' } = req.query;
+    const validatedOrderBy: WorkOrder = orderBy in WorkOrder ? (orderBy as WorkOrder) : WorkOrder.recent;
+    const options: { challengeId: string; orderBy: WorkOrder; page: number; pageSize: number } = {
+      challengeId: id,
+      orderBy: validatedOrderBy,
+      page: parseInt(page, 10),
+      pageSize: parseInt(pageSize, 10),
     };
-    const Work = await this.WorkService.getWorks(options);
-
-    res.json(Work);
+    const work = await this.WorkService.getWorks(options);
+    res.json(work);
   };
 
   getWorkById = async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
     assert(id, Uuid, MESSAGES.WRONG_ID_FORMAT);
-
-    const Work = await this.WorkService.getWorkById(id);
-
-    res.json(Work);
+    const work = await this.WorkService.getWorkById(id);
+    if (!work) {
+      const error = new NotFound(MESSAGES.WORK_NOT_FOUND);
+      return next(error);
+    }
+    res.json(work);
+    res.json(111);
   };
 
   postWork = async (req: Request, res: Response, next: NextFunction) => {

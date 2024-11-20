@@ -7,7 +7,7 @@ export interface IChallengeService {
     status?: Status;
     mediaType?: MediaType;
     keyword: string;
-    order: Order;
+    orderBy: Order;
     page: number;
     pageSize: number;
   }): Promise<{ list: Challenge[]; totalCount: number }>;

@@ -2,6 +2,7 @@ import type { ChallengeWork } from '@prisma/client';
 import type { IWorkService } from '#interfaces/services/work.service.interface.js';
 import type { WorkRepository } from '#repositories/work.repository.js';
 import type { CreateWorkDTO, UpdateWorkDTO } from '#types/work.types.js';
+import type { GetWorksOptions } from '#types/work.types.js';
 
 export class WorkService implements IWorkService {
   constructor(private WorkRepository: WorkRepository) {} // 이 부분에 Repository를 연결합니다.
@@ -9,16 +10,17 @@ export class WorkService implements IWorkService {
   // 이 아래로 데이터를 가공하는 코드를 작성합니다.
   // 비즈니스 로직, DB에서 가져온 데이터를 가공하는 코드가 주로 작성됩니다.
   // 여기서 가공된 데이터를 controller로 올려줍니다.
-  getWorks = async (options: { orderBy: string; page: number; pageSize: number }): Promise<ChallengeWork[] | null> => {
-    const Works = await this.WorkRepository.findMany(options);
-
-    return Works;
+  getWorks = async (options: GetWorksOptions): Promise<{ list: ChallengeWork[]; totalCount: number } | null> => {
+    const [list, totalCount] = await Promise.all([
+      this.WorkRepository.findMany(options),
+      this.WorkRepository.totalCount(options.challengeId),
+    ]);
+    return { list: list || [], totalCount: totalCount || 0 };
   };
 
   getWorkById = async (id: string): Promise<ChallengeWork | null> => {
-    const Work = await this.WorkRepository.findById(id);
-
-    return Work;
+    const work = await this.WorkRepository.findById(id);
+    return work;
   };
 
   createWork = async (WorkData: CreateWorkDTO): Promise<ChallengeWork> => {
