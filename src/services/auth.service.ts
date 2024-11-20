@@ -2,7 +2,7 @@ import type { IAuthService } from '#interfaces/services/auth.service.interface.j
 import { getStorage } from '#middlewares/asyncLocalStorage.js';
 import type { UserRepository } from '#repositories/user.repository.js';
 import type { CreateUserDTO, SigninResponse, UserToken } from '#types/auth.types.js';
-import { BadRequest, Unauthorized } from '#types/http-error.type.js';
+import { BadRequest, Unauthorized } from '#types/http-error.types.js';
 import type { SafeUser } from '#types/user.types.js';
 import MESSAGES from '#utils/constants/messages.js';
 import createToken from '#utils/createToken.js';

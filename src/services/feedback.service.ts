@@ -2,7 +2,7 @@ import type { Feedback } from '@prisma/client';
 import type { IFeedbackService } from '#interfaces/services/feedback.service.interface.js';
 import type { FeedbackRepository } from '#repositories/feedback.repository.js';
 import type { CreateFeedbackDTO, UpdateFeedbackDTO } from '#types/feedback.types.js';
-import { NotFound } from '#types/http-error.type.js';
+import { NotFound } from '#types/http-error.types.js';
 import MESSAGES from '#utils/constants/messages.js';
 
 export class FeedbackService implements IFeedbackService {

@@ -3,7 +3,7 @@ import { assert } from 'superstruct';
 import type { AuthService } from '#services/auth.service.js';
 import type { CreateUserDTO, SignInDTO } from '#types/auth.types.js';
 import type { Request } from '#types/common.types.js';
-import { BadRequest, NotFound, Unauthorized } from '#types/http-error.type.js';
+import { BadRequest, NotFound, Unauthorized } from '#types/http-error.types.js';
 import MESSAGES from '#utils/constants/messages.js';
 import { CreateUser, SignIn } from '#utils/struct.js';
 
