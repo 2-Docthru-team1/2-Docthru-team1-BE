@@ -1,10 +1,10 @@
 import type { Challenge } from '@prisma/client';
 import type { IChallengeService } from '#interfaces/services/challenge.service.interface.js';
 import type { ChallengeRepository } from '#repositories/challenge.repository.js';
-import type { CreateChallengeDTO, UpdateChallengeDTO, getChallengesOptions } from '#types/challenge.types.js';
+import type { ChallengeInput, CreateChallengeDTO, getChallengesOptions } from '#types/challenge.types.js';
 
 export class ChallengeService implements IChallengeService {
-  constructor(private challengeRepository: ChallengeRepository) {} // 이 부분에 Repository를 연결합니다.
+  constructor(private challengeRepository: ChallengeRepository) {}
 
   // 이 아래로 데이터를 가공하는 코드를 작성합니다.
   // 비즈니스 로직, DB에서 가져온 데이터를 가공하는 코드가 주로 작성됩니다.
@@ -20,11 +20,16 @@ export class ChallengeService implements IChallengeService {
     return await this.challengeRepository.findById(id);
   };
 
-  // createChallenge = async (challengeData: CreateChallengeDTO): Promise<Challenge> => {
-  //   const challenge = await this.challengeRepository.create(challengeData);
-
-  //   return challenge;
-  // };
+  createChallenge = async (challengeData: CreateChallengeDTO, userId: string): Promise<Challenge> => {
+    const ChallengeInput: ChallengeInput = {
+      ...challengeData,
+      status: 'pending',
+      isHidden: false,
+      requestUserId: userId,
+      participants: [{ id: userId }],
+    };
+    return await this.challengeRepository.create(ChallengeInput);
+  };
 
   // updateChallenge = async (id: string, challengeData: UpdateChallengeDTO): Promise<Challenge> => {
   //   const challenge = await this.challengeRepository.update(id, challengeData);
