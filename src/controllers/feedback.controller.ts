@@ -9,12 +9,12 @@ export class FeedbackController {
   constructor(private feedbackService: FeedbackService) {}
 
   getFeedbacks = async (req: Request, res: Response, next: NextFunction) => {
-    const { orderBy, page, pageSize } = req.query;
+    const { orderBy = 'latest', page = '1', pageSize = '10' } = req.query;
 
     const options: { orderBy: string; page: number; pageSize: number } = {
       orderBy: orderBy as string,
-      page: Number(page) ?? 1,
-      pageSize: Number(pageSize) ?? 10,
+      page: parseInt(page as string, 10) ?? 1,
+      pageSize: parseInt(pageSize as string, 10) ?? 10,
     };
     const Feedbacks = await this.feedbackService.getFeedbacks(options);
 

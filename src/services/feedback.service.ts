@@ -2,6 +2,8 @@ import type { Feedback } from '@prisma/client';
 import type { IFeedbackService } from '#interfaces/services/feedback.service.interface.js';
 import type { FeedbackRepository } from '#repositories/feedback.repository.js';
 import type { CreateFeedbackDTO, UpdateFeedbackDTO } from '#types/feedback.types.js';
+import { NotFound } from '#types/http-error.type.js';
+import MESSAGES from '#utils/constants/messages.js';
 
 export class FeedbackService implements IFeedbackService {
   constructor(private feedbackRepository: FeedbackRepository) {}
@@ -19,6 +21,9 @@ export class FeedbackService implements IFeedbackService {
 
   getFeedbackById = async (id: string): Promise<Feedback | null> => {
     const Feedback = await this.feedbackRepository.findById(id);
+    if (!Feedback) {
+      throw new NotFound(MESSAGES.NOT_FOUND);
+    }
 
     return Feedback;
   };
