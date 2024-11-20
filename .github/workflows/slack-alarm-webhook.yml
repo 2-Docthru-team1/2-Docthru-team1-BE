@@ -11,6 +11,11 @@ jobs:
   mention_notification:
     name: Mention Notification
     runs-on: ubuntu-latest
+    if: >
+      github.event_name == 'pull_request_review' &&
+      (github.event.review.state == 'APPROVED' || github.event.review.state == 'CHANGES_REQUESTED') ||
+      github.event_name == 'pull_request' ||
+      github.event_name == 'repository_dispatch'
     steps:
       - name: Debug Event
         run: |
@@ -107,12 +112,27 @@ jobs:
               prTitle = context.payload.pull_request.title;
               prUrl = context.payload.pull_request.html_url;
               
-              const { data: reviewData } = await github.rest.pulls.listRequestedReviewers({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                pull_number: context.payload.pull_request.number
-              });
-              reviewers = reviewData.users.map(user => user.login);
+              const [requestedReviewers, completedReviews] = await Promise.all([
+                github.rest.pulls.listRequestedReviewers({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  pull_number: context.payload.pull_request.number
+                }),
+                github.rest.pulls.listReviews({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  pull_number: context.payload.pull_request.number
+                })
+              ]);
+
+              const allReviewers = new Set([
+                ...requestedReviewers.data.users.map(user => user.login),
+                ...completedReviews.data
+                  .map(review => review.user.login)
+                  .filter(reviewer => reviewer !== prAuthor)
+              ]);
+              
+              reviewers = Array.from(allReviewers);
             }
 
             const authorSlackId = mapping[prAuthor] || prAuthor;

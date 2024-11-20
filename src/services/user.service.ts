@@ -1,6 +1,6 @@
 import type { IUserService } from '#interfaces/services/user.service.interface.js';
 import type { UserRepository } from '#repositories/user.repository.js';
-import type { UpdateUserDTO, User } from '#types/user.types.js';
+import type { User } from '#types/user.types.js';
 
 export class UserService implements IUserService {
   constructor(private userRepository: UserRepository) {} // 이 부분에 Repository를 연결합니다.
@@ -20,7 +20,7 @@ export class UserService implements IUserService {
     return user;
   };
 
-  updateUser = async (id: string, data: UpdateUserDTO): Promise<User> => {
+  updateUser = async (id: string, data: User): Promise<User> => {
     const user = await this.userRepository.update(id, data);
 
     return user;
