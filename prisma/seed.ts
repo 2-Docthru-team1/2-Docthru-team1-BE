@@ -43,11 +43,9 @@ async function main() {
         imageUrl2: challenge.imageUrl2,
         embedUrl: challenge.embedUrl,
         mediaType: challenge.mediaType,
-        requestUser: challenge.requestUserId
-          ? {
-              connect: { id: challenge.requestUserId },
-            }
-          : undefined,
+        requestUser: {
+          connect: { id: challenge.requestUserId },
+        },
       },
     });
   }
