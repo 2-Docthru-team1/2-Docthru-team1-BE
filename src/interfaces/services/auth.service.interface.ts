@@ -1,8 +1,8 @@
-import type { CreateUserDTO, UserToken } from '#types/auth.types.js';
+import type { CreateUserDTO, SigninResponse, UserToken } from '#types/auth.types.js';
 import type { SafeUser } from '#types/user.types.js';
 
 export interface IAuthService {
-  signIn(email: string, password: string): Promise<SafeUser>;
+  signIn(email: string, password: string): Promise<SigninResponse>;
   createUser(userData: CreateUserDTO): Promise<SafeUser>;
   getNewToken(userToken: UserToken, refreshToken: string): Promise<SafeUser>;
 }
