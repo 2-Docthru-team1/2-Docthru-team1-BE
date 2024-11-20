@@ -1,4 +1,4 @@
-import { HttpError } from '#types/http-error.type.js';
+import { HttpError } from '#types/http-error.types.js';
 
 class CustomHttpError extends HttpError {
   name: string;
