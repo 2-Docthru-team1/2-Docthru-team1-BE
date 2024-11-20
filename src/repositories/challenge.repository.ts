@@ -1,7 +1,7 @@
 import type { Challenge, MediaType, PrismaClient, Status } from '@prisma/client';
 import prismaClient from '#connection/postgres.connection.js';
 import type { IChallengeRepository } from '#interfaces/repositories/challenge.repository.interface.js';
-import type { ChallengeInput, getChallengesOptions } from '#types/challenge.types.js';
+import type { ChallengeInput, UpdateChallengeDTO, getChallengesOptions } from '#types/challenge.types.js';
 import { Order } from '#utils/constants/enum.js';
 
 export class ChallengeRepository implements IChallengeRepository {
@@ -103,11 +103,18 @@ export class ChallengeRepository implements IChallengeRepository {
     });
   };
 
-  // update = async (id: string, data: UpdateChallengeDTO): Promise<Challenge> => {
-  //   const challenge = await this.challenge.update({ where: { id }, data });
-
-  //   return challenge;
-  // };
+  update = async (id: string, data: UpdateChallengeDTO): Promise<Challenge> => {
+    const challenge = await this.challenge.update({
+      where: { id },
+      data,
+      include: {
+        participants: true,
+        works: true,
+        abortReason: true,
+      },
+    });
+    return challenge;
+  };
 
   // delete = async (id: string): Promise<Challenge> => {
   //   const challenge = await this.challenge.delete({ where: { id } });

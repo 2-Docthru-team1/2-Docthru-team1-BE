@@ -44,9 +44,12 @@ export interface ChallengeInput {
   participants: { id: string }[];
 }
 
-// export interface UpdateChallengeDTO {
-//   title?: string;
-//   description?: string;
-//   status?: string;
-//   deadline?: Date;
-// }
+export interface UpdateChallengeDTO {
+  title?: string;
+  description?: string;
+  deadline?: Date;
+  embedUrl?: string;
+  imageUrl?: string;
+  imageUrl2?: string;
+  mediaType?: MediaType;
+}
