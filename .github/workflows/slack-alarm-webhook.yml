@@ -11,6 +11,11 @@ jobs:
   mention_notification:
     name: Mention Notification
     runs-on: ubuntu-latest
+    if: >
+      github.event_name == 'pull_request_review' &&
+      (github.event.review.state == 'APPROVED' || github.event.review.state == 'CHANGES_REQUESTED') ||
+      github.event_name == 'pull_request' ||
+      github.event_name == 'repository_dispatch'
     steps:
       - name: Debug Event
         run: |
