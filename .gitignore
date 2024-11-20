@@ -2,6 +2,7 @@ node_modules
 http
 .vscode
 .env
+devs
 dist
 *.csv
 *.pem

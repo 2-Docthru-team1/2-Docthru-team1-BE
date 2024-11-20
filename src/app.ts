@@ -3,6 +3,7 @@ import cors from 'cors';
 import express from 'express';
 import 'express-async-errors';
 import { port } from '#configs/common.config.js';
+import { runAsyncLocalStorage } from '#middlewares/asyncLocalStorage.js';
 import errorHandler from '#middlewares/error-handler.js';
 import validatePaginationOptions from '#middlewares/pagination.validation.js';
 import authRouter from '#routes/auth.route.js';
@@ -18,6 +19,7 @@ app.use(express.json());
 app.use(cors({ credentials: true, origin: true }));
 app.use(cookieParser());
 app.use(validatePaginationOptions);
+app.use(runAsyncLocalStorage);
 
 /*********************************************************************************** routes **********************************************************************************************/
 app.use('/auth', authRouter);
@@ -25,6 +27,10 @@ app.use('/challenges', challengeRouter);
 app.use('/users', userRouter);
 app.use('/feedbacks', feedbackRouter);
 app.use('/works', workRouter);
+
+app.get('/hello', (req, res) => {
+  res.send('Hello World');
+});
 
 /*********************************************************************************** handler **********************************************************************************************/
 app.use(errorHandler);

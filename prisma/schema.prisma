@@ -20,11 +20,11 @@ model User {
   deleteAt  DateTime?
 
   name         String
-  email        String  @unique
+  email        String @unique
   password     String
   salt         String
-  refreshToken String?
-  role         Role    @default(normal)
+  refreshToken String @default("")
+  role         Role   @default(normal)
   // TODO 전문가 유저는 랭킹 시스템에 연동되는 고도화 내용
   // 랭킹 시스템과 연동되기 떄문에 나중에 추천수 필드를 유저에 만들어야됨
 

@@ -1,6 +1,6 @@
-import type { User } from '#types/user.types.js';
+import type { SafeUser, User } from '#types/user.types.js';
 
-export default function filterSensitiveData(data: User) {
+export default function filterSensitiveData(data: User): SafeUser {
   const { password, salt, refreshToken, ...rest } = data;
 
   return rest;
