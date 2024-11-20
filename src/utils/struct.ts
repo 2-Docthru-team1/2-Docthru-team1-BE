@@ -72,4 +72,6 @@ export const CreateFeedback = object({
   workId: Uuid,
 });
 
-export const PatchFeedback = object({});
+export const PatchFeedback = object({
+  content: string(),
+});
