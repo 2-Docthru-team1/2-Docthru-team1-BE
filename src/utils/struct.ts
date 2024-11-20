@@ -1,7 +1,7 @@
 import { Role } from '@prisma/client';
 import isEmail from 'is-email';
 import isUuid from 'is-uuid';
-import { define, enums, object, optional, string } from 'superstruct';
+import { coerce, date, define, enums, object, optional, string } from 'superstruct';
 
 // prisma의 enum 타입을 js string[]로 변환
 const roleEnumValues = Object.values(Role) as string[];
@@ -28,9 +28,35 @@ export const SignIn = object({
 
 export const PatchUser = object({});
 
-export const CreateChallenge = object({});
+const urlRegex = /^(https?:\/\/[^\s$.?#].[^\s]*)$/;
+export const Url = define<string>('Url', value => {
+  if (typeof value !== 'string') {
+    return false;
+  }
+  return urlRegex.test(value);
+});
 
-export const PatchChallenge = object({});
+const ISO8601Regex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z$/;
+export const ISO8601String = define<string>('ISO8601String', value => {
+  if (typeof value !== 'string') {
+    return false;
+  }
+  return ISO8601Regex.test(value);
+});
+
+export const MediaType = enums(['youtube', 'blog', 'recipeWeb', 'socialMedia']);
+
+export const CreateChallenge = object({
+  title: string(),
+  description: string(),
+  deadline: ISO8601String,
+  embedUrl: Url,
+  imageUrl: Url,
+  imageUrl2: optional(Url),
+  mediaType: MediaType,
+});
+
+export const PatchChallenge = object({ CreateChallenge });
 
 export const CreateRequest = object({});
 

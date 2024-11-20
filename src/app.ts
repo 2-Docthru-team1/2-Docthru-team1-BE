@@ -21,13 +21,14 @@ app.use(validatePaginationOptions);
 
 /*********************************************************************************** routes **********************************************************************************************/
 app.use('/auth', authRouter);
-app.use('/challenge', challengeRouter);
-app.use('/user', userRouter);
-app.use('/feedback', feedbackRouter);
-app.use('/work', workRouter);
+app.use('/challenges', challengeRouter);
+app.use('/users', userRouter);
+app.use('/feedbacks', feedbackRouter);
+app.use('/works', workRouter);
 
 /*********************************************************************************** handler **********************************************************************************************/
 app.use(errorHandler);
+
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
