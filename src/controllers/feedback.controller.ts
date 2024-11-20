@@ -52,7 +52,7 @@ export class FeedbackController {
     res.json(user);
   };
 
-  deleteChallege = async (req: Request<{ params: { id: string } }>, res: Response, next: NextFunction) => {
+  deleteFeedback = async (req: Request<{ params: { id: string } }>, res: Response, next: NextFunction) => {
     const { id } = req.params;
 
     const user = await this.feedbackService.deleteFeedback(id);

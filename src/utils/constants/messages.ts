@@ -15,6 +15,7 @@ const MESSAGES = Object.freeze({
   USER_NOT_FOUND: '사용자를 찾을 수 없습니다.',
   INVALID_ACCESS_TOKEN: '유효하지 않은 엑세스 토큰입니다.',
   INVALID_REFRESH_TOKEN: '유효하지 않은 리프레시 토큰입니다.',
+  DELETED_RESOURCE: '삭제된 리소스입니다.',
 });
 
 export default MESSAGES;

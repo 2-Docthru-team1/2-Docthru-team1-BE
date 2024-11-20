@@ -8,4 +8,5 @@ export interface IFeedbackRepository {
   create(FeedbackData: CreateFeedbackDTO): Promise<Feedback>;
   update(id: string, FeedbackData: UpdateFeedbackDTO): Promise<Feedback>;
   delete(id: string): Promise<Feedback>;
+  isDeleted(id: string): Promise<boolean>;
 }

@@ -49,8 +49,14 @@ export class FeedbackRepository implements IFeedbackRepository {
   };
 
   delete = async (id: string): Promise<Feedback> => {
-    const feedback = await this.feedback.delete({ where: { id } });
+    const feedback = await this.feedback.update({ where: { id }, data: { deletedAt: new Date() } });
 
     return feedback;
+  };
+
+  isDeleted = async (id: string): Promise<boolean> => {
+    const feedback = await this.feedback.findUnique({ where: { id } });
+
+    return !!feedback?.deletedAt;
   };
 }

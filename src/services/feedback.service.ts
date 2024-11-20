@@ -2,7 +2,7 @@ import type { Feedback } from '@prisma/client';
 import type { IFeedbackService } from '#interfaces/services/feedback.service.interface.js';
 import type { FeedbackRepository } from '#repositories/feedback.repository.js';
 import type { CreateFeedbackDTO, UpdateFeedbackDTO } from '#types/feedback.types.js';
-import { NotFound } from '#types/http-error.type.js';
+import { BadRequest, NotFound } from '#types/http-error.type.js';
 import MESSAGES from '#utils/constants/messages.js';
 
 export class FeedbackService implements IFeedbackService {
@@ -35,9 +35,15 @@ export class FeedbackService implements IFeedbackService {
   };
 
   updateFeedback = async (id: string, FeedbackData: UpdateFeedbackDTO): Promise<Feedback> => {
+    // NOTE 피드백 존재 여부 확인
     const isExist = !!(await this.feedbackRepository.findById(id));
     if (!isExist) {
       throw new NotFound(MESSAGES.NOT_FOUND);
+    }
+    // NOTE 피드백 삭제 여부 확인
+    const isDeleted = await this.feedbackRepository.isDeleted(id);
+    if (isDeleted) {
+      throw new BadRequest(MESSAGES.DELETED_RESOURCE);
     }
 
     const Feedback = await this.feedbackRepository.update(id, FeedbackData);
@@ -46,6 +52,11 @@ export class FeedbackService implements IFeedbackService {
   };
 
   deleteFeedback = async (id: string): Promise<Feedback> => {
+    const isExist = !!(await this.feedbackRepository.findById(id));
+    if (!isExist) {
+      throw new NotFound(MESSAGES.NOT_FOUND);
+    }
+
     const Feedback = await this.feedbackRepository.delete(id);
 
     return Feedback;
