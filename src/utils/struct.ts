@@ -1,7 +1,7 @@
 import { Role } from '@prisma/client';
 import isEmail from 'is-email';
 import isUuid from 'is-uuid';
-import { define, enums, object, optional, string } from 'superstruct';
+import { define, enums, object, optional, partial, string } from 'superstruct';
 
 // prisma의 enum 타입을 js string[]로 변환
 const roleEnumValues = Object.values(Role) as string[];
@@ -56,7 +56,7 @@ export const CreateChallenge = object({
   mediaType: MediaType,
 });
 
-export const PatchChallenge = object({ CreateChallenge });
+export const PatchChallenge = partial(CreateChallenge);
 
 export const CreateRequest = object({});
 
@@ -66,6 +66,12 @@ export const CreateWork = object({});
 
 export const PatchWork = object({});
 
-export const CreateFeedback = object({});
+export const CreateFeedback = object({
+  content: string(),
+  ownerId: Uuid,
+  workId: Uuid,
+});
 
-export const PatchFeedback = object({});
+export const PatchFeedback = object({
+  content: string(),
+});

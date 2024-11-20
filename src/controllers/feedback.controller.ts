@@ -1,31 +1,32 @@
-import type { NextFunction, Request, Response } from 'express';
+import type { NextFunction, Response } from 'express';
 import { assert } from 'superstruct';
 import type { FeedbackService } from '#services/feedback.service.js';
-import type { CreateFeedbackDTO } from '#types/feedback.types.js';
+import type { BasicOptions, Request } from '#types/common.types.js';
+import type { CreateFeedbackDTO, UpdateFeedbackDTO } from '#types/feedback.types.js';
 import MESSAGES from '#utils/constants/messages.js';
 import { CreateFeedback, PatchFeedback, Uuid } from '#utils/struct.js';
 
 export class FeedbackController {
-  constructor(private FeedbackService: FeedbackService) {}
+  constructor(private feedbackService: FeedbackService) {}
 
-  getFeedbacks = async (req: Request, res: Response, next: NextFunction) => {
-    const { orderBy, page, pageSize } = req.query;
+  getFeedbacks = async (req: Request<{ query: BasicOptions }>, res: Response, next: NextFunction) => {
+    const { orderBy = 'latest', page = '1', pageSize = '10' } = req.query;
 
     const options: { orderBy: string; page: number; pageSize: number } = {
-      orderBy: orderBy as string,
-      page: Number(page) ?? 1,
-      pageSize: Number(pageSize) ?? 10,
+      orderBy,
+      page: parseInt(page, 10) ?? 1,
+      pageSize: parseInt(pageSize, 10) ?? 10,
     };
-    const Feedbacks = await this.FeedbackService.getFeedbacks(options);
+    const Feedbacks = await this.feedbackService.getFeedbacks(options);
 
     res.json(Feedbacks);
   };
 
-  getFeedbackById = async (req: Request, res: Response, next: NextFunction) => {
+  getFeedbackById = async (req: Request<{ params: { id: string } }>, res: Response, next: NextFunction) => {
     const { id } = req.params;
     assert(id, Uuid, MESSAGES.WRONG_ID_FORMAT);
 
-    const Feedback = await this.FeedbackService.getFeedbackById(id);
+    const Feedback = await this.feedbackService.getFeedbackById(id);
 
     res.json(Feedback);
   };
@@ -33,33 +34,29 @@ export class FeedbackController {
   postFeedback = async (req: Request, res: Response, next: NextFunction) => {
     assert(req.body, CreateFeedback, MESSAGES.WRONG_FORMAT);
 
-    const user = await this.FeedbackService.createFeedback(req.body as CreateFeedbackDTO);
+    const user = await this.feedbackService.createFeedback(req.body as CreateFeedbackDTO);
 
     res.json(user);
   };
 
-  patchFeedback = async (req: Request, res: Response, next: NextFunction) => {
+  patchFeedback = async (
+    req: Request<{ params: { id: string }; body: UpdateFeedbackDTO }>,
+    res: Response,
+    next: NextFunction,
+  ) => {
     const { id } = req.params;
     assert(req.body, PatchFeedback, MESSAGES.WRONG_FORMAT);
 
-    const user = await this.FeedbackService.updateFeedback(id, req.body);
+    const user = await this.feedbackService.updateFeedback(id, req.body);
 
     res.json(user);
   };
 
-  deleteChallege = async (req: Request, res: Response, next: NextFunction) => {
+  deleteChallege = async (req: Request<{ params: { id: string } }>, res: Response, next: NextFunction) => {
     const { id } = req.params;
 
-    const user = await this.FeedbackService.deleteFeedback(id);
+    const user = await this.feedbackService.deleteFeedback(id);
 
     res.json(user);
   };
 }
-
-// 챌린지, 작업물 등 관련된 것들
-
-// Feedback, Work, Feedback WorkImage
-// 경호님
-// 태연님
-
-// User팀이 도와줌

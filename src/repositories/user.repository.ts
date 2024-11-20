@@ -1,6 +1,7 @@
 import type { PrismaClient } from '@prisma/client';
 import type { IUserRepository } from '#interfaces/repositories/user.repository.interface.js';
-import type { CreateUserDTO, UpdateUserDTO, User } from '#types/user.types.js';
+import type { CreateUserDTO } from '#types/auth.types.js';
+import type { User } from '#types/user.types.js';
 
 export class UserRepository implements IUserRepository {
   constructor(private user: PrismaClient['user']) {}
@@ -23,14 +24,14 @@ export class UserRepository implements IUserRepository {
     return user;
   };
 
-  update = async (id: string, data: UpdateUserDTO): Promise<User> => {
+  update = async (id: string, data: User): Promise<User> => {
     const user = await this.user.update({ where: { id }, data });
 
     return user;
   };
 
   delete = async (id: string): Promise<User> => {
-    const user = await this.user.delete({ where: { id } });
+    const user = await this.user.update({ where: { id }, data: { deletedAt: new Date() } });
 
     return user;
   };

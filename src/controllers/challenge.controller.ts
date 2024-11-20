@@ -47,7 +47,7 @@ export class ChallengeController {
     const updateChallenge = await this.challengeService.updateChallenge(id, req.body);
     res.json(updateChallenge);
   };
-
+  
   patchChallengeStatus = async (req: Request<{ id: string }, {}, UpdateChallengeStatusDTO>, res: Response) => {
     const { id: challengeId } = req.params;
     const { status, abortReason } = req.body;

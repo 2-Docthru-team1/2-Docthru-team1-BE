@@ -51,7 +51,7 @@ export class ChallengeService implements IChallengeService {
     userRole,
   }: ChallengeStatusInput): Promise<Challenge | null> => {
     const challenge = await this.challengeRepository.findById(challengeId);
-
+    
     validateUpdateStatus({
       challenge,
       status,
