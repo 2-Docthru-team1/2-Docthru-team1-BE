@@ -1,14 +1,16 @@
 import type { Challenge, MediaType, PrismaClient, Status } from '@prisma/client';
 import prismaClient from '#connection/postgres.connection.js';
 import type { IChallengeRepository } from '#interfaces/repositories/challenge.repository.interface.js';
-import type { ChallengeInput, UpdateChallengeDTO, getChallengesOptions } from '#types/challenge.types.js';
+import type { ChallengeInput, ChallengeStatusInput, UpdateChallengeDTO, getChallengesOptions } from '#types/challenge.types.js';
 import { Order } from '#utils/constants/enum.js';
 
 export class ChallengeRepository implements IChallengeRepository {
   private challenge: PrismaClient['challenge'];
+  private abortReason: PrismaClient['abortReason'];
 
   constructor(client: PrismaClient) {
     this.challenge = client.challenge;
+    this.abortReason = client.abortReason;
   }
 
   findMany = async (options: getChallengesOptions): Promise<Challenge[] | null> => {
@@ -116,9 +118,27 @@ export class ChallengeRepository implements IChallengeRepository {
     return challenge;
   };
 
-  // delete = async (id: string): Promise<Challenge> => {
-  //   const challenge = await this.challenge.delete({ where: { id } });
-
-  //   return challenge;
-  // };
+  updateStatus = async (data: ChallengeStatusInput): Promise<Challenge> => {
+    const { challengeId, status, abortReason, userId } = data;
+    const newStatus = { status };
+    if (abortReason && ['denied', 'aborted'].includes(status)) {
+      await this.abortReason.upsert({
+        where: { challengeId },
+        create: {
+          content: abortReason,
+          adminId: userId,
+          challengeId,
+        },
+        update: {
+          content: abortReason,
+          adminId: userId,
+        },
+      });
+    }
+    return await this.challenge.update({
+      where: { id: challengeId },
+      data: newStatus,
+      include: { abortReason: true },
+    });
+  };
 }
