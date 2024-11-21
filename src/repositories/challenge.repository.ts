@@ -1,36 +1,36 @@
-import type { Challenge, MediaType, PrismaClient, Status } from '@prisma/client';
+import type { AbortReason, Challenge, MediaType, PrismaClient, Status } from '@prisma/client';
+import prismaClient from '#connection/postgres.connection.js';
 import type { IChallengeRepository } from '#interfaces/repositories/challenge.repository.interface.js';
-import type { CreateChallengeDTO, UpdateChallengeDTO, getChallengesOptions } from '#types/challenge.types.js';
+import type { ChallengeInput, ChallengeStatusInput, UpdateChallengeDTO, getChallengesOptions } from '#types/challenge.types.js';
 import { Order } from '#utils/constants/enum.js';
-import prismaClient from '../connection/postgres.connection.js';
 
 export class ChallengeRepository implements IChallengeRepository {
   private challenge: PrismaClient['challenge'];
+  private abortReason: PrismaClient['abortReason'];
 
   constructor(client: PrismaClient) {
-    this.challenge = client.challenge; // 이 부분에 각 모델(스키마)를 연결합니다.
+    this.challenge = client.challenge;
+    this.abortReason = client.abortReason;
   }
 
-  // 이 아래로 직접 DB와 통신하는 코드를 작성합니다.
-  // 여기서 DB와 통신해 받아온 데이터를 위로(service로) 올려줍니다.
   findMany = async (options: getChallengesOptions): Promise<Challenge[] | null> => {
-    const { status, mediaType, order, keyword, page, pageSize } = options;
-    const orderBy: {
+    const { status, mediaType, orderBy, keyword, page, pageSize } = options;
+    const applyOrderBy: {
       deadline?: 'asc' | 'desc';
       createdAt?: 'asc' | 'desc';
     } = {};
-    switch (order) {
+    switch (orderBy) {
       case Order.deadlineEarliest:
-        orderBy.deadline = 'asc';
+        applyOrderBy.deadline = 'asc';
         break;
       case Order.deadlineLatest:
-        orderBy.deadline = 'desc';
+        applyOrderBy.deadline = 'desc';
         break;
       case Order.earliestFirst:
-        orderBy.createdAt = 'asc';
+        applyOrderBy.createdAt = 'asc';
         break;
       default:
-        orderBy.createdAt = 'desc';
+        applyOrderBy.createdAt = 'desc';
     }
     const whereCondition: {
       mediaType?: MediaType;
@@ -45,8 +45,8 @@ export class ChallengeRepository implements IChallengeRepository {
       ...(keyword
         ? {
             OR: [
-              { title: { contains: keyword, mode: 'insensitive' } }, // title에서 키워드 검색
-              { description: { contains: keyword, mode: 'insensitive' } }, // description에서 키워드 검색
+              { title: { contains: keyword, mode: 'insensitive' } },
+              { description: { contains: keyword, mode: 'insensitive' } },
             ],
           }
         : {}),
@@ -55,7 +55,7 @@ export class ChallengeRepository implements IChallengeRepository {
       skip: (page - 1) * pageSize,
       take: pageSize,
       where: whereCondition,
-      orderBy,
+      orderBy: applyOrderBy,
     });
     return challenges;
   };
@@ -74,8 +74,8 @@ export class ChallengeRepository implements IChallengeRepository {
       ...(status ? { status } : {}),
       ...(keyword && {
         OR: [
-          { title: { contains: options.keyword, mode: 'insensitive' } }, // title에서 키워드 검색
-          { description: { contains: options.keyword, mode: 'insensitive' } }, // description에서 키워드 검색
+          { title: { contains: options.keyword, mode: 'insensitive' } },
+          { description: { contains: options.keyword, mode: 'insensitive' } },
         ],
       }),
     };
@@ -84,24 +84,67 @@ export class ChallengeRepository implements IChallengeRepository {
   };
 
   findById = async (id: string): Promise<Challenge | null> => {
-    return await prismaClient.challenge.findUnique({ where: { id } });
+    return await prismaClient.challenge.findUnique({
+      where: { id },
+      include: {
+        participants: true,
+        works: true,
+        abortReason: true,
+      },
+    });
   };
 
-  // create = async (data: CreateChallengeDTO): Promise<Challenge> => {
-  //   const challenge = await this.challenge.create({ data });
+  create = async (data: ChallengeInput): Promise<Challenge> => {
+    return await this.challenge.create({
+      data: {
+        ...data,
+        participants: {
+          connect: [{ id: data.participants[0].id }],
+        },
+      },
+    });
+  };
 
-  //   return challenge;
-  // };
+  update = async (id: string, data: UpdateChallengeDTO): Promise<Challenge> => {
+    const challenge = await this.challenge.update({
+      where: { id },
+      data,
+      include: {
+        participants: true,
+        works: true,
+        abortReason: true,
+      },
+    });
+    return challenge;
+  };
 
-  // update = async (id: string, data: UpdateChallengeDTO): Promise<Challenge> => {
-  //   const challenge = await this.challenge.update({ where: { id }, data });
+  updateStatus = async (data: ChallengeStatusInput): Promise<Challenge> => {
+    const { challengeId, status, abortReason, userId } = data;
+    const newStatus = { status };
+    if (abortReason && ['denied', 'aborted'].includes(status)) {
+      await this.abortReason.upsert({
+        where: { challengeId },
+        create: {
+          content: abortReason,
+          adminId: userId,
+          challengeId,
+        },
+        update: {
+          content: abortReason,
+          adminId: userId,
+        },
+      });
+    }
+    return await this.challenge.update({
+      where: { id: challengeId },
+      data: newStatus,
+      include: { abortReason: true },
+    });
+  };
 
-  //   return challenge;
-  // };
-
-  // delete = async (id: string): Promise<Challenge> => {
-  //   const challenge = await this.challenge.delete({ where: { id } });
-
-  //   return challenge;
-  // };
+  findAbortReason = async (id: string): Promise<AbortReason | null> => {
+    return await this.abortReason.findUnique({
+      where: { challengeId: id },
+    });
+  };
 }

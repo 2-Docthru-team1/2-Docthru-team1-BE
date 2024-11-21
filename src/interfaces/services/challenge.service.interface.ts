@@ -1,5 +1,5 @@
-import type { Challenge, MediaType, Status } from '@prisma/client';
-import type { CreateChallengeDTO, UpdateChallengeDTO } from '#types/challenge.types.js';
+import type { AbortReason, Challenge, MediaType, Status } from '@prisma/client';
+import type { ChallengeStatusInput, CreateChallengeDTO, UpdateChallengeDTO } from '#types/challenge.types.js';
 import { Order } from '#utils/constants/enum.js';
 
 export interface IChallengeService {
@@ -7,12 +7,13 @@ export interface IChallengeService {
     status?: Status;
     mediaType?: MediaType;
     keyword: string;
-    order: Order;
+    orderBy: Order;
     page: number;
     pageSize: number;
   }): Promise<{ list: Challenge[]; totalCount: number }>;
   getChallengeById(id: string): Promise<Challenge | null>;
-  // createChallenge(ChallengeData: CreateChallengeDTO): Promise<Challenge>;
-  // updateChallenge(id: string, ChallengeData: UpdateChallengeDTO): Promise<Challenge>;
-  // deleteChallenge(id: string): Promise<Challenge>;
+  createChallenge(challengeData: CreateChallengeDTO, userId: string): Promise<Challenge>;
+  updateChallenge(id: string, challengeData: UpdateChallengeDTO): Promise<Challenge>;
+  updateStatus(data: ChallengeStatusInput): Promise<Challenge | null>;
+  getAbortReason(id: string): Promise<AbortReason | null>;
 }

@@ -7,4 +7,5 @@ export interface IWorkRepository {
   create(workData: CreateWorkDTO): Promise<ChallengeWork>;
   update(id: string, workData: UpdateWorkDTO): Promise<ChallengeWork>;
   delete(id: string): Promise<ChallengeWork>;
+  totalCount(challengeId: string): Promise<number | null>;
 }

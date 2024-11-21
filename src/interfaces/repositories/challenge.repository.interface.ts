@@ -1,12 +1,12 @@
-import type { Challenge, MediaType, Status } from '@prisma/client';
-import type { CreateChallengeDTO, UpdateChallengeDTO } from '#types/challenge.types.js';
+import type { AbortReason, Challenge, MediaType, Status } from '@prisma/client';
+import type { ChallengeInput, ChallengeStatusInput, UpdateChallengeDTO } from '#types/challenge.types.js';
 import { Order } from '#utils/constants/enum.js';
 
 export interface IChallengeRepository {
   findMany(options: {
     status?: Status;
     mediaType?: MediaType;
-    order: Order;
+    orderBy: Order;
     keyword: string;
     page: Number;
     pageSize: Number;
@@ -20,7 +20,8 @@ export interface IChallengeRepository {
   }): Promise<number | null>;
 
   findById(id: string): Promise<Challenge | null>;
-  // create(userData: CreateChallengeDTO): Promise<Challenge>;
-  // update(id: string, userData: UpdateChallengeDTO): Promise<Challenge>;
-  // delete(id: string): Promise<Challenge>;
+  create(data: ChallengeInput): Promise<Challenge>;
+  update(id: string, data: UpdateChallengeDTO): Promise<Challenge>;
+  updateStatus(data: ChallengeStatusInput): Promise<Challenge>;
+  findAbortReason(id: string): Promise<AbortReason | null>;
 }

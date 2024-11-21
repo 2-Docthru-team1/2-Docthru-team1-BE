@@ -1,45 +1,63 @@
 import type { IAuthService } from '#interfaces/services/auth.service.interface.js';
+import { getStorage } from '#middlewares/asyncLocalStorage.js';
 import type { UserRepository } from '#repositories/user.repository.js';
-import type { UserToken } from '#types/auth.types.js';
-import type { CreateUserDTO, User } from '#types/user.types.js';
+import type { CreateUserDTO, SigninResponse, UserToken } from '#types/auth.types.js';
+import { BadRequest, NotFound, Unauthorized } from '#types/http-error.types.js';
+import type { SafeUser } from '#types/user.types.js';
 import MESSAGES from '#utils/constants/messages.js';
 import createToken from '#utils/createToken.js';
 import filterSensitiveData from '#utils/filterSensitiveData.js';
 import hashingPassword from '#utils/hashingPassword.js';
-// import { generateAccessToken } from '#utils/jwt.js';
 import remainingTime from '#utils/remainingTime.js';
 
 export class AuthService implements IAuthService {
   constructor(private userRepository: UserRepository) {}
 
-  signIn = async (email: string, password: string): Promise<User> => {
+  signIn = async (email: string, password: string): Promise<SigninResponse> => {
     const user = await this.userRepository.findByEmail(email);
     if (!user) {
       throw new Error(MESSAGES.INVALID_CREDENTIALS);
     }
+
     const hashedInputPassword = hashingPassword(password, user.salt);
     if (hashedInputPassword !== user.password) {
       throw new Error(MESSAGES.INVALID_CREDENTIALS);
     }
 
-    // const accessToken = generateAccessToken(user);
-    // user.accessToken = accessToken;
-    return user;
+    const refreshToken = createToken(user, 'refresh');
+    user.refreshToken = refreshToken;
+    await this.userRepository.update(user.id, user);
+
+    const accessToken = createToken(user, 'access');
+    user.accessToken = accessToken;
+    return { ...filterSensitiveData(user), refreshToken };
   };
 
-  createUser = async (data: CreateUserDTO): Promise<User> => {
+  getUser = async (userId: string): Promise<SafeUser> => {
+    const user = await this.userRepository.findById(userId);
+    if (!user) {
+      throw new NotFound(MESSAGES.USER_NOT_FOUND);
+    }
+
+    return filterSensitiveData(user);
+  };
+
+  createUser = async (data: CreateUserDTO): Promise<SafeUser> => {
     const user = await this.userRepository.create(data);
 
-    return user;
+    const storage = getStorage();
+    console.log('🚀 ~ AuthService ~ createUser= ~ storage:', storage);
+
+    return filterSensitiveData(user);
   };
 
-  getNewToken = async (userToken: UserToken, refreshToken: string) => {
+  getNewToken = async (userToken: UserToken, refreshToken: string): Promise<SafeUser> => {
     const user = await this.userRepository.findById(userToken.userId);
     if (!user) {
-      throw new Error(MESSAGES.BAD_REQUEST);
+      throw new BadRequest(MESSAGES.INVALID_ACCESS_TOKEN);
     }
     if (user.refreshToken !== refreshToken) {
-      throw new Error(MESSAGES.UNAUTHORIZED);
+      throw new Unauthorized(MESSAGES.INVALID_REFRESH_TOKEN);
     }
 
     // NOTE 리프레시 토큰의 남은 시간이 2시간 이내일경우
@@ -53,6 +71,9 @@ export class AuthService implements IAuthService {
 
     const accessToken = createToken(user, 'access');
     user.accessToken = accessToken;
+
+    const storage = getStorage();
+    console.log('🚀 ~ AuthService ~ getNewToken= ~ storage:', storage);
 
     return filterSensitiveData(user);
   };

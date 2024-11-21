@@ -5,12 +5,20 @@ on:
     types: [synchronize]
   pull_request_review:
     types: [submitted]
+  pull_request_review_comment:
+    types: [created]
   repository_dispatch:
     types: [pr_review_request]
 jobs:
   mention_notification:
     name: Mention Notification
     runs-on: ubuntu-latest
+    if: >
+      github.event_name == 'pull_request_review' &&
+      (github.event.review.state == 'APPROVED' || github.event.review.state == 'CHANGES_REQUESTED') ||
+      github.event_name == 'pull_request' ||
+      github.event_name == 'repository_dispatch' ||
+      (github.event_name == 'pull_request_review_comment' && github.event.action == 'created')
     steps:
       - name: Debug Event
         run: |
@@ -18,15 +26,24 @@ jobs:
           echo "Event action: ${{ github.event.action }}"
           echo "Triggered by: ${{ github.actor }}"
 
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
 
+      - name: Cache npm packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-yaml-${{ hashFiles('**/js-yaml/**') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-yaml-
+
       - name: Install yaml package
-        run: npm install --no-package-lock yaml
+        run: npm install yaml
 
       - name: Read Slack mapping
         id: slack-mapping
@@ -98,12 +115,27 @@ jobs:
               prTitle = context.payload.pull_request.title;
               prUrl = context.payload.pull_request.html_url;
               
-              const { data: reviewData } = await github.rest.pulls.listRequestedReviewers({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                pull_number: context.payload.pull_request.number
-              });
-              reviewers = reviewData.users.map(user => user.login);
+              const [requestedReviewers, completedReviews] = await Promise.all([
+                github.rest.pulls.listRequestedReviewers({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  pull_number: context.payload.pull_request.number
+                }),
+                github.rest.pulls.listReviews({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  pull_number: context.payload.pull_request.number
+                })
+              ]);
+
+              const allReviewers = new Set([
+                ...requestedReviewers.data.users.map(user => user.login),
+                ...completedReviews.data
+                  .map(review => review.user.login)
+                  .filter(reviewer => reviewer !== prAuthor)
+              ]);
+              
+              reviewers = Array.from(allReviewers);
             }
 
             const authorSlackId = mapping[prAuthor] || prAuthor;
@@ -113,6 +145,20 @@ jobs:
               .map(reviewer => mapping[reviewer] || reviewer)
               .map(id => id.startsWith('<@') ? id : `<@${id}>`)
               .join(', ');
+
+            if (context.eventName === 'pull_request_review_comment') {
+              const currentUser = context.payload.comment.user.login;
+              const prAuthor = context.payload.pull_request.user.login;
+              
+              // 현재 코멘트가 대화 스레드의 일부인지 확인
+              const isReplyInThread = context.payload.comment.in_reply_to_id !== null;
+              
+              // PR 작성자의 댓글이거나 대화 스레드의 일부인 경우 알림 스킵
+              if (currentUser === prAuthor || isReplyInThread) {
+                console.log('Skipping notification - Comment is from PR author or is part of a thread');
+                return;
+              }
+            }
 
             const message = {
               blocks: [

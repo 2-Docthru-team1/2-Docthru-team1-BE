@@ -1,43 +1,86 @@
-// import { PrismaClient } from '@prisma/client';
-// import { CHALLENGES, USERS } from './mock/challengeMock.js';
+import { PrismaClient } from '@prisma/client';
+import { CHALLENGES, USERS } from './mock/challengeMock.js';
+import { CHALLENGE_WORKS, WORK_IMAGES } from './mock/challengeWorkMock.js';
 
-// const prisma = new PrismaClient();
+const prisma = new PrismaClient();
 
-// async function main() {
-//   //기존 데이터 삭제
-//   await prisma.user.deleteMany();
-//   await prisma.challenge.deleteMany();
+async function main() {
+  // 기존 데이터 삭제
+  await prisma.workImage.deleteMany();
+  await prisma.challengeWork.deleteMany();
+  await prisma.user.deleteMany();
+  await prisma.challenge.deleteMany();
 
-//   // 목 데이터 삽입
-//   await prisma.user.createMany({
-//     data: USERS.map(user => ({
-//       id: user.id,
-//       createdAt: user.createdAt,
-//       updatedAt: user.updatedAt,
-//       deleteAt: user.deleteAt,
-//       name: user.name,
-//       email: user.email,
-//       password: user.password,
-//       salt: user.salt,
-//       refreshToken: user.refreshToken || null,
-//       role: user.role,
-//     })),
-//     skipDuplicates: true,
-//   });
+  // 사용자 데이터 삽입 (관계형 필드 제외)
+  for (const user of USERS) {
+    await prisma.user.create({
+      data: {
+        id: user.id,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+        //deleteAt: user.deleteAt,
+        salt: user.salt,
+        name: user.name,
+        email: user.email,
+        password: user.password,
+        refreshToken: user.refreshToken,
+        role: user.role,
+      },
+    });
+  }
 
-//   await prisma.challenge.createMany({
-//     data: CHALLENGES,
-//     skipDuplicates: true,
-//   });
-// }
+  // 챌린지 데이터 삽입
+  for (const challenge of CHALLENGES) {
+    await prisma.challenge.create({
+      data: {
+        id: challenge.id,
+        createdAt: challenge.createdAt,
+        updatedAt: challenge.updatedAt,
+        //deleteAt: challenge.deleteAt,
+        title: challenge.title,
+        description: challenge.description,
+        status: challenge.status,
+        deadline: challenge.deadline,
+        isHidden: challenge.isHidden,
+        imageUrl: challenge.imageUrl,
+        imageUrl2: challenge.imageUrl2,
+        embedUrl: challenge.embedUrl,
+        mediaType: challenge.mediaType,
+        requestUser: {
+          connect: { id: challenge.requestUserId },
+        },
+      },
+    });
+  }
 
-// //데이터베이스와의 연결 종료
-// main()
-//   .then(async () => {
-//     await prisma.$disconnect();
-//   })
-//   .catch(async e => {
-//     console.error(e);
-//     await prisma.$disconnect();
-//     process.exit(1);
-//   });
+  // 사용자 데이터 업데이트 (requests 연결)
+  for (const user of USERS) {
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        requests: {
+          connect: user.requests.map((requestId: string) => ({ id: requestId })),
+        },
+      },
+    });
+  }
+  await prisma.challengeWork.createMany({
+    data: CHALLENGE_WORKS,
+    skipDuplicates: true,
+  });
+  await prisma.workImage.createMany({
+    data: WORK_IMAGES,
+    skipDuplicates: true,
+  });
+}
+
+// 데이터베이스 연결 종료
+main()
+  .then(async () => {
+    await prisma.$disconnect();
+  })
+  .catch(async e => {
+    console.error(e);
+    await prisma.$disconnect();
+    process.exit(1);
+  });

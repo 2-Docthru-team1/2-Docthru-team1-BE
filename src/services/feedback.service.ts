@@ -1,42 +1,60 @@
 import type { Feedback } from '@prisma/client';
 import type { IFeedbackService } from '#interfaces/services/feedback.service.interface.js';
 import type { FeedbackRepository } from '#repositories/feedback.repository.js';
+import type { BasicOptions } from '#types/common.types.js';
 import type { CreateFeedbackDTO, UpdateFeedbackDTO } from '#types/feedback.types.js';
+import { BadRequest, NotFound } from '#types/http-error.types.js';
+import MESSAGES from '#utils/constants/messages.js';
 
 export class FeedbackService implements IFeedbackService {
-  constructor(private FeedbackRepository: FeedbackRepository) {}
+  constructor(private feedbackRepository: FeedbackRepository) {}
 
-  getFeedbacks = async (options: {
-    orderBy: string;
-    page: number;
-    pageSize: number;
-  }): Promise<{ totalCount: number; list: Feedback[] | null }> => {
-    const totalCount = await this.FeedbackRepository.getCount();
-    const Feedbacks = await this.FeedbackRepository.findMany(options);
+  getFeedbacks = async (options: BasicOptions): Promise<{ totalCount: number; list: Feedback[] | null }> => {
+    const totalCount = await this.feedbackRepository.getCount();
+    const feedbacks = await this.feedbackRepository.findMany(options);
 
-    return { totalCount, list: Feedbacks };
+    return { totalCount, list: feedbacks };
   };
 
   getFeedbackById = async (id: string): Promise<Feedback | null> => {
-    const Feedback = await this.FeedbackRepository.findById(id);
+    const feedback = await this.feedbackRepository.findById(id);
+    if (!feedback) {
+      throw new NotFound(MESSAGES.NOT_FOUND);
+    }
 
-    return Feedback;
+    return feedback;
   };
 
-  createFeedback = async (FeedbackData: CreateFeedbackDTO): Promise<Feedback> => {
-    const Feedback = await this.FeedbackRepository.create(FeedbackData);
+  createFeedback = async (feedbackData: CreateFeedbackDTO): Promise<Feedback> => {
+    const feedback = await this.feedbackRepository.create(feedbackData);
 
-    return Feedback;
+    return feedback;
   };
 
-  updateFeedback = async (id: string, FeedbackData: UpdateFeedbackDTO): Promise<Feedback> => {
-    const Feedback = await this.FeedbackRepository.update(id, FeedbackData);
-    return Feedback;
+  updateFeedback = async (id: string, feedbackData: UpdateFeedbackDTO): Promise<Feedback> => {
+    const isExist = !!(await this.feedbackRepository.findById(id));
+    if (!isExist) {
+      throw new NotFound(MESSAGES.NOT_FOUND);
+    }
+    // NOTE 피드백 삭제 여부 확인
+    const isDeleted = await this.feedbackRepository.isDeleted(id);
+    if (isDeleted) {
+      throw new BadRequest(MESSAGES.DELETED_RESOURCE);
+    }
+
+    const feedback = await this.feedbackRepository.update(id, feedbackData);
+
+    return feedback;
   };
 
   deleteFeedback = async (id: string): Promise<Feedback> => {
-    const Feedback = await this.FeedbackRepository.delete(id);
+    const isExist = !!(await this.feedbackRepository.findById(id));
+    if (!isExist) {
+      throw new NotFound(MESSAGES.NOT_FOUND);
+    }
 
-    return Feedback;
+    const feedback = await this.feedbackRepository.delete(id);
+
+    return feedback;
   };
 }

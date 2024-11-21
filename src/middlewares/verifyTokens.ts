@@ -1,16 +1,24 @@
-import type { RequestHandler } from 'express';
+import type { NextFunction, Request, Response } from 'express';
 import { expressjwt } from 'express-jwt';
 import { jwtSecret } from '#configs/auth.config.js';
 
-export const verifyAccessToken = expressjwt({
-  secret: jwtSecret,
-  algorithms: ['HS256'],
-  requestProperty: 'user',
-}) as RequestHandler;
+export const verifyAccessToken = async (req: Request, res: Response, next: NextFunction) => {
+  await expressjwt({
+    secret: jwtSecret,
+    algorithms: ['HS256'],
+    requestProperty: 'user',
+  })(req, res, () => {});
 
-export const verifyRefreshToken = expressjwt({
-  secret: jwtSecret,
-  algorithms: ['HS256'],
-  getToken: req => req.cookies.refreshToken,
-  requestProperty: 'user',
-}) as RequestHandler;
+  next();
+};
+
+export const verifyRefreshToken = async (req: Request, res: Response, next: NextFunction) => {
+  await expressjwt({
+    secret: jwtSecret,
+    algorithms: ['HS256'],
+    getToken: req => req.cookies.refreshToken,
+    requestProperty: 'user',
+  })(req, res, () => {});
+
+  next();
+};
