@@ -1,6 +1,7 @@
 import type { Feedback } from '@prisma/client';
 import type { IFeedbackService } from '#interfaces/services/feedback.service.interface.js';
 import type { FeedbackRepository } from '#repositories/feedback.repository.js';
+import type { BasicOptions } from '#types/common.types.js';
 import type { CreateFeedbackDTO, UpdateFeedbackDTO } from '#types/feedback.types.js';
 import { NotFound } from '#types/http-error.types.js';
 import MESSAGES from '#utils/constants/messages.js';
@@ -8,11 +9,7 @@ import MESSAGES from '#utils/constants/messages.js';
 export class FeedbackService implements IFeedbackService {
   constructor(private feedbackRepository: FeedbackRepository) {}
 
-  getFeedbacks = async (options: {
-    orderBy: string;
-    page: number;
-    pageSize: number;
-  }): Promise<{ totalCount: number; list: Feedback[] | null }> => {
+  getFeedbacks = async (options: BasicOptions): Promise<{ totalCount: number; list: Feedback[] | null }> => {
     const totalCount = await this.feedbackRepository.getCount();
     const Feedbacks = await this.feedbackRepository.findMany(options);
 
