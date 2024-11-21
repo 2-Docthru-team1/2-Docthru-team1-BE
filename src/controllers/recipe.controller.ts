@@ -1,7 +1,7 @@
 import type { NextFunction, Response } from 'express';
 import type { RecipeService } from '#services/recipe.service.js';
 import type { Request } from '#types/common.types.js';
-import type { CreateRecipeDTO, RecipeOptions, RecipeQueries } from '#types/recipe.types.js';
+import type { CreateRecipeDTO, RecipeOptions, RecipeQueries, UpdateRecipeDTO } from '#types/recipe.types.js';
 
 export class RecipeController {
   constructor(private recipeService: RecipeService) {}
@@ -33,5 +33,12 @@ export class RecipeController {
     const recipe = await this.recipeService.createRecipe(req.body);
 
     res.status(201).json(recipe);
+  };
+
+  patchRecipe = async (req: Request<{ params: { id: string }; body: UpdateRecipeDTO }>, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    const recipe = await this.recipeService.updateRecipe(id, req.body);
+
+    res.json(recipe);
   };
 }

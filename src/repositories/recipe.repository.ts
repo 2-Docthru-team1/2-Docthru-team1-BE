@@ -1,6 +1,6 @@
 import type { PrismaClient } from '@prisma/client/extension';
 import type { IRecipeRepository } from '#interfaces/repositories/recipe.repository.interface.js';
-import type { CreateRecipeDTO, RecipeOptions } from '#types/recipe.types.js';
+import type { CreateRecipeDTO, RecipeOptions, UpdateRecipeDTO } from '#types/recipe.types.js';
 
 export class RecipeRepository implements IRecipeRepository {
   constructor(private recipe: PrismaClient['recipe']) {}
@@ -37,6 +37,12 @@ export class RecipeRepository implements IRecipeRepository {
 
   create = async (data: CreateRecipeDTO) => {
     const recipe = await this.recipe.create({ data });
+
+    return recipe;
+  };
+
+  update = async (id: string, data: UpdateRecipeDTO) => {
+    const recipe = await this.recipe.update({ where: { id }, data });
 
     return recipe;
   };
