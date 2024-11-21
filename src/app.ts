@@ -33,6 +33,7 @@ app.get('/hello', (req, res) => {
   res.send('Hello World');
 });
 app.get('/s3-download', async (req, res) => {
+  // NOTE 다운로드 할 파일의 S3 경로
   const url = await generatePresignedDownloadUrl('GoogleBtn.png');
   res.send({ url });
 });
