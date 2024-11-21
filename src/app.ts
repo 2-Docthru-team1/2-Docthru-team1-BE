@@ -1,5 +1,6 @@
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
+import { randomUUID } from 'crypto';
 import express from 'express';
 import 'express-async-errors';
 import { port } from '#configs/common.config.js';
@@ -12,6 +13,8 @@ import feedbackRouter from '#routes/feedback.route.js';
 import userRouter from '#routes/user.route.js';
 import workRouter from '#routes/work.route.js';
 import { generatePresignedDownloadUrl } from '#utils/S3/generate-presigned-download-url.js';
+import { generatePresignedUploadUrl } from '#utils/S3/generate-presigned-upload-url.js';
+
 
 const app = express();
 
@@ -37,6 +40,14 @@ app.get('/s3-download', async (req, res) => {
   const url = await generatePresignedDownloadUrl('GoogleBtn.png');
   res.send({ url });
 });
+app.get('/s3-upload', async (req, res) => {
+  // NOTE s3에 업로드 될 경로
+  const s3Key = `userId/${randomUUID()}`;
+  // NOTE 업로드 형식은 기본값이 image/jpeg입니다.
+  const url = await generatePresignedUploadUrl(s3Key, 'text/plain');
+  res.send({ url });
+});
+
 
 /*********************************************************************************** handler **********************************************************************************************/
 app.use(errorHandler);
