@@ -5,6 +5,8 @@ on:
     types: [synchronize]
   pull_request_review:
     types: [submitted]
+  pull_request_review_comment:
+    types: [created]
   repository_dispatch:
     types: [pr_review_request]
 jobs:
@@ -15,7 +17,8 @@ jobs:
       github.event_name == 'pull_request_review' &&
       (github.event.review.state == 'APPROVED' || github.event.review.state == 'CHANGES_REQUESTED') ||
       github.event_name == 'pull_request' ||
-      github.event_name == 'repository_dispatch'
+      github.event_name == 'repository_dispatch' ||
+      (github.event_name == 'pull_request_review_comment' && github.event.action == 'created')
     steps:
       - name: Debug Event
         run: |
@@ -142,6 +145,20 @@ jobs:
               .map(reviewer => mapping[reviewer] || reviewer)
               .map(id => id.startsWith('<@') ? id : `<@${id}>`)
               .join(', ');
+
+            if (context.eventName === 'pull_request_review_comment') {
+              const currentUser = context.payload.comment.user.login;
+              const prAuthor = context.payload.pull_request.user.login;
+              
+              // 현재 코멘트가 대화 스레드의 일부인지 확인
+              const isReplyInThread = context.payload.comment.in_reply_to_id !== null;
+              
+              // PR 작성자의 댓글이거나 대화 스레드의 일부인 경우 알림 스킵
+              if (currentUser === prAuthor || isReplyInThread) {
+                console.log('Skipping notification - Comment is from PR author or is part of a thread');
+                return;
+              }
+            }
 
             const message = {
               blocks: [
