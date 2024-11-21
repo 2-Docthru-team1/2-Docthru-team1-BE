@@ -3,7 +3,7 @@ import type { IFeedbackService } from '#interfaces/services/feedback.service.int
 import type { FeedbackRepository } from '#repositories/feedback.repository.js';
 import type { BasicOptions } from '#types/common.types.js';
 import type { CreateFeedbackDTO, UpdateFeedbackDTO } from '#types/feedback.types.js';
-import { NotFound } from '#types/http-error.types.js';
+import { BadRequest, NotFound } from '#types/http-error.types.js';
 import MESSAGES from '#utils/constants/messages.js';
 
 export class FeedbackService implements IFeedbackService {
@@ -36,6 +36,11 @@ export class FeedbackService implements IFeedbackService {
     if (!isExist) {
       throw new NotFound(MESSAGES.NOT_FOUND);
     }
+    // NOTE 피드백 삭제 여부 확인
+    const isDeleted = await this.feedbackRepository.isDeleted(id);
+    if (isDeleted) {
+      throw new BadRequest(MESSAGES.DELETED_RESOURCE);
+    }
 
     const feedback = await this.feedbackRepository.update(id, feedbackData);
 
@@ -43,6 +48,11 @@ export class FeedbackService implements IFeedbackService {
   };
 
   deleteFeedback = async (id: string): Promise<Feedback> => {
+    const isExist = !!(await this.feedbackRepository.findById(id));
+    if (!isExist) {
+      throw new NotFound(MESSAGES.NOT_FOUND);
+    }
+
     const feedback = await this.feedbackRepository.delete(id);
 
     return feedback;
