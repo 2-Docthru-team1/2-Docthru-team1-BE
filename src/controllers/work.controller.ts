@@ -1,13 +1,9 @@
 import type { NextFunction, Response } from 'express';
 import { assert } from 'superstruct';
 import type { WorkService } from '#services/work.service.js';
-import type { Request } from '#types/common.types.js';
-//import type { Request } from '#types/common.types.js';
-import type { BasicOptions } from '#types/common.types.js';
+import type { BasicQueries, Request } from '#types/common.types.js';
 import { NotFound } from '#types/http-error.types.js';
 import { WorkOrder } from '#types/work.types.js';
-import { generatePresignedDownloadUrl } from '#utils/S3/generate-presigned-download-url.js';
-import { Order } from '#utils/constants/enum.js';
 import MESSAGES from '#utils/constants/messages.js';
 import { CreateWork, PatchWork, Uuid } from '#utils/struct.js';
 
@@ -20,7 +16,7 @@ export class WorkController {
   // 요청의 유효성 검사는 middleware를 작성해 route단에서 하는 것이 좋습니다.
   // 간단한 유효성 검사라면 이곳에 작성해도 됩니다.
   // 응답의 status를 지정하고, body를 전달합니다.
-  getWorks = async (req: Request<{ params: { id: string }; query: BasicOptions }>, res: Response, next: NextFunction) => {
+  getWorks = async (req: Request<{ params: { id: string }; query: BasicQueries }>, res: Response, next: NextFunction) => {
     const { id } = req.params;
     const { orderBy = 'favoritest', page = '1', pageSize = '4' } = req.query;
     const finalOrderBy: WorkOrder = orderBy in WorkOrder ? (orderBy as WorkOrder) : WorkOrder.recent;
@@ -52,7 +48,7 @@ export class WorkController {
     // res.json(user);
   };
 
-  patchWork = async (req: Request, res: Response, next: NextFunction) => {
+  patchWork = async (req: Request<{ params: { id: string } }>, res: Response, next: NextFunction) => {
     const { id } = req.params;
     assert(req.body, PatchWork, MESSAGES.WRONG_FORMAT);
 
@@ -61,7 +57,7 @@ export class WorkController {
     // res.json(user);
   };
 
-  deleteChallege = async (req: Request, res: Response, next: NextFunction) => {
+  deleteChallege = async (req: Request<{ params: { id: string } }>, res: Response, next: NextFunction) => {
     const { id } = req.params;
 
     const user = await this.WorkService.deleteWork(id);

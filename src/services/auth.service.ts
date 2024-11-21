@@ -36,7 +36,7 @@ export class AuthService implements IAuthService {
   getUser = async (userId: string): Promise<SafeUser> => {
     const user = await this.userRepository.findById(userId);
     if (!user) {
-      throw new NotFound(MESSAGES.USER_NOT_FOUND);
+      throw new NotFound(MESSAGES.NOT_FOUND);
     }
 
     return filterSensitiveData(user);
