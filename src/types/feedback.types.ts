@@ -5,5 +5,5 @@ export interface CreateFeedbackDTO {
 }
 
 export interface UpdateFeedbackDTO {
-  content?: string;
+  content: string;
 }

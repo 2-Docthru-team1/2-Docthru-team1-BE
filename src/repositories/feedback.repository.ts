@@ -16,6 +16,9 @@ export class FeedbackRepository implements IFeedbackRepository {
 
     let orderOptions;
     switch (orderBy) {
+      case 'oldest':
+        orderOptions = { createdAt: Prisma.SortOrder.asc };
+        break;
       case 'latest':
       default:
         // NOTE orderBy는 Prisma SortOrder 타입을 사용해야 함

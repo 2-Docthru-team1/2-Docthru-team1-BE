@@ -1,7 +1,8 @@
 import type { IAuthService } from '#interfaces/services/auth.service.interface.js';
+import { getStorage } from '#middlewares/asyncLocalStorage.js';
 import type { UserRepository } from '#repositories/user.repository.js';
-import type { CreateUserDTO, UserToken } from '#types/auth.types.js';
-import { BadRequest, Unauthorized } from '#types/http-error.type.js';
+import type { CreateUserDTO, SigninResponse, UserToken } from '#types/auth.types.js';
+import { BadRequest, Unauthorized } from '#types/http-error.types.js';
 import type { SafeUser } from '#types/user.types.js';
 import MESSAGES from '#utils/constants/messages.js';
 import createToken from '#utils/createToken.js';
@@ -12,7 +13,7 @@ import remainingTime from '#utils/remainingTime.js';
 export class AuthService implements IAuthService {
   constructor(private userRepository: UserRepository) {}
 
-  signIn = async (email: string, password: string): Promise<SafeUser> => {
+  signIn = async (email: string, password: string): Promise<SigninResponse> => {
     const user = await this.userRepository.findByEmail(email);
     if (!user) {
       throw new Error(MESSAGES.INVALID_CREDENTIALS);
@@ -23,13 +24,20 @@ export class AuthService implements IAuthService {
       throw new Error(MESSAGES.INVALID_CREDENTIALS);
     }
 
+    const refreshToken = createToken(user, 'refresh');
+    user.refreshToken = refreshToken;
+    await this.userRepository.update(user.id, user);
+
     const accessToken = createToken(user, 'access');
     user.accessToken = accessToken;
-    return filterSensitiveData(user);
+    return { ...filterSensitiveData(user), refreshToken };
   };
 
   createUser = async (data: CreateUserDTO): Promise<SafeUser> => {
     const user = await this.userRepository.create(data);
+
+    const storage = getStorage();
+    console.log('🚀 ~ AuthService ~ createUser= ~ storage:', storage);
 
     return filterSensitiveData(user);
   };
@@ -54,6 +62,9 @@ export class AuthService implements IAuthService {
 
     const accessToken = createToken(user, 'access');
     user.accessToken = accessToken;
+
+    const storage = getStorage();
+    console.log('🚀 ~ AuthService ~ getNewToken= ~ storage:', storage);
 
     return filterSensitiveData(user);
   };

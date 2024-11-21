@@ -1,7 +1,7 @@
 import type { NextFunction, Request, Response } from 'express';
 import { assert } from 'superstruct';
 import type { WorkService } from '#services/work.service.js';
-import { NotFound } from '#types/http-error.type.js';
+import { NotFound } from '#types/http-error.types.js';
 import { WorkOrder } from '#types/work.types.js';
 import { Order } from '#utils/constants/enum.js';
 import MESSAGES from '#utils/constants/messages.js';
