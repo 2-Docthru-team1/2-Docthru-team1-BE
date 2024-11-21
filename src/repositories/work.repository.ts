@@ -16,7 +16,10 @@ export class WorkRepository implements IWorkRepository {
       take: pageSize,
       orderBy: orderResult,
       where: { challengeId },
-      include: { images: true },
+      include: {
+        owner: { select: { id: true, name: true, email: true, role: true } },
+        images: true,
+      },
     });
     return works;
   };

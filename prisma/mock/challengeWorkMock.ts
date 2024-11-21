@@ -3,77 +3,77 @@ export const WORK_IMAGES = [
     createdAt: '2024-11-20T10:00:00Z',
     updatedAt: '2024-11-20T10:00:00Z',
     deletedAt: null,
-    imageUrl: 'https://hancook-bucket.s3.ap-northeast-2.amazonaws.com/bibimbab.png',
+    imageUrl: 'bibimbab.png',
     workId: 'dcacba47-d7f3-4b06-af49-cdb4296b6563', // 첫 번째 챌린지 워크의 ID
   },
   {
     createdAt: '2024-11-20T10:00:00Z',
     updatedAt: '2024-11-20T10:00:00Z',
     deletedAt: null,
-    imageUrl: 'https://hancook-bucket.s3.ap-northeast-2.amazonaws.com/bibimbab.png',
+    imageUrl: 'bibimbab.png',
     workId: 'dcacba47-d7f3-4b06-af49-cdb4296b6563', // 첫 번째 챌린지 워크의 ID
   },
   {
     createdAt: '2024-11-20T10:00:00Z',
     updatedAt: '2024-11-20T10:00:00Z',
     deletedAt: null,
-    imageUrl: 'https://hancook-bucket.s3.ap-northeast-2.amazonaws.com/bibimbab.png',
+    imageUrl: 'bibimbab.png',
     workId: 'e233182b-4746-4d61-983e-b87cd302e68b', // 두 번째 챌린지 워크의 ID
   },
   {
     createdAt: '2024-11-20T10:00:00Z',
     updatedAt: '2024-11-20T10:00:00Z',
     deletedAt: null,
-    imageUrl: 'https://hancook-bucket.s3.ap-northeast-2.amazonaws.com/bibimbab.png',
+    imageUrl: 'bibimbab.png',
     workId: '6d2ec97d-8376-4600-99a8-9a1e2c386c31', // 세 번째 챌린지 워크의 ID
   },
   {
     createdAt: '2024-11-20T10:00:00Z',
     updatedAt: '2024-11-20T10:00:00Z',
     deletedAt: null,
-    imageUrl: 'https://hancook-bucket.s3.ap-northeast-2.amazonaws.com/bibimbab.png',
+    imageUrl: 'bibimbab.png',
     workId: '3eb9b648-6363-418d-96da-5bc230d3a134', // 네 번째 챌린지 워크의 ID
   },
   {
     createdAt: '2024-11-20T10:00:00Z',
     updatedAt: '2024-11-20T10:00:00Z',
     deletedAt: null,
-    imageUrl: 'https://hancook-bucket.s3.ap-northeast-2.amazonaws.com/bibimbab.png',
+    imageUrl: 'bibimbab.png',
     workId: '2f11bea0-f22f-4411-8111-e7bfd0590967', // 다섯 번째 챌린지 워크의 ID
   },
   {
     createdAt: '2024-11-20T10:00:00Z',
     updatedAt: '2024-11-20T10:00:00Z',
     deletedAt: null,
-    imageUrl: 'https://hancook-bucket.s3.ap-northeast-2.amazonaws.com/bibimbab.png',
+    imageUrl: 'bibimbab.png',
     workId: '796a2bdb-99c5-4bf6-b8c5-4b644dcf81e2', // 여섯 번째 챌린지 워크의 ID
   },
   {
     createdAt: '2024-11-20T10:00:00Z',
     updatedAt: '2024-11-20T10:00:00Z',
     deletedAt: null,
-    imageUrl: 'https://hancook-bucket.s3.ap-northeast-2.amazonaws.com/bibimbab.png',
+    imageUrl: 'bibimbab.png',
     workId: 'fa6e0905-0a92-4dab-af41-60854afc8e31', // 일곱 번째 챌린지 워크의 ID
   },
   {
     createdAt: '2024-11-20T10:00:00Z',
     updatedAt: '2024-11-20T10:00:00Z',
     deletedAt: null,
-    imageUrl: 'https://hancook-bucket.s3.ap-northeast-2.amazonaws.com/bibimbab.png',
+    imageUrl: 'bibimbab.png',
     workId: '3fe920eb-86e7-403a-b898-d624667ca15c', // 여덟 번째 챌린지 워크의 ID
   },
   {
     createdAt: '2024-11-20T10:00:00Z',
     updatedAt: '2024-11-20T10:00:00Z',
     deletedAt: null,
-    imageUrl: 'https://hancook-bucket.s3.ap-northeast-2.amazonaws.com/bibimbab.png',
+    imageUrl: 'bibimbab.png',
     workId: '3ce38089-f27a-47fe-9f4e-32d037f97540', // 아홉 번째 챌린지 워크의 ID
   },
   {
     createdAt: '2024-11-20T10:00:00Z',
     updatedAt: '2024-11-20T10:00:00Z',
     deletedAt: null,
-    imageUrl: 'https://hancook-bucket.s3.ap-northeast-2.amazonaws.com/bibimbab.png',
+    imageUrl: 'bibimbab.png',
     workId: 'd7f5fb39-652b-4da4-9f26-19d2bf9722dd', // 열 번째 챌린지 워크의 ID
   },
 ];

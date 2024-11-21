@@ -6,6 +6,7 @@ import type { Request } from '#types/common.types.js';
 import type { BasicOptions } from '#types/common.types.js';
 import { NotFound } from '#types/http-error.types.js';
 import { WorkOrder } from '#types/work.types.js';
+import { generatePresignedDownloadUrl } from '#utils/S3/generate-presigned-download-url.js';
 import { Order } from '#utils/constants/enum.js';
 import MESSAGES from '#utils/constants/messages.js';
 import { CreateWork, PatchWork, Uuid } from '#utils/struct.js';
@@ -29,8 +30,8 @@ export class WorkController {
       page: parseInt(page, 10),
       pageSize: parseInt(pageSize, 10),
     };
-    const work = await this.WorkService.getWorks(options);
-    res.json(work);
+    const result = await this.WorkService.getWorks(options);
+    res.json(result);
   };
   getWorkById = async (req: Request<{ params: { id: string } }>, res: Response, next: NextFunction) => {
     const { id } = req.params;

@@ -1,4 +1,4 @@
-import type { Status } from '@prisma/client';
+import type { ChallengeWork, Status, User, WorkImage } from '@prisma/client';
 
 export interface CreateWorkDTO {
   status: Status;
@@ -32,6 +32,7 @@ export interface GetWorksOptions {
   page: number;
   pageSize: number;
 }
+export type ResultChallengeWork = Omit<ChallengeWork, 'ownerId'> & { images: WorkImage[] };
 export enum WorkOrder {
   recent = 'recent',
   favoritest = 'favoritest',
