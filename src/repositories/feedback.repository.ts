@@ -25,13 +25,21 @@ export class FeedbackRepository implements IFeedbackRepository {
         orderOptions = { createdAt: Prisma.SortOrder.desc };
     }
 
-    const feedbacks = await this.feedback.findMany({ orderBy: orderOptions, skip: (page - 1) * pageSize, take: pageSize });
+    const feedbacks = await this.feedback.findMany({
+      orderBy: orderOptions,
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+      include: { owner: { select: { name: true } } },
+    });
 
     return feedbacks;
   };
 
   findById = async (id: string): Promise<Feedback | null> => {
-    const feedback = await this.feedback.findUnique({ where: { id } });
+    const feedback = await this.feedback.findUnique({
+      where: { id },
+      include: { owner: { select: { name: true } } },
+    });
 
     return feedback;
   };
