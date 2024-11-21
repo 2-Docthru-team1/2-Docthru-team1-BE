@@ -14,6 +14,12 @@ export interface Request<T = { params: {}; response: {}; body: {}; query: {} }>
 
 export interface BasicOptions {
   orderBy: string;
+  page: number;
+  pageSize: number;
+}
+
+export interface BasicQueries {
+  orderBy: string;
   page: string;
   pageSize: string;
 }
