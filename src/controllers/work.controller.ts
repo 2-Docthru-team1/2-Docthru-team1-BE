@@ -1,6 +1,9 @@
-import type { NextFunction, Request, Response } from 'express';
+import type { NextFunction, Response } from 'express';
 import { assert } from 'superstruct';
 import type { WorkService } from '#services/work.service.js';
+import type { Request } from '#types/common.types.js';
+//import type { Request } from '#types/common.types.js';
+import type { BasicOptions } from '#types/common.types.js';
 import { NotFound } from '#types/http-error.types.js';
 import { WorkOrder } from '#types/work.types.js';
 import { Order } from '#utils/constants/enum.js';
@@ -16,31 +19,26 @@ export class WorkController {
   // 요청의 유효성 검사는 middleware를 작성해 route단에서 하는 것이 좋습니다.
   // 간단한 유효성 검사라면 이곳에 작성해도 됩니다.
   // 응답의 status를 지정하고, body를 전달합니다.
-  getWorks = async (
-    req: Request<{ id: string }, {}, {}, { orderBy: string; page: string; pageSize: string }>,
-    res: Response,
-    next: NextFunction,
-  ) => {
+  getWorks = async (req: Request<{ params: { id: string }; query: BasicOptions }>, res: Response, next: NextFunction) => {
     const { id } = req.params;
     const { orderBy = 'favoritest', page = '1', pageSize = '4' } = req.query;
-    const validatedOrderBy: WorkOrder = orderBy in WorkOrder ? (orderBy as WorkOrder) : WorkOrder.recent;
+    const finalOrderBy: WorkOrder = orderBy in WorkOrder ? (orderBy as WorkOrder) : WorkOrder.recent;
     const options: { challengeId: string; orderBy: WorkOrder; page: number; pageSize: number } = {
       challengeId: id,
-      orderBy: validatedOrderBy,
+      orderBy: finalOrderBy,
       page: parseInt(page, 10),
       pageSize: parseInt(pageSize, 10),
     };
     const work = await this.WorkService.getWorks(options);
     res.json(work);
   };
-
-  getWorkById = async (req: Request, res: Response, next: NextFunction) => {
+  getWorkById = async (req: Request<{ params: { id: string } }>, res: Response, next: NextFunction) => {
     const { id } = req.params;
-    //assert(id, Uuid, MESSAGES.WRONG_ID_FORMAT);
+    assert(id, Uuid, MESSAGES.WRONG_ID_FORMAT);
     const work = await this.WorkService.getWorkById(id);
     if (!work) {
       const error = new NotFound(MESSAGES.WORK_NOT_FOUND);
-      return next(error);
+      throw error;
     }
     res.json(work);
   };

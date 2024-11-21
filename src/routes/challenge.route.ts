@@ -10,14 +10,15 @@ export const challengeRouter = express.Router();
 // app.method로 입력하지 않도록 주의해주세요. router.method입니다.
 challengeRouter
   .route('/')
-  .get(validatePaginationOptions, challengeController.getChallenges)
+  .get(challengeController.getChallenges)
   .post(validateCreateChallenge, challengeController.postChallenge);
 
 challengeRouter
   .route('/:id')
   .get(challengeController.getChallengeById)
   .patch(validateUpdateChallenge, challengeController.patchChallenge);
-challengeRouter.route('/:id/works').get(validatePaginationOptions, workController.getWorks);
+
+challengeRouter.route('/:id/works').get(workController.getWorks);
 
 // app에서 사용할 수 있도록 export 해주어야 합니다.
 export default challengeRouter;
