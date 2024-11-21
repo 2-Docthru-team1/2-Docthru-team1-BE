@@ -43,15 +43,10 @@ export class ChallengeService implements IChallengeService {
     return challenge;
   };
 
-  updateStatus = async ({
-    challengeId,
-    status,
-    abortReason,
-    userId,
-    userRole,
-  }: ChallengeStatusInput): Promise<Challenge | null> => {
+  updateStatus = async (data: ChallengeStatusInput): Promise<Challenge | null> => {
+    const { challengeId, status, abortReason, userId, userRole } = data;
     const challenge = await this.challengeRepository.findById(challengeId);
-    
+
     validateUpdateStatus({
       challenge,
       status,

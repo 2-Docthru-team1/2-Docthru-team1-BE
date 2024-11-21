@@ -22,5 +22,5 @@ export interface IChallengeRepository {
   findById(id: string): Promise<Challenge | null>;
   create(data: ChallengeInput): Promise<Challenge>;
   update(id: string, data: UpdateChallengeDTO): Promise<Challenge>;
-  updateStatus({ challengeId, status, abortReason, userId }: ChallengeStatusInput): Promise<Challenge>;
+  updateStatus(data: ChallengeStatusInput): Promise<Challenge>;
 }

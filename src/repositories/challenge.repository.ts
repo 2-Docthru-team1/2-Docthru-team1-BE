@@ -118,7 +118,8 @@ export class ChallengeRepository implements IChallengeRepository {
     return challenge;
   };
 
-  updateStatus = async ({ challengeId, status, abortReason, userId }: ChallengeStatusInput): Promise<Challenge> => {
+  updateStatus = async (data: ChallengeStatusInput): Promise<Challenge> => {
+    const { challengeId, status, abortReason, userId } = data;
     const newStatus = { status };
     if (abortReason && ['denied', 'aborted'].includes(status)) {
       await this.abortReason.upsert({

@@ -14,5 +14,5 @@ export interface IChallengeService {
   getChallengeById(id: string): Promise<Challenge | null>;
   createChallenge(challengeData: CreateChallengeDTO, userId: string): Promise<Challenge>;
   updateChallenge(id: string, challengeData: UpdateChallengeDTO): Promise<Challenge>;
-  updateStatus({ challengeId, status, abortReason, userId, userRole }: ChallengeStatusInput): Promise<Challenge | null>;
+  updateStatus(data: ChallengeStatusInput): Promise<Challenge | null>;
 }
