@@ -24,7 +24,7 @@ challengeRouter
     challengeController.patchChallenge,
   );
 
-challengeRouter.patch('/:id/status', challengeController.patchChallengeStatus);
+challengeRouter.patch('/:id/status', tokenVerifier.verifyAccessToken, challengeController.patchChallengeStatus);
 challengeRouter.get('/:id/reason', challengeController.getChallengeAbortReason);
 
 export default challengeRouter;
