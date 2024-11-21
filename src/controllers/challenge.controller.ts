@@ -1,4 +1,4 @@
-import type { MediaType, Status } from '@prisma/client';
+import type { AbortReason, MediaType, Status } from '@prisma/client';
 import type { NextFunction, Request, Response } from 'express';
 import type { ChallengeService } from '#services/challenge.service.js';
 import type {
@@ -29,7 +29,7 @@ export class ChallengeController {
     res.json({ list, totalCount });
   };
 
-  getChallengeById = async (req: Request<{ id: string }, {}, UpdateChallengeDTO>, res: Response) => {
+  getChallengeById = async (req: Request, res: Response) => {
     const { id } = req.params;
     const challenge = await this.challengeService.getChallengeById(id);
     res.json(challenge);
@@ -47,7 +47,7 @@ export class ChallengeController {
     const updateChallenge = await this.challengeService.updateChallenge(id, req.body);
     res.json(updateChallenge);
   };
-  
+
   patchChallengeStatus = async (req: Request<{ id: string }, {}, UpdateChallengeStatusDTO>, res: Response) => {
     const { id: challengeId } = req.params;
     const { status, abortReason } = req.body;
@@ -61,5 +61,11 @@ export class ChallengeController {
       userRole,
     });
     res.json(updatedChallenge);
+  };
+
+  getChallengeAbortReason = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const abortReason = await this.challengeService.getAbortReason(id);
+    res.json(abortReason);
   };
 }
