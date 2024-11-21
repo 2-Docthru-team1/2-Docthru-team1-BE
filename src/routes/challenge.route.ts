@@ -11,10 +11,13 @@ challengeRouter
   .route('/')
   .get(validatePaginationOptions, challengeController.getChallenges)
   .post(validateCreateChallenge, challengeController.postChallenge);
+
 challengeRouter
   .route('/:id')
   .get(challengeController.getChallengeById)
   .patch(validateUpdateChallenge, challengeController.patchChallenge);
 
-// app에서 사용할 수 있도록 export 해주어야 합니다.
+challengeRouter.patch('/:id/status', challengeController.patchChallengeStatus);
+challengeRouter.get('/:id/reason', challengeController.getChallengeAbortReason);
+
 export default challengeRouter;

@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from 'express';
-import { HttpError } from '#types/http-error.type.js';
+import { HttpError } from '#types/http-error.types.js';
 import HTTP_STATUS from '#utils/constants/http-status.js';
 
 export default function errorHandler(err: Error, req: Request, res: Response, next: NextFunction) {
