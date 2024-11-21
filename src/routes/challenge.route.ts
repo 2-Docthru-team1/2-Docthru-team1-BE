@@ -18,5 +18,6 @@ challengeRouter
   .patch(validateUpdateChallenge, challengeController.patchChallenge);
 
 challengeRouter.patch('/:id/status', challengeController.patchChallengeStatus);
+challengeRouter.get('/:id/reason', challengeController.getChallengeAbortReason);
 
 export default challengeRouter;

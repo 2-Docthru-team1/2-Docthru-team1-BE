@@ -1,4 +1,4 @@
-import type { Challenge } from '@prisma/client';
+import type { AbortReason, Challenge } from '@prisma/client';
 import type { IChallengeService } from '#interfaces/services/challenge.service.interface.js';
 import type { ChallengeRepository } from '#repositories/challenge.repository.js';
 import type {
@@ -61,5 +61,10 @@ export class ChallengeService implements IChallengeService {
       abortReason,
       userId,
     });
+  };
+
+  getAbortReason = async (id: string): Promise<AbortReason | null> => {
+    const abortReason = await this.challengeRepository.findAbortReason(id);
+    return abortReason;
   };
 }

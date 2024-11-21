@@ -1,4 +1,4 @@
-import type { Challenge, MediaType, Status } from '@prisma/client';
+import type { AbortReason, Challenge, MediaType, Status } from '@prisma/client';
 import type { ChallengeStatusInput, CreateChallengeDTO, UpdateChallengeDTO } from '#types/challenge.types.js';
 import { Order } from '#utils/constants/enum.js';
 
@@ -15,4 +15,5 @@ export interface IChallengeService {
   createChallenge(challengeData: CreateChallengeDTO, userId: string): Promise<Challenge>;
   updateChallenge(id: string, challengeData: UpdateChallengeDTO): Promise<Challenge>;
   updateStatus(data: ChallengeStatusInput): Promise<Challenge | null>;
+  getAbortReason(id: string): Promise<AbortReason | null>;
 }

@@ -7,7 +7,7 @@ import MESSAGES from '#utils/constants/messages.js';
 export class RecipeService implements IRecipeService {
   constructor(private recipeRepository: RecipeRepository) {}
 
-  gerRecipes = async (options: RecipeOptions) => {
+  getRecipes = async (options: RecipeOptions) => {
     const recipes = await this.recipeRepository.findMany(options);
     const totalCount = await this.recipeRepository.getCount(options);
 
