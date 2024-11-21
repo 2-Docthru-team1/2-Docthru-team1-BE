@@ -1,4 +1,4 @@
-import type { NextFunction, Response } from 'express';
+import type { Response } from 'express';
 import type { RecipeService } from '#services/recipe.service.js';
 import type { Request } from '#types/common.types.js';
 import type { RecipeOptions, RecipeQueries } from '#types/recipe.types.js';
@@ -6,7 +6,7 @@ import type { RecipeOptions, RecipeQueries } from '#types/recipe.types.js';
 export class RecipeController {
   constructor(private recipeService: RecipeService) {}
 
-  getRecipes = async (req: Request<{ query: RecipeQueries }>, res: Response, next: NextFunction) => {
+  getRecipes = async (req: Request<{ query: RecipeQueries }>, res: Response) => {
     const { orderBy = 'highest', category, page = '1', pageSize = '10' } = req.query;
 
     const options: RecipeOptions = {
@@ -16,12 +16,12 @@ export class RecipeController {
       pageSize: parseInt(pageSize, 10) ?? 10,
     };
 
-    const recipes = await this.recipeService.gerRecipes(options);
+    const recipes = await this.recipeService.getRecipes(options);
 
     res.json(recipes);
   };
 
-  getRecipeById = async (req: Request<{ params: { id: string } }>, res: Response, next: NextFunction) => {
+  getRecipeById = async (req: Request<{ params: { id: string } }>, res: Response) => {
     const { id } = req.params;
 
     const recipe = await this.recipeService.getRecipeById(id);

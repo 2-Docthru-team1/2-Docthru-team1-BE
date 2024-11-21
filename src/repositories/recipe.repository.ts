@@ -15,8 +15,14 @@ export class RecipeRepository implements IRecipeRepository {
   findMany = async (options: RecipeOptions) => {
     const { orderBy: order, category, page, pageSize } = options;
     let orderBy = {};
-    if (order) {
-      orderBy = order === 'highest' ? { likeCount: 'desc' } : { likeCount: 'asc' };
+    switch (order) {
+      case 'highest':
+        orderBy = { likeCount: 'desc' };
+        break;
+      case 'lowest':
+        orderBy = { likeCount: 'asc' };
+        break;
+      default:
     }
 
     const recipes = await this.recipe.findMany({
