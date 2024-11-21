@@ -20,5 +20,6 @@ challengeRouter
 
 challengeRouter.route('/:id/works').get(workController.getWorks);
 
-// app에서 사용할 수 있도록 export 해주어야 합니다.
+challengeRouter.patch('/:id/status', challengeController.patchChallengeStatus);
+
 export default challengeRouter;
