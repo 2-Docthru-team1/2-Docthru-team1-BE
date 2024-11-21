@@ -3,7 +3,7 @@ import type { CreateWorkDTO, GetWorksOptions, ResultChallengeWork, UpdateWorkDTO
 
 export interface IWorkService {
   getWorks(options: GetWorksOptions): Promise<{ list: ResultChallengeWork[]; totalCount: number } | null>;
-  getWorkById(id: string): Promise<ChallengeWork | null>;
+  getWorkById(id: string): Promise<ResultChallengeWork | null>;
   createWork(WorkData: CreateWorkDTO): Promise<ChallengeWork>;
   updateWork(id: string, WorkData: UpdateWorkDTO): Promise<ChallengeWork>;
   deleteWork(id: string): Promise<ChallengeWork>;

@@ -30,7 +30,10 @@ export class WorkRepository implements IWorkRepository {
   findById = async (id: string): Promise<ChallengeWork | null> => {
     const work = await this.challengeWork.findUnique({
       where: { id },
-      include: { images: true },
+      include: {
+        owner: { select: { id: true, name: true, email: true, role: true } },
+        images: true,
+      },
     });
     return work;
   };

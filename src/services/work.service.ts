@@ -38,9 +38,19 @@ export class WorkService implements IWorkService {
     return { list: (updatedList as ResultChallengeWork[]) || [], totalCount: totalCount || 0 };
   };
 
-  getWorkById = async (id: string): Promise<ChallengeWork | null> => {
+  getWorkById = async (id: string): Promise<ResultChallengeWork | null> => {
     const work = await this.WorkRepository.findById(id);
-    return work;
+    const { ownerId, ...otherWorkField } = work || {};
+    const changedWork = { ...otherWorkField } as ResultChallengeWork;
+    const updatedImages = await Promise.all(
+      changedWork.images.map(async workImage => {
+        const url = workImage.imageUrl;
+        const resultUrl = await generatePresignedDownloadUrl(url);
+        workImage.imageUrl = resultUrl;
+        return workImage;
+      }),
+    );
+    return { ...changedWork, images: updatedImages };
   };
 
   createWork = async (WorkData: CreateWorkDTO): Promise<ChallengeWork> => {
