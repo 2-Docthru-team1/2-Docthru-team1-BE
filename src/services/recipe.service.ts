@@ -36,4 +36,10 @@ export class RecipeService implements IRecipeService {
 
     return newRecipe;
   };
+
+  deleteRecipe = async (id: string) => {
+    const recipe = await this.recipeRepository.delete(id);
+
+    return recipe;
+  };
 }

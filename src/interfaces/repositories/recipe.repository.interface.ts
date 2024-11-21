@@ -7,5 +7,5 @@ export interface IRecipeRepository {
   findById(id: string): Promise<Recipe | null>;
   create(recipeData: CreateRecipeDTO): Promise<Recipe>;
   update(id: string, recipeData: UpdateRecipeDTO): Promise<Recipe>;
-  // delete(id: string): Promise<Recipe>;
+  delete(id: string): Promise<Recipe>;
 }

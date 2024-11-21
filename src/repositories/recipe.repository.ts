@@ -46,4 +46,10 @@ export class RecipeRepository implements IRecipeRepository {
 
     return recipe;
   };
+
+  delete = async (id: string) => {
+    const recipe = await this.recipe.update({ where: { id }, data: { deletedAt: new Date() } });
+
+    return recipe;
+  };
 }

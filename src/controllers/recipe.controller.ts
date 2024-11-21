@@ -41,4 +41,11 @@ export class RecipeController {
 
     res.json(recipe);
   };
+
+  deleteRecipe = async (req: Request<{ params: { id: string } }>, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    const recipe = await this.recipeService.deleteRecipe(id);
+
+    res.json(recipe);
+  };
 }
