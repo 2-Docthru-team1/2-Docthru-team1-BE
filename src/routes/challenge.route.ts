@@ -20,5 +20,6 @@ challengeRouter
 challengeRouter.route('/:id/works').get(validatePaginationOptions, workController.getWorks);
 
 challengeRouter.patch('/:id/status', challengeController.patchChallengeStatus);
+challengeRouter.get('/:id/reason', challengeController.getChallengeAbortReason);
 
 export default challengeRouter;
