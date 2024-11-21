@@ -15,6 +15,7 @@ import workRouter from '#routes/work.route.js';
 import { generatePresignedDownloadUrl } from '#utils/S3/generate-presigned-download-url.js';
 import { generatePresignedUploadUrl } from '#utils/S3/generate-presigned-upload-url.js';
 
+
 const app = express();
 
 /*********************************************************************************** middlewares **********************************************************************************************/
@@ -35,6 +36,7 @@ app.get('/hello', (req, res) => {
   res.send('Hello World');
 });
 app.get('/s3-download', async (req, res) => {
+  // NOTE 다운로드 할 파일의 S3 경로
   const url = await generatePresignedDownloadUrl('GoogleBtn.png');
   res.send({ url });
 });
@@ -45,6 +47,7 @@ app.get('/s3-upload', async (req, res) => {
   const url = await generatePresignedUploadUrl(s3Key, 'text/plain');
   res.send({ url });
 });
+
 
 /*********************************************************************************** handler **********************************************************************************************/
 app.use(errorHandler);
