@@ -28,4 +28,10 @@ export class RecipeRepository implements IRecipeRepository {
 
     return recipes;
   };
+
+  findById = async (id: string) => {
+    const recipe = await this.recipe.findUnique({ where: { id } });
+
+    return recipe;
+  };
 }

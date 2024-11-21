@@ -5,4 +5,6 @@ export const recipeRouter = Router();
 
 recipeRouter.route('/').get(recipeController.getRecipes);
 
+recipeRouter.route('/:id').get(recipeController.getRecipeById);
+
 export default recipeRouter;

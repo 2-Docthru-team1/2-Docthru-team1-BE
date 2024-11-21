@@ -20,4 +20,12 @@ export class RecipeController {
 
     res.json(recipes);
   };
+
+  getRecipeById = async (req: Request<{ params: { id: string } }>, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+
+    const recipe = await this.recipeService.getRecipeById(id);
+
+    res.json(recipe);
+  };
 }

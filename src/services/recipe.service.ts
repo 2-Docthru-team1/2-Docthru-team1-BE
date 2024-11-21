@@ -9,10 +9,12 @@ export class RecipeService implements IRecipeService {
     const recipes = await this.recipeRepository.findMany(options);
     const totalCount = await this.recipeRepository.getCount(options);
 
-    // recipes.forEach((recipe: Recipe) => {
-    //   recipe.benefits = JSON.parse(recipe.benefits as string);
-    // });
-
     return { list: recipes, totalCount };
+  };
+
+  getRecipeById = async (id: string) => {
+    const recipe = await this.recipeRepository.findById(id);
+
+    return recipe;
   };
 }
