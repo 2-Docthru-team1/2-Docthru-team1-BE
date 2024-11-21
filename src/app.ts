@@ -11,6 +11,7 @@ import challengeRouter from '#routes/challenge.route.js';
 import feedbackRouter from '#routes/feedback.route.js';
 import userRouter from '#routes/user.route.js';
 import workRouter from '#routes/work.route.js';
+import { generatePresignedDownloadUrl } from '#utils/S3/generate-presigned-download-url.js';
 
 const app = express();
 
@@ -30,6 +31,10 @@ app.use('/works', workRouter);
 
 app.get('/hello', (req, res) => {
   res.send('Hello World');
+});
+app.get('/s3-download', async (req, res) => {
+  const url = await generatePresignedDownloadUrl('GoogleBtn.png');
+  res.send({ url });
 });
 
 /*********************************************************************************** handler **********************************************************************************************/
