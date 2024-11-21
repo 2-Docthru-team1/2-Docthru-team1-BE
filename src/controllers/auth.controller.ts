@@ -19,6 +19,12 @@ export class AuthController {
     res.json(user);
   };
 
+  getMe = async (req: Request, res: Response, next: NextFunction) => {
+    const user = await this.authService.getUser(req.user!.userId);
+
+    res.json(user);
+  };
+
   signUp = async (req: Request<{ body: CreateUserDTO }>, res: Response, next: NextFunction) => {
     assert(req.body, CreateUser, MESSAGES.WRONG_FORMAT);
     const user = await this.authService.createUser(req.body);

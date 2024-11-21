@@ -1,10 +1,10 @@
 const MESSAGES = Object.freeze({
-  BAD_REQUEST: '클라이언트 오류로 인해 서버가 요청을 처리할 수 없습니다.',
+  BAD_REQUEST: '요청이 잘못되었습니다.',
   UNAUTHORIZED: '로그인이 필요합니다.',
-  FORBIDDEN: '토큰이 유효하지 않습니다.',
+  FORBIDDEN: '접근 권한이 없습니다.',
   NOT_FOUND: '찾을 수 없는 리소스입니다.',
   INTERNAL_ERROR: '서버 내부 오류가 발생했습니다.',
-  
+
   WRONG_ID_FORMAT: 'ID 형식이 잘못되었습니다.',
   WRONG_EMAIL_FORMAT: 'Email 형식이 잘못되었습니다.',
   WRONG_FORMAT: '데이터 형식이 잘못되었습니다.',
