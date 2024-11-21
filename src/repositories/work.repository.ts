@@ -16,6 +16,7 @@ export class WorkRepository implements IWorkRepository {
       take: pageSize,
       orderBy: orderResult,
       where: { challengeId },
+      include: { images: true },
     });
     return works;
   };
@@ -24,7 +25,10 @@ export class WorkRepository implements IWorkRepository {
     return totalCount;
   };
   findById = async (id: string): Promise<ChallengeWork | null> => {
-    const work = await this.challengeWork.findUnique({ where: { id } });
+    const work = await this.challengeWork.findUnique({
+      where: { id },
+      include: { images: true },
+    });
     return work;
   };
 

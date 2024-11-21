@@ -36,14 +36,13 @@ export class WorkController {
 
   getWorkById = async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
-    assert(id, Uuid, MESSAGES.WRONG_ID_FORMAT);
+    //assert(id, Uuid, MESSAGES.WRONG_ID_FORMAT);
     const work = await this.WorkService.getWorkById(id);
     if (!work) {
       const error = new NotFound(MESSAGES.WORK_NOT_FOUND);
       return next(error);
     }
     res.json(work);
-    res.json(111);
   };
 
   postWork = async (req: Request, res: Response, next: NextFunction) => {
