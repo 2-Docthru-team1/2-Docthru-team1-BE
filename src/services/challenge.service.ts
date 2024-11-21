@@ -1,7 +1,14 @@
 import type { Challenge } from '@prisma/client';
 import type { IChallengeService } from '#interfaces/services/challenge.service.interface.js';
 import type { ChallengeRepository } from '#repositories/challenge.repository.js';
-import type { ChallengeInput, CreateChallengeDTO, UpdateChallengeDTO, getChallengesOptions } from '#types/challenge.types.js';
+import type {
+  ChallengeInput,
+  ChallengeStatusInput,
+  CreateChallengeDTO,
+  UpdateChallengeDTO,
+  getChallengesOptions,
+} from '#types/challenge.types.js';
+import { validateUpdateStatus } from '#utils/validateUpdateStatus.js';
 
 export class ChallengeService implements IChallengeService {
   constructor(private challengeRepository: ChallengeRepository) {}
@@ -36,9 +43,23 @@ export class ChallengeService implements IChallengeService {
     return challenge;
   };
 
-  // deleteChallenge = async (id: string): Promise<Challenge> => {
-  //   const challenge = await this.challengeRepository.delete(id);
+  updateStatus = async (data: ChallengeStatusInput): Promise<Challenge | null> => {
+    const { challengeId, status, abortReason, userId, userRole } = data;
+    const challenge = await this.challengeRepository.findById(challengeId);
 
-  //   return challenge;
-  // };
+    validateUpdateStatus({
+      challenge,
+      status,
+      abortReason,
+      userId,
+      userRole,
+    });
+
+    return await this.challengeRepository.updateStatus({
+      challengeId,
+      status,
+      abortReason,
+      userId,
+    });
+  };
 }
