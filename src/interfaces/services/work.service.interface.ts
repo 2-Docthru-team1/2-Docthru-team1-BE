@@ -1,9 +1,9 @@
 import type { ChallengeWork } from '@prisma/client';
-import type { CreateWorkDTO, UpdateWorkDTO } from '#types/work.types.js';
+import type { CreateWorkDTO, GetWorksOptions, ResultChallengeWork, UpdateWorkDTO, WorkOrder } from '#types/work.types.js';
 
 export interface IWorkService {
-  getWorks(options: { orderBy: string; page: number; pageSize: number }): Promise<ChallengeWork[] | null>;
-  getWorkById(id: string): Promise<ChallengeWork | null>;
+  getWorks(options: GetWorksOptions): Promise<{ list: ResultChallengeWork[]; totalCount: number } | null>;
+  getWorkById(id: string): Promise<ResultChallengeWork | null>;
   createWork(WorkData: CreateWorkDTO): Promise<ChallengeWork>;
   updateWork(id: string, WorkData: UpdateWorkDTO): Promise<ChallengeWork>;
   deleteWork(id: string): Promise<ChallengeWork>;
