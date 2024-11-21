@@ -1,5 +1,6 @@
 import express from 'express';
 import challengeController from '#containers/challenge.container.js';
+import workController from '#containers/work.container.js';
 import validatePaginationOptions from '#middlewares/pagination.validation.js';
 import { validateCreateChallenge, validateUpdateChallenge } from '#middlewares/validateChallenge.js';
 
@@ -9,13 +10,15 @@ export const challengeRouter = express.Router();
 // app.method로 입력하지 않도록 주의해주세요. router.method입니다.
 challengeRouter
   .route('/')
-  .get(validatePaginationOptions, challengeController.getChallenges)
+  .get(challengeController.getChallenges)
   .post(validateCreateChallenge, challengeController.postChallenge);
 
 challengeRouter
   .route('/:id')
   .get(challengeController.getChallengeById)
   .patch(validateUpdateChallenge, challengeController.patchChallenge);
+
+challengeRouter.route('/:id/works').get(workController.getWorks);
 
 challengeRouter.patch('/:id/status', challengeController.patchChallengeStatus);
 challengeRouter.get('/:id/reason', challengeController.getChallengeAbortReason);
