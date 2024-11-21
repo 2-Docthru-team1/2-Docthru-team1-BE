@@ -1,4 +1,4 @@
-import type { Challenge, MediaType, PrismaClient, Status } from '@prisma/client';
+import type { AbortReason, Challenge, MediaType, PrismaClient, Status } from '@prisma/client';
 import prismaClient from '#connection/postgres.connection.js';
 import type { IChallengeRepository } from '#interfaces/repositories/challenge.repository.interface.js';
 import type { ChallengeInput, ChallengeStatusInput, UpdateChallengeDTO, getChallengesOptions } from '#types/challenge.types.js';
@@ -139,6 +139,12 @@ export class ChallengeRepository implements IChallengeRepository {
       where: { id: challengeId },
       data: newStatus,
       include: { abortReason: true },
+    });
+  };
+
+  findAbortReason = async (id: string): Promise<AbortReason | null> => {
+    return await this.abortReason.findUnique({
+      where: { challengeId: id },
     });
   };
 }

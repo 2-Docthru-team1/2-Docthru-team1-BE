@@ -12,7 +12,7 @@ export class TokenVerifier {
       secret: jwtSecret,
       algorithms: ['HS256'],
       requestProperty: 'user',
-    })(req, res, () => {});
+    })(req, res, next);
 
     const user = await this.userService.getUserById(req.user!.userId);
     const storage = getStorage();
@@ -29,7 +29,7 @@ export class TokenVerifier {
       algorithms: ['HS256'],
       getToken: req => req.cookies.refreshToken,
       requestProperty: 'user',
-    })(req, res, () => {});
+    })(req, res, next);
 
     const user = await this.userService.getUserById(req.user!.userId);
     const storage = getStorage();
