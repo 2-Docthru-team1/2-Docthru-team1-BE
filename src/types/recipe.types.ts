@@ -4,11 +4,13 @@ import type { BasicOptions, BasicQueries } from '#types/common.types.js';
 export interface RecipeQueries extends Omit<BasicQueries, 'orderBy'> {
   orderBy?: string;
   category?: Category;
+  keyword?: string;
 }
 
 export interface RecipeOptions extends Omit<BasicOptions, 'orderBy'> {
   orderBy?: string;
   category?: Category;
+  keyword?: string;
 }
 
 export interface CreateRecipeDTO {
