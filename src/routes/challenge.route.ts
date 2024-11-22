@@ -24,5 +24,4 @@ challengeRouter.get('/:id/reason', challengeController.getChallengeAbortReason);
 
 challengeRouter.route('/:id/works').get(workController.getWorks);
 
-
 export default challengeRouter;

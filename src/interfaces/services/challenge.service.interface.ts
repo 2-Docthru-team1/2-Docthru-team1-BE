@@ -13,7 +13,7 @@ export interface IChallengeService {
   }): Promise<{ list: Challenge[]; totalCount: number }>;
   getChallengeById(id: string): Promise<Challenge | null>;
   createChallenge(challengeData: CreateChallengeDTO, userId: string): Promise<Challenge>;
-  updateChallenge(id: string, challengeData: UpdateChallengeDTO): Promise<Challenge>;
+  updateChallenge(id: string, challengeData: UpdateChallengeDTO, userId: string): Promise<Challenge>;
   updateStatus(data: ChallengeStatusInput): Promise<Challenge | null>;
   getAbortReason(id: string): Promise<AbortReason | null>;
 }

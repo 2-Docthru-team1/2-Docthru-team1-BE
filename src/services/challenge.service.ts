@@ -38,20 +38,24 @@ export class ChallengeService implements IChallengeService {
     return await this.challengeRepository.create(ChallengeInput);
   };
 
-  updateChallenge = async (id: string, challengeData: UpdateChallengeDTO): Promise<Challenge> => {
+  updateChallenge = async (id: string, challengeData: UpdateChallengeDTO, userId: string): Promise<Challenge> => {
     const challenge = await this.challengeRepository.update(id, challengeData);
-    return challenge;
-  };
-
-  updateStatus = async (data: ChallengeStatusInput): Promise<Challenge | null> => {
-    const { challengeId, status, abortReason, userId, userRole } = data;
-    const challenge = await this.challengeRepository.findById(challengeId);
+    if (!userId) {
+      throw new Error();
+    }
     if (!challenge) {
       throw new Error();
     }
     if (challenge.requestUserId !== userId) {
       throw new Error();
     }
+
+    return challenge;
+  };
+
+  updateStatus = async (data: ChallengeStatusInput): Promise<Challenge | null> => {
+    const { challengeId, status, abortReason, userId, userRole } = data;
+    const challenge = await this.challengeRepository.findById(challengeId);
 
     validateUpdateStatus({
       challenge,

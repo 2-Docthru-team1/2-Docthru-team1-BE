@@ -21,7 +21,7 @@ export class TokenVerifier {
   };
 
   verifyAccessToken = async (req: Request, res: Response, next: NextFunction) => {
-    return await new Promise(resolve => {
+    return await new Promise<void>(resolve => {
       expressjwt({
         secret: jwtSecret,
         algorithms: ['HS256'],
@@ -38,7 +38,7 @@ export class TokenVerifier {
         storage.userRole = user?.role;
 
         next();
-        resolve(null);
+        resolve();
       });
     });
   };
