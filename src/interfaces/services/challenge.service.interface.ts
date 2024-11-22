@@ -16,7 +16,11 @@ export interface IChallengeService {
     challengeData: CreateChallengeDTO,
     userId: string,
   ): Promise<{ challenge: Challenge; uploadUrls: { uploadUrl: string }[] }>;
-  updateChallenge(id: string, challengeData: UpdateChallengeDTO, userId: string): Promise<Challenge>;
+  updateChallenge(
+    id: string,
+    challengeData: UpdateChallengeDTO,
+    userId: string,
+  ): Promise<{ challenge: Challenge; uploadUrls: { uploadUrl: string }[] }>;
   updateStatus(data: ChallengeStatusInput): Promise<Challenge | null>;
   getAbortReason(id: string): Promise<AbortReason | null>;
 }

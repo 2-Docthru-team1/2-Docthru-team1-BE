@@ -74,8 +74,14 @@ export class ChallengeService implements IChallengeService {
     return { challenge, uploadUrls };
   };
 
-  updateChallenge = async (id: string, challengeData: UpdateChallengeDTO, userId: string): Promise<Challenge> => {
-    const challenge = await this.challengeRepository.update(id, challengeData);
+  updateChallenge = async (
+    id: string,
+    challengeData: UpdateChallengeDTO,
+    userId: string,
+  ): Promise<{ challenge: Challenge; uploadUrls: { uploadUrl: string }[] }> => {
+    const { imageCount, ...restChallengeData } = challengeData;
+
+    const challenge = await this.challengeRepository.findById(id);
     if (!userId) {
       throw new Error();
     }
@@ -86,7 +92,31 @@ export class ChallengeService implements IChallengeService {
       throw new Error();
     }
 
-    return challenge;
+    const uploadUrls: { uploadUrl: string }[] = [];
+    let imageUrl: string = '';
+    let imageUrl2: string | undefined = undefined;
+
+    if (imageCount !== undefined && imageCount > 0) {
+      for (let i = 0; i < imageCount; i++) {
+        const uniqueFileName = `${Date.now()}-image-${i}.jpg`;
+        const s3Key = `challenges/${uniqueFileName}`;
+        const contentType = 'image/jpeg';
+        const expiresIn = 3600;
+        const uploadUrl = await generatePresignedUploadUrl(s3Key, contentType, expiresIn);
+        uploadUrls.push({ uploadUrl });
+        if (i === 0) imageUrl = s3Key;
+        if (i === 1) imageUrl2 = s3Key;
+      }
+    }
+
+    const updatedChallengeInput: UpdateChallengeDTO = {
+      ...restChallengeData,
+      imageUrl,
+      imageUrl2,
+    };
+
+    const updatedChallenge = await this.challengeRepository.update(id, updatedChallengeInput);
+    return { challenge: updatedChallenge, uploadUrls };
   };
 
   updateStatus = async (data: ChallengeStatusInput): Promise<Challenge | null> => {

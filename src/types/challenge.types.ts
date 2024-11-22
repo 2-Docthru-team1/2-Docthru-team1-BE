@@ -53,6 +53,7 @@ export interface UpdateChallengeDTO {
   imageUrl?: string;
   imageUrl2?: string;
   mediaType?: MediaType;
+  imageCount?: number;
 }
 
 export interface UpdateChallengeStatusDTO {

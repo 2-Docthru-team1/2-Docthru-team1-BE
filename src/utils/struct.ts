@@ -51,8 +51,6 @@ export const CreateChallenge = object({
   description: string(),
   deadline: ISO8601String,
   embedUrl: Url,
-  imageUrl: Url,
-  imageUrl2: optional(Url),
   mediaType: MediaType,
   imageCount: number(),
 });
