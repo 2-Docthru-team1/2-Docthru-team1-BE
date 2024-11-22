@@ -7,7 +7,7 @@ export class RecipeRepository implements IRecipeRepository {
 
   getCount = async (options: RecipeOptions) => {
     const { category } = options;
-    const count = await this.recipe.count({ where: { category } });
+    const count = await this.recipe.count({ where: { category, deletedAt: null } });
 
     return count;
   };
@@ -27,7 +27,7 @@ export class RecipeRepository implements IRecipeRepository {
 
     const recipes = await this.recipe.findMany({
       orderBy,
-      where: { category },
+      where: { category, deletedAt: null },
       skip: (page - 1) * pageSize,
       take: pageSize,
     });
@@ -36,7 +36,7 @@ export class RecipeRepository implements IRecipeRepository {
   };
 
   findById = async (id: string) => {
-    const recipe = await this.recipe.findUnique({ where: { id } });
+    const recipe = await this.recipe.findUnique({ where: { id, deletedAt: null } });
 
     return recipe;
   };
@@ -48,13 +48,13 @@ export class RecipeRepository implements IRecipeRepository {
   };
 
   update = async (id: string, data: UpdateRecipeDTO) => {
-    const recipe = await this.recipe.update({ where: { id }, data });
+    const recipe = await this.recipe.update({ where: { id, deletedAt: null }, data });
 
     return recipe;
   };
 
   delete = async (id: string) => {
-    const recipe = await this.recipe.update({ where: { id }, data: { deletedAt: new Date() } });
+    const recipe = await this.recipe.update({ where: { id, deletedAt: null }, data: { deletedAt: new Date() } });
 
     return recipe;
   };

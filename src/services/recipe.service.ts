@@ -16,6 +16,9 @@ export class RecipeService implements IRecipeService {
 
   getRecipeById = async (id: string) => {
     const recipe = await this.recipeRepository.findById(id);
+    if (!recipe || recipe.deletedAt) {
+      throw new NotFound(MESSAGES.NOT_FOUND);
+    }
 
     return recipe;
   };
@@ -28,7 +31,7 @@ export class RecipeService implements IRecipeService {
 
   updateRecipe = async (id: string, data: UpdateRecipeDTO) => {
     const recipe = await this.recipeRepository.findById(id);
-    if (!recipe) {
+    if (!recipe || recipe.deletedAt) {
       throw new NotFound(MESSAGES.NOT_FOUND);
     }
 
@@ -39,6 +42,9 @@ export class RecipeService implements IRecipeService {
 
   deleteRecipe = async (id: string) => {
     const recipe = await this.recipeRepository.delete(id);
+    if (!recipe || recipe.deletedAt) {
+      throw new NotFound(MESSAGES.NOT_FOUND);
+    }
 
     return recipe;
   };
