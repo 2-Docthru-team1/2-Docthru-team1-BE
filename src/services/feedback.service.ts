@@ -9,9 +9,16 @@ import MESSAGES from '#utils/constants/messages.js';
 export class FeedbackService implements IFeedbackService {
   constructor(private feedbackRepository: FeedbackRepository) {}
 
-  getFeedbacks = async (options: BasicOptions): Promise<{ totalCount: number; list: Feedback[] | null }> => {
-    const totalCount = await this.feedbackRepository.getCount();
-    const feedbacks = await this.feedbackRepository.findMany(options);
+  getFeedbacks = async (options: BasicOptions, userId?: string): Promise<{ totalCount: number; list: Feedback[] | null }> => {
+    let totalCount: number;
+    let feedbacks: Feedback[] | null;
+    if (userId) {
+      totalCount = await this.feedbackRepository.getCount(userId);
+      feedbacks = await this.feedbackRepository.findMany(options, userId);
+    } else {
+      totalCount = await this.feedbackRepository.getCount();
+      feedbacks = await this.feedbackRepository.findMany(options);
+    }
 
     return { totalCount, list: feedbacks };
   };

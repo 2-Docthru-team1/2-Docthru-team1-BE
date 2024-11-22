@@ -6,13 +6,13 @@ import type { CreateFeedbackDTO, UpdateFeedbackDTO } from '#types/feedback.types
 export class FeedbackRepository implements IFeedbackRepository {
   constructor(private feedback: PrismaClient['feedback']) {}
 
-  getCount = async (): Promise<number> => {
-    const count = await this.feedback.count({ where: { deletedAt: null } });
+  getCount = async (userId?: string): Promise<number> => {
+    const count = await this.feedback.count({ where: { deletedAt: null, ownerId: userId } });
 
     return count;
   };
 
-  findMany = async (options: BasicOptions): Promise<Feedback[] | null> => {
+  findMany = async (options: BasicOptions, userId?: string): Promise<Feedback[] | null> => {
     const { orderBy, page, pageSize } = options;
 
     let orderOptions;
@@ -27,7 +27,7 @@ export class FeedbackRepository implements IFeedbackRepository {
     }
 
     const feedbacks = await this.feedback.findMany({
-      where: { deletedAt: null },
+      where: { deletedAt: null, ownerId: userId },
       orderBy: orderOptions,
       skip: (page - 1) * pageSize,
       take: pageSize,

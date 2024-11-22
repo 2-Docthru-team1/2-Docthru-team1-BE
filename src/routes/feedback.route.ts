@@ -1,9 +1,13 @@
 import { Router } from 'express';
 import feedbackController from '#containers/feedback.container.js';
+import tokenVerifier from '#containers/verify.container.js';
 
 export const feedbackRouter = Router();
 
-feedbackRouter.route('/').get(feedbackController.getFeedbacks).post(feedbackController.postFeedback);
+feedbackRouter
+  .route('/')
+  .get(tokenVerifier.optionalVerifyAccessToken, feedbackController.getFeedbacks)
+  .post(feedbackController.postFeedback);
 
 feedbackRouter
   .route('/:id')

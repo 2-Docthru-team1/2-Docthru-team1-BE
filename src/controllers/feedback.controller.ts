@@ -17,7 +17,7 @@ export class FeedbackController {
       page: parseInt(page, 10) ?? 1,
       pageSize: parseInt(pageSize, 10) ?? 10,
     };
-    const Feedbacks = await this.feedbackService.getFeedbacks(options);
+    const Feedbacks = await this.feedbackService.getFeedbacks(options, req.user?.userId);
 
     res.json(Feedbacks);
   };
