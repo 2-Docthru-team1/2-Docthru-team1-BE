@@ -7,7 +7,9 @@ export class FeedbackRepository implements IFeedbackRepository {
   constructor(private feedback: PrismaClient['feedback']) {}
 
   getCount = async (userId?: string): Promise<number> => {
-    const count = await this.feedback.count({ where: { ownerId: userId } });
+    const count = await this.feedback.count({
+      where: { ownerId: userId },
+    });
 
     return count;
   };

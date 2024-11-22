@@ -8,8 +8,10 @@ import type {
   UpdateChallengeDTO,
   getChallengesOptions,
 } from '#types/challenge.types.js';
+import { NotFound } from '#types/http-error.types.js';
 import { generatePresignedDownloadUrl } from '#utils/S3/generate-presigned-download-url.js';
 import { generatePresignedUploadUrl } from '#utils/S3/generate-presigned-upload-url.js';
+import MESSAGES from '#utils/constants/messages.js';
 import { validateUpdateStatus } from '#utils/validateUpdateStatus.js';
 
 export class ChallengeService implements IChallengeService {
@@ -28,8 +30,8 @@ export class ChallengeService implements IChallengeService {
   getChallengeById = async (id: string): Promise<Challenge | null> => {
     const expiresIn = 3600;
     const challenge = await this.challengeRepository.findById(id);
-    if (!challenge) {
-      throw new Error();
+    if (!challenge || challenge.deletedAt) {
+      throw new NotFound(MESSAGES.NOT_FOUND);
     }
     const imageUrl = await generatePresignedDownloadUrl(challenge.imageUrl, expiresIn);
     const imageUrl2 = challenge.imageUrl2 ? await generatePresignedDownloadUrl(challenge.imageUrl2, expiresIn) : null;
@@ -85,8 +87,8 @@ export class ChallengeService implements IChallengeService {
     if (!userId) {
       throw new Error();
     }
-    if (!challenge) {
-      throw new Error();
+    if (!challenge || challenge.deletedAt) {
+      throw new NotFound(MESSAGES.NOT_FOUND);
     }
     if (challenge.requestUserId !== userId) {
       throw new Error();
