@@ -8,6 +8,7 @@ import type {
   UpdateChallengeDTO,
   getChallengesOptions,
 } from '#types/challenge.types.js';
+import { generatePresignedUploadUrl } from '#utils/S3/generate-presigned-upload-url.js';
 import { validateUpdateStatus } from '#utils/validateUpdateStatus.js';
 
 export class ChallengeService implements IChallengeService {
@@ -27,15 +28,38 @@ export class ChallengeService implements IChallengeService {
     return await this.challengeRepository.findById(id);
   };
 
-  createChallenge = async (challengeData: CreateChallengeDTO, userId: string): Promise<Challenge> => {
+  createChallenge = async (
+    challengeData: CreateChallengeDTO,
+    userId: string,
+  ): Promise<{ challenge: Challenge; uploadUrls: { uploadUrl: string }[] }> => {
+    const { imageCount, ...restChallengeData } = challengeData;
+    const uploadUrls: { uploadUrl: string }[] = [];
+    let imageUrl: string = '';
+    let imageUrl2: string | undefined = undefined;
+
+    for (let i = 0; i < imageCount; i++) {
+      const uniqueFileName = `${Date.now()}-image-${i}.jpg`;
+      const s3Key = `challenges/${uniqueFileName}`;
+      const contentType = 'image/jpeg';
+      const expiresIn = 3600;
+      const uploadUrl = await generatePresignedUploadUrl(s3Key, contentType, expiresIn);
+      uploadUrls.push({ uploadUrl });
+      if (i === 0) imageUrl = s3Key;
+      if (i === 1) imageUrl2 = s3Key;
+    }
+
     const ChallengeInput: ChallengeInput = {
-      ...challengeData,
+      ...restChallengeData,
       status: 'pending',
       isHidden: false,
       requestUserId: userId,
       participants: [{ id: userId }],
+      imageUrl,
+      imageUrl2,
     };
-    return await this.challengeRepository.create(ChallengeInput);
+
+    const challenge = await this.challengeRepository.create(ChallengeInput);
+    return { challenge, uploadUrls };
   };
 
   updateChallenge = async (id: string, challengeData: UpdateChallengeDTO, userId: string): Promise<Challenge> => {

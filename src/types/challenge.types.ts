@@ -28,6 +28,7 @@ export interface CreateChallengeDTO {
   imageUrl: string;
   imageUrl2?: string;
   mediaType: MediaType;
+  imageCount: number;
 }
 
 export interface ChallengeInput {
@@ -74,4 +75,3 @@ export interface ValidateUpdateStatusInput {
   userId: string;
   userRole?: Role;
 }
-
