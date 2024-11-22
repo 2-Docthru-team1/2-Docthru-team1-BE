@@ -7,13 +7,13 @@ export class UserRepository implements IUserRepository {
   constructor(private user: PrismaClient['user']) {}
 
   findById = async (id: string): Promise<User | null> => {
-    const user = await this.user.findUnique({ where: { id, deletedAt: null } });
+    const user = await this.user.findUnique({ where: { id } });
 
     return user;
   };
 
   findByEmail = async (email: string): Promise<User | null> => {
-    const user = await this.user.findUnique({ where: { email, deletedAt: null } });
+    const user = await this.user.findUnique({ where: { email } });
 
     return user;
   };
@@ -25,13 +25,13 @@ export class UserRepository implements IUserRepository {
   };
 
   update = async (id: string, data: User): Promise<User> => {
-    const user = await this.user.update({ where: { id, deletedAt: null }, data });
+    const user = await this.user.update({ where: { id }, data });
 
     return user;
   };
 
   delete = async (id: string): Promise<User> => {
-    const user = await this.user.update({ where: { id, deletedAt: null }, data: { deletedAt: new Date() } });
+    const user = await this.user.update({ where: { id }, data: { deletedAt: new Date() } });
 
     return user;
   };

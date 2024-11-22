@@ -1,5 +1,5 @@
 import type { AbortReason, Challenge, MediaType, PrismaClient, Status } from '@prisma/client';
-import prismaClient from '#connection/postgres.connection.js';
+import baseClient from '#connection/postgres.connection.js';
 import type { IChallengeRepository } from '#interfaces/repositories/challenge.repository.interface.js';
 import type { ChallengeInput, ChallengeStatusInput, UpdateChallengeDTO, getChallengesOptions } from '#types/challenge.types.js';
 import { Order } from '#utils/constants/enum.js';
@@ -39,7 +39,6 @@ export class ChallengeRepository implements IChallengeRepository {
         title?: { contains: string; mode: 'insensitive' };
         description?: { contains: string; mode: 'insensitive' };
       }>;
-      deletedAt?: null;
     } = {
       ...(mediaType ? { mediaType } : {}),
       ...(status ? { status } : {}),
@@ -51,7 +50,6 @@ export class ChallengeRepository implements IChallengeRepository {
             ],
           }
         : {}),
-      deletedAt: null,
     };
     const challenges = await this.challenge.findMany({
       skip: (page - 1) * pageSize,
@@ -71,7 +69,6 @@ export class ChallengeRepository implements IChallengeRepository {
         title?: { contains: string; mode: 'insensitive' };
         description?: { contains: string; mode: 'insensitive' };
       }>;
-      deletedAt?: null;
     } = {
       ...(mediaType ? { mediaType } : {}),
       ...(status ? { status } : {}),
@@ -81,15 +78,14 @@ export class ChallengeRepository implements IChallengeRepository {
           { description: { contains: options.keyword, mode: 'insensitive' } },
         ],
       }),
-      deletedAt: null,
     };
     const totalCount = await this.challenge.count({ where: whereCondition });
     return totalCount;
   };
 
   findById = async (id: string): Promise<Challenge | null> => {
-    return await prismaClient.challenge.findUnique({
-      where: { id, deletedAt: null },
+    return await baseClient.challenge.findUnique({
+      where: { id },
       include: {
         participants: true,
         works: true,
@@ -111,7 +107,7 @@ export class ChallengeRepository implements IChallengeRepository {
 
   update = async (id: string, data: UpdateChallengeDTO): Promise<Challenge> => {
     const challenge = await this.challenge.update({
-      where: { id, deletedAt: null },
+      where: { id },
       data,
       include: {
         participants: true,
@@ -127,7 +123,7 @@ export class ChallengeRepository implements IChallengeRepository {
     const newStatus = { status };
     if (abortReason && ['denied', 'aborted'].includes(status)) {
       await this.abortReason.upsert({
-        where: { challengeId, deletedAt: null },
+        where: { challengeId },
         create: {
           content: abortReason,
           adminId: userId,
@@ -140,7 +136,7 @@ export class ChallengeRepository implements IChallengeRepository {
       });
     }
     return await this.challenge.update({
-      where: { id: challengeId, deletedAt: null },
+      where: { id: challengeId },
       data: newStatus,
       include: { abortReason: true },
     });
@@ -148,7 +144,7 @@ export class ChallengeRepository implements IChallengeRepository {
 
   findAbortReason = async (id: string): Promise<AbortReason | null> => {
     return await this.abortReason.findUnique({
-      where: { challengeId: id, deletedAt: null },
+      where: { challengeId: id },
     });
   };
 }
