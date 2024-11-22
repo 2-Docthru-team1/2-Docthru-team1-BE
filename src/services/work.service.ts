@@ -1,10 +1,10 @@
-import type { ChallengeWork, WorkImage } from '@prisma/client';
+import type { ChallengeWork } from '@prisma/client';
 import type { IWorkService } from '#interfaces/services/work.service.interface.js';
 import type { WorkRepository } from '#repositories/work.repository.js';
-import type { CreateWorkDTO, UpdateWorkDTO } from '#types/work.types.js';
-import type { GetWorksOptions, ResultChallengeWork } from '#types/work.types.js';
+import { NotFound } from '#types/http-error.types.js';
+import type { CreateWorkDTO, GetWorksOptions, ResultChallengeWork, UpdateWorkDTO } from '#types/work.types.js';
 import { generatePresignedDownloadUrl } from '#utils/S3/generate-presigned-download-url.js';
-import type { WORK_IMAGES } from '@/prisma/mock/challengeWorkMock.js';
+import MESSAGES from '#utils/constants/messages.js';
 
 export class WorkService implements IWorkService {
   constructor(private WorkRepository: WorkRepository) {} // 이 부분에 Repository를 연결합니다.
@@ -40,6 +40,10 @@ export class WorkService implements IWorkService {
 
   getWorkById = async (id: string): Promise<ResultChallengeWork | null> => {
     const work = await this.WorkRepository.findById(id);
+    if (!work || work.deletedAt) {
+      throw new NotFound(MESSAGES.NOT_FOUND);
+    }
+
     const { ownerId, ...otherWorkField } = work || {};
     const changedWork = { ...otherWorkField } as ResultChallengeWork;
     const updatedImages = await Promise.all(
@@ -61,11 +65,18 @@ export class WorkService implements IWorkService {
 
   updateWork = async (id: string, WorkData: UpdateWorkDTO): Promise<ChallengeWork> => {
     const Work = await this.WorkRepository.update(id, WorkData);
+    if (!Work || Work.deletedAt) {
+      throw new NotFound(MESSAGES.NOT_FOUND);
+    }
+
     return Work;
   };
 
   deleteWork = async (id: string): Promise<ChallengeWork> => {
     const Work = await this.WorkRepository.delete(id);
+    if (!Work || Work.deletedAt) {
+      throw new NotFound(MESSAGES.NOT_FOUND);
+    }
 
     return Work;
   };
