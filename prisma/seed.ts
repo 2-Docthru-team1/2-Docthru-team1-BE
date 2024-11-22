@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import RECIPES from '@/prisma/mock/recipeMock.js';
 import { CHALLENGES } from './mock/challengeMock.js';
 import { CHALLENGE_WORKS, WORK_IMAGES } from './mock/challengeWorkMock.js';
 import USERS from './mock/userMock.js';
@@ -7,18 +8,17 @@ const prisma = new PrismaClient();
 
 async function main() {
   // 기존 데이터 삭제
+  await prisma.recipe.deleteMany();
   await prisma.workImage.deleteMany();
   await prisma.challengeWork.deleteMany();
   await prisma.challenge.deleteMany();
   await prisma.user.deleteMany();
 
-  // 사용자 데이터 삽입
   await prisma.user.createMany({
     data: USERS,
     skipDuplicates: true,
   });
 
-  // 챌린지 데이터 삽입
   await prisma.challenge.createMany({
     data: CHALLENGES,
     skipDuplicates: true,
@@ -30,6 +30,11 @@ async function main() {
   });
   await prisma.workImage.createMany({
     data: WORK_IMAGES,
+    skipDuplicates: true,
+  });
+
+  await prisma.recipe.createMany({
+    data: RECIPES,
     skipDuplicates: true,
   });
 }
