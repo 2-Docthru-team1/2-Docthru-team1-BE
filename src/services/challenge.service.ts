@@ -8,6 +8,8 @@ import type {
   UpdateChallengeDTO,
   getChallengesOptions,
 } from '#types/challenge.types.js';
+import { NotFound } from '#types/http-error.types.js';
+import MESSAGES from '#utils/constants/messages.js';
 import { validateUpdateStatus } from '#utils/validateUpdateStatus.js';
 
 export class ChallengeService implements IChallengeService {
@@ -24,7 +26,12 @@ export class ChallengeService implements IChallengeService {
   };
 
   getChallengeById = async (id: string): Promise<Challenge | null> => {
-    return await this.challengeRepository.findById(id);
+    const challenge = await this.challengeRepository.findById(id);
+    if (!challenge || challenge.deletedAt) {
+      throw new NotFound(MESSAGES.NOT_FOUND);
+    }
+
+    return challenge;
   };
 
   createChallenge = async (challengeData: CreateChallengeDTO, userId: string): Promise<Challenge> => {
@@ -40,17 +47,18 @@ export class ChallengeService implements IChallengeService {
 
   updateChallenge = async (id: string, challengeData: UpdateChallengeDTO): Promise<Challenge> => {
     const challenge = await this.challengeRepository.update(id, challengeData);
+    if (!challenge || challenge.deletedAt) {
+      throw new NotFound(MESSAGES.NOT_FOUND);
+    }
+
     return challenge;
   };
 
   updateStatus = async (data: ChallengeStatusInput): Promise<Challenge | null> => {
     const { challengeId, status, abortReason, userId, userRole } = data;
     const challenge = await this.challengeRepository.findById(challengeId);
-    if (!challenge) {
-      throw new Error();
-    }
-    if (challenge.requestUserId !== userId) {
-      throw new Error();
+    if (!challenge || challenge.deletedAt) {
+      throw new NotFound(MESSAGES.NOT_FOUND);
     }
 
     validateUpdateStatus({
@@ -71,6 +79,10 @@ export class ChallengeService implements IChallengeService {
 
   getAbortReason = async (id: string): Promise<AbortReason | null> => {
     const abortReason = await this.challengeRepository.findAbortReason(id);
+    if (!abortReason) {
+      throw new NotFound(MESSAGES.NOT_FOUND);
+    }
+
     return abortReason;
   };
 }

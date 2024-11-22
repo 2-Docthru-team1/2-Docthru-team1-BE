@@ -15,13 +15,13 @@ export class AuthService implements IAuthService {
 
   signIn = async (email: string, password: string): Promise<SigninResponse> => {
     const user = await this.userRepository.findByEmail(email);
-    if (!user) {
-      throw new Error(MESSAGES.INVALID_CREDENTIALS);
+    if (!user || user.deletedAt) {
+      throw new NotFound(MESSAGES.INVALID_CREDENTIALS);
     }
 
     const hashedInputPassword = hashingPassword(password, user.salt);
     if (hashedInputPassword !== user.password) {
-      throw new Error(MESSAGES.INVALID_CREDENTIALS);
+      throw new NotFound(MESSAGES.INVALID_CREDENTIALS);
     }
 
     const refreshToken = createToken(user, 'refresh');
@@ -35,7 +35,7 @@ export class AuthService implements IAuthService {
 
   getUser = async (userId: string): Promise<SafeUser> => {
     const user = await this.userRepository.findById(userId);
-    if (!user) {
+    if (!user || user.deletedAt) {
       throw new NotFound(MESSAGES.NOT_FOUND);
     }
 
@@ -50,7 +50,7 @@ export class AuthService implements IAuthService {
 
   getNewToken = async (userToken: UserToken, refreshToken: string): Promise<SafeUser> => {
     const user = await this.userRepository.findById(userToken.userId);
-    if (!user) {
+    if (!user || user.deletedAt) {
       throw new BadRequest(MESSAGES.INVALID_ACCESS_TOKEN);
     }
     if (user.refreshToken !== refreshToken) {
