@@ -7,11 +7,12 @@ export class RecipeController {
   constructor(private recipeService: RecipeService) {}
 
   getRecipes = async (req: Request<{ query: RecipeQueries }>, res: Response) => {
-    const { orderBy = 'highest', category, page = '1', pageSize = '10' } = req.query;
+    const { orderBy = 'highest', category, keyword, page = '1', pageSize = '10' } = req.query;
 
     const options: RecipeOptions = {
       orderBy,
       category,
+      keyword,
       page: parseInt(page, 10) ?? 1,
       pageSize: parseInt(pageSize, 10) ?? 10,
     };

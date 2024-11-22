@@ -6,14 +6,14 @@ export class RecipeRepository implements IRecipeRepository {
   constructor(private recipe: PrismaClient['recipe']) {}
 
   getCount = async (options: RecipeOptions) => {
-    const { category } = options;
-    const count = await this.recipe.count({ where: { category } });
+    const { category, keyword } = options;
+    const count = await this.recipe.count({ where: { category, title: { contains: keyword } } });
 
     return count;
   };
 
   findMany = async (options: RecipeOptions) => {
-    const { orderBy: order, category, page, pageSize } = options;
+    const { orderBy: order, category, keyword, page, pageSize } = options;
     let orderBy = {};
     switch (order) {
       case 'highest':
@@ -27,7 +27,7 @@ export class RecipeRepository implements IRecipeRepository {
 
     const recipes = await this.recipe.findMany({
       orderBy,
-      where: { category },
+      where: { category, title: { contains: keyword } },
       skip: (page - 1) * pageSize,
       take: pageSize,
     });
