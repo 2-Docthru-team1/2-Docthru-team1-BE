@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import FEEDBACKS from '@/prisma/mock/feedbackMock.js';
 import RECIPES from '@/prisma/mock/recipeMock.js';
 import { CHALLENGES } from './mock/challengeMock.js';
 import { CHALLENGE_WORKS, WORK_IMAGES } from './mock/challengeWorkMock.js';
@@ -7,8 +8,8 @@ import USERS from './mock/userMock.js';
 const prisma = new PrismaClient();
 
 async function main() {
-  // 기존 데이터 삭제
   await prisma.recipe.deleteMany();
+  await prisma.feedback.deleteMany();
   await prisma.workImage.deleteMany();
   await prisma.challengeWork.deleteMany();
   await prisma.challenge.deleteMany();
@@ -30,6 +31,11 @@ async function main() {
   });
   await prisma.workImage.createMany({
     data: WORK_IMAGES,
+    skipDuplicates: true,
+  });
+
+  await prisma.feedback.createMany({
+    data: FEEDBACKS,
     skipDuplicates: true,
   });
 
