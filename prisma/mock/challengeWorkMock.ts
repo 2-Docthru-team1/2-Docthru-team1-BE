@@ -86,7 +86,7 @@ export const CHALLENGE_WORKS = [
     title: '첫 번째 챌린지 워크',
     content: '이것은 첫 번째 챌린지 워크의 내용입니다.',
     likeCount: 5,
-    ownerId: '029dc2ea-93d1-4c8d-844e-07fd9c87d23e',
+    ownerId: 'e8394ccc-7359-4c16-ab37-4ed9671146a4',
     challengeId: '16786232-7ccf-44b0-8e50-51e6c148a590',
   },
   {
@@ -96,7 +96,7 @@ export const CHALLENGE_WORKS = [
     title: '두 번째 챌린지 워크',
     content: '이것은 두 번째 챌린지 워크의 내용입니다.',
     likeCount: 10,
-    ownerId: '029dc2ea-93d1-4c8d-844e-07fd9c87d23e',
+    ownerId: 'e8394ccc-7359-4c16-ab37-4ed9671146a4',
     challengeId: 'a8437a55-b9e2-4cce-a16b-d3aa268d5464',
   },
   {
@@ -106,7 +106,7 @@ export const CHALLENGE_WORKS = [
     title: '세 번째 챌린지 워크',
     content: '이것은 세 번째 챌린지 워크의 내용입니다.',
     likeCount: 3,
-    ownerId: '029dc2ea-93d1-4c8d-844e-07fd9c87d23e',
+    ownerId: '0081e090-abfa-4e86-a13d-3cba9539a06c',
     challengeId: '636d645a-99ab-4435-8770-1918e0101461',
   },
   {
@@ -116,7 +116,7 @@ export const CHALLENGE_WORKS = [
     title: '네 번째 챌린지 워크',
     content: '이것은 네 번째 챌린지 워크의 내용입니다.',
     likeCount: 8,
-    ownerId: '029dc2ea-93d1-4c8d-844e-07fd9c87d23e',
+    ownerId: '0081e090-abfa-4e86-a13d-3cba9539a06c',
     challengeId: 'b9428723-211d-467a-94b0-b48cc9ebbe39',
   },
   {
@@ -126,7 +126,7 @@ export const CHALLENGE_WORKS = [
     title: '다섯 번째 챌린지 워크',
     content: '이것은 다섯 번째 챌린지 워크의 내용입니다.',
     likeCount: 12,
-    ownerId: '029dc2ea-93d1-4c8d-844e-07fd9c87d23e',
+    ownerId: '143c6a80-3522-41e9-a2ed-c57cbdb18f75',
     challengeId: 'aacf7489-bf9e-4115-9a11-7fbc2cae314d',
   },
   {
@@ -136,7 +136,7 @@ export const CHALLENGE_WORKS = [
     title: '여섯 번째 챌린지 워크',
     content: '이것은 여섯 번째 챌린지 워크의 내용입니다.',
     likeCount: 7,
-    ownerId: '029dc2ea-93d1-4c8d-844e-07fd9c87d23e',
+    ownerId: '143c6a80-3522-41e9-a2ed-c57cbdb18f75',
     challengeId: '458ac4b2-9fab-4f37-b6f2-45b21f140b4e',
   },
   {
@@ -146,7 +146,7 @@ export const CHALLENGE_WORKS = [
     title: '일곱 번째 챌린지 워크',
     content: '이것은 일곱 번째 챌린지 워크의 내용입니다.',
     likeCount: 4,
-    ownerId: '029dc2ea-93d1-4c8d-844e-07fd9c87d23e',
+    ownerId: '590602e9-3796-4287-bca1-de9969139fbc',
     challengeId: 'ac3fe802-94ec-4ebf-be15-ebc3ec7355d8',
   },
   {
@@ -156,7 +156,7 @@ export const CHALLENGE_WORKS = [
     title: '여덟 번째 챌린지 워크',
     content: '이것은 여덟 번째 챌린지 워크의 내용입니다.',
     likeCount: 6,
-    ownerId: '029dc2ea-93d1-4c8d-844e-07fd9c87d23e',
+    ownerId: '590602e9-3796-4287-bca1-de9969139fbc',
     challengeId: '6e6793e9-19e4-4e5f-a288-fa717bf6d618',
   },
   {
@@ -166,7 +166,7 @@ export const CHALLENGE_WORKS = [
     title: '아홉 번째 챌린지 워크',
     content: '이것은 아홉 번째 챌린지 워크의 내용입니다.',
     likeCount: 9,
-    ownerId: '029dc2ea-93d1-4c8d-844e-07fd9c87d23e',
+    ownerId: '78dd77e8-36e4-4cbd-bd7b-27e7fcaae6f9',
     challengeId: 'bfe9a836-36b6-40bb-8ffa-81dee5aed6b9',
   },
   {
@@ -176,7 +176,7 @@ export const CHALLENGE_WORKS = [
     title: '열 번째 챌린지 워크',
     content: '이것은 열 번째 챌린지 워크의 내용입니다.',
     likeCount: 11,
-    ownerId: '029dc2ea-93d1-4c8d-844e-07fd9c87d23e',
+    ownerId: '78dd77e8-36e4-4cbd-bd7b-27e7fcaae6f9',
     challengeId: '62eda79b-066f-4a97-8296-e34ae656086b',
   },
 ];

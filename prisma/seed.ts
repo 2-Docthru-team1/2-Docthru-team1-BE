@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { CHALLENGES } from './mock/challengeMock.js';
-// import { CHALLENGE_WORKS, WORK_IMAGES } from './mock/challengeWorkMock.js';
+import { CHALLENGE_WORKS, WORK_IMAGES } from './mock/challengeWorkMock.js';
 import USERS from './mock/userMock.js';
 
 const prisma = new PrismaClient();
@@ -24,14 +24,14 @@ async function main() {
     skipDuplicates: true,
   });
 
-  // await prisma.challengeWork.createMany({
-  //   data: CHALLENGE_WORKS,
-  //   skipDuplicates: true,
-  // });
-  // await prisma.workImage.createMany({
-  //   data: WORK_IMAGES,
-  //   skipDuplicates: true,
-  // });
+  await prisma.challengeWork.createMany({
+    data: CHALLENGE_WORKS,
+    skipDuplicates: true,
+  });
+  await prisma.workImage.createMany({
+    data: WORK_IMAGES,
+    skipDuplicates: true,
+  });
 }
 
 // 데이터베이스 연결 종료
