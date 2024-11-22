@@ -45,9 +45,6 @@ export class AuthService implements IAuthService {
   createUser = async (data: CreateUserDTO): Promise<SafeUser> => {
     const user = await this.userRepository.create(data);
 
-    const storage = getStorage();
-    console.log('🚀 ~ AuthService ~ createUser= ~ storage:', storage);
-
     return filterSensitiveData(user);
   };
 
