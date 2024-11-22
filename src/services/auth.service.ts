@@ -2,7 +2,7 @@ import type { IAuthService } from '#interfaces/services/auth.service.interface.j
 import { getStorage } from '#middlewares/asyncLocalStorage.js';
 import type { UserRepository } from '#repositories/user.repository.js';
 import type { CreateUserDTO, SigninResponse, UserToken } from '#types/auth.types.js';
-import { BadRequest, Unauthorized } from '#types/http-error.types.js';
+import { BadRequest, NotFound, Unauthorized } from '#types/http-error.types.js';
 import type { SafeUser } from '#types/user.types.js';
 import MESSAGES from '#utils/constants/messages.js';
 import createToken from '#utils/createToken.js';
@@ -31,6 +31,15 @@ export class AuthService implements IAuthService {
     const accessToken = createToken(user, 'access');
     user.accessToken = accessToken;
     return { ...filterSensitiveData(user), refreshToken };
+  };
+
+  getUser = async (userId: string): Promise<SafeUser> => {
+    const user = await this.userRepository.findById(userId);
+    if (!user) {
+      throw new NotFound(MESSAGES.NOT_FOUND);
+    }
+
+    return filterSensitiveData(user);
   };
 
   createUser = async (data: CreateUserDTO): Promise<SafeUser> => {

@@ -1,6 +1,7 @@
 import express from 'express';
 import challengeController from '#containers/challenge.container.js';
 import tokenVerifier from '#containers/verify.container.js';
+import workController from '#containers/work.container.js';
 import validatePaginationOptions from '#middlewares/pagination.validation.js';
 import { validateCreateChallenge, validateUpdateChallenge } from '#middlewares/validateChallenge.js';
 
@@ -20,5 +21,8 @@ challengeRouter
 
 challengeRouter.patch('/:id/status', tokenVerifier.verifyAccessToken, challengeController.patchChallengeStatus);
 challengeRouter.get('/:id/reason', challengeController.getChallengeAbortReason);
+
+challengeRouter.route('/:id/works').get(workController.getWorks);
+
 
 export default challengeRouter;

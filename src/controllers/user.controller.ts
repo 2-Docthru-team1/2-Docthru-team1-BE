@@ -35,9 +35,9 @@ export class UserController {
     const { id } = req.params;
     assert(req.body, PatchUser, MESSAGES.WRONG_FORMAT);
 
-    const user = await this.userService.updateUser(id, req.body);
+    // const user = await this.userService.updateUser(id, new User(req.body));
 
-    res.json(user);
+    // res.json(user);
   };
 
   deleteUser = async (req: Request, res: Response, next: NextFunction) => {

@@ -1,5 +1,6 @@
 import { type Feedback, Prisma, type PrismaClient } from '@prisma/client';
 import type { IFeedbackRepository } from '#interfaces/repositories/feedback.repository.interface.js';
+import type { BasicOptions } from '#types/common.types.js';
 import type { CreateFeedbackDTO, UpdateFeedbackDTO } from '#types/feedback.types.js';
 
 export class FeedbackRepository implements IFeedbackRepository {
@@ -11,7 +12,7 @@ export class FeedbackRepository implements IFeedbackRepository {
     return count;
   };
 
-  findMany = async (options: { orderBy: string; page: number; pageSize: number }): Promise<Feedback[] | null> => {
+  findMany = async (options: BasicOptions): Promise<Feedback[] | null> => {
     const { orderBy, page, pageSize } = options;
 
     let orderOptions;
@@ -57,8 +58,14 @@ export class FeedbackRepository implements IFeedbackRepository {
   };
 
   delete = async (id: string): Promise<Feedback> => {
-    const feedback = await this.feedback.delete({ where: { id } });
+    const feedback = await this.feedback.update({ where: { id }, data: { deletedAt: new Date() } });
 
     return feedback;
+  };
+
+  isDeleted = async (id: string): Promise<boolean> => {
+    const feedback = await this.feedback.findUnique({ where: { id } });
+
+    return !!feedback?.deletedAt;
   };
 }

@@ -9,6 +9,7 @@ import createToken from '#utils/createToken.js';
 export const authRouter = express.Router();
 
 authRouter.post('/signIn', authController.signIn);
+authRouter.get('/me', tokenVerifier.verifyAccessToken, authController.getMe);
 authRouter.post('/signUp', hashPassword, authController.signUp);
 authRouter.post('/refresh', tokenVerifier.verifyRefreshToken, authController.refreshToken);
 

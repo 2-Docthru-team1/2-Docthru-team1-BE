@@ -1,11 +1,11 @@
-import type { NextFunction, Response } from 'express';
-import { assert } from 'superstruct';
 import type { AuthService } from '#services/auth.service.js';
 import type { CreateUserDTO, SignInDTO } from '#types/auth.types.js';
 import type { Request } from '#types/common.types.js';
 import { BadRequest, NotFound, Unauthorized } from '#types/http-error.types.js';
 import MESSAGES from '#utils/constants/messages.js';
 import { CreateUser, SignIn } from '#utils/struct.js';
+import type { NextFunction, Response } from 'express';
+import { assert } from 'superstruct';
 
 export class AuthController {
   constructor(private authService: AuthService) {}
@@ -15,6 +15,12 @@ export class AuthController {
     const { email, password } = req.body;
 
     const user = await this.authService.signIn(email, password);
+
+    res.json(user);
+  };
+
+  getMe = async (req: Request, res: Response, next: NextFunction) => {
+    const user = await this.authService.getUser(req.user!.userId);
 
     res.json(user);
   };
@@ -37,7 +43,7 @@ export class AuthController {
 
     const user = await this.authService.getNewToken(req.user, refreshToken);
     if (!user) {
-      throw new NotFound(MESSAGES.USER_NOT_FOUND);
+      throw new NotFound(MESSAGES.NOT_FOUND);
     }
 
     res.json(user);
