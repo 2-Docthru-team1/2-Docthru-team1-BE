@@ -55,7 +55,6 @@ export class WorkService implements IWorkService {
 
   createWork = async (WorkData: CreateWorkDTO): Promise<ChallengeWork> => {
     const Work = await this.WorkRepository.create(WorkData);
-
     return Work;
   };
 

@@ -17,7 +17,11 @@ export interface BasicOptions {
   page: number;
   pageSize: number;
 }
-
+export interface BasicStringOptions {
+  orderBy: string;
+  page: string;
+  pageSize: string;
+}
 export interface BasicQueries {
   orderBy: string;
   page: string;

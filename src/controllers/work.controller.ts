@@ -1,9 +1,14 @@
 import type { NextFunction, Response } from 'express';
 import { assert } from 'superstruct';
+import { getStorage } from '#middlewares/asyncLocalStorage.js';
 import type { WorkService } from '#services/work.service.js';
-import type { BasicQueries, Request } from '#types/common.types.js';
+import type { Request } from '#types/common.types.js';
+//import type { Request } from '#types/common.types.js';
+import type { BasicOptions, BasicStringOptions } from '#types/common.types.js';
 import { NotFound } from '#types/http-error.types.js';
-import { WorkOrder } from '#types/work.types.js';
+import { type CreateWorkDTO, type RequestCreateWorkDTO, WorkOrder } from '#types/work.types.js';
+import { generatePresignedDownloadUrl } from '#utils/S3/generate-presigned-download-url.js';
+import { Order } from '#utils/constants/enum.js';
 import MESSAGES from '#utils/constants/messages.js';
 import { CreateWork, PatchWork, Uuid } from '#utils/struct.js';
 
@@ -16,7 +21,8 @@ export class WorkController {
   // 요청의 유효성 검사는 middleware를 작성해 route단에서 하는 것이 좋습니다.
   // 간단한 유효성 검사라면 이곳에 작성해도 됩니다.
   // 응답의 status를 지정하고, body를 전달합니다.
-  getWorks = async (req: Request<{ params: { id: string }; query: BasicQueries }>, res: Response, next: NextFunction) => {
+
+  getWorks = async (req: Request<{ params: { id: string }; query: BasicStringOptions }>, res: Response, next: NextFunction) => {
     const { id } = req.params;
     const { orderBy = 'favoritest', page = '1', pageSize = '4' } = req.query;
     const finalOrderBy: WorkOrder = orderBy in WorkOrder ? (orderBy as WorkOrder) : WorkOrder.recent;
@@ -40,12 +46,21 @@ export class WorkController {
     res.json(work);
   };
 
-  postWork = async (req: Request, res: Response, next: NextFunction) => {
-    assert(req.body, CreateWork, MESSAGES.WRONG_FORMAT);
-
-    // const user = await this.WorkService.createWork(req.body);
-
-    // res.json(user);
+  postWork = async (req: Request<{ params: { id: string }; body: RequestCreateWorkDTO }>, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    const { title, content, images } = req.body;
+    const storage = getStorage();
+    const userId = storage.userId;
+    const workData = {
+      challengeId: id,
+      ownerId: userId,
+      title,
+      content,
+      images,
+    };
+    assert(workData, CreateWork, MESSAGES.WRONG_FORMAT);
+    const work = await this.WorkService.createWork(workData);
+    res.json(work);
   };
 
   patchWork = async (req: Request<{ params: { id: string } }>, res: Response, next: NextFunction) => {

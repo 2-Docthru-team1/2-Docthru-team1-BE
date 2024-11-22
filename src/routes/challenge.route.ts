@@ -12,17 +12,19 @@ export const challengeRouter = express.Router();
 challengeRouter
   .route('/')
   .get(validatePaginationOptions, challengeController.getChallenges)
-  .post(tokenVerifier.verifyAccessToken, validateCreateChallenge, challengeController.postChallenge);
+  .post(tokenVerifier.optionalVerifyAccessToken, validateCreateChallenge, challengeController.postChallenge);
 
 challengeRouter
   .route('/:id')
   .get(challengeController.getChallengeById)
-  .patch(tokenVerifier.verifyAccessToken, validateUpdateChallenge, challengeController.patchChallenge);
+  .patch(tokenVerifier.optionalVerifyAccessToken, validateUpdateChallenge, challengeController.patchChallenge);
 
-challengeRouter.patch('/:id/status', tokenVerifier.verifyAccessToken, challengeController.patchChallengeStatus);
+challengeRouter.patch('/:id/status', tokenVerifier.optionalVerifyAccessToken, challengeController.patchChallengeStatus);
 challengeRouter.get('/:id/reason', challengeController.getChallengeAbortReason);
 
-challengeRouter.route('/:id/works').get(workController.getWorks);
-
+challengeRouter
+  .route('/:id/works')
+  .get(workController.getWorks)
+  .post(tokenVerifier.optionalVerifyAccessToken, workController.postWork);
 
 export default challengeRouter;

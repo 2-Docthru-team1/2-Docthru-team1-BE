@@ -10,13 +10,10 @@ export class TokenVerifier {
 
   optionalVerifyAccessToken = async (req: Request, res: Response, next: NextFunction) => {
     const authorizationHeader = req.headers.authorization;
-
     if (authorizationHeader) {
       await this.verifyAccessToken(req, res, next);
-
       return;
     }
-
     next();
   };
 
