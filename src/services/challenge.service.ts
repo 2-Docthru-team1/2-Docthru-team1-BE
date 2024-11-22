@@ -8,6 +8,7 @@ import type {
   UpdateChallengeDTO,
   getChallengesOptions,
 } from '#types/challenge.types.js';
+import { generatePresignedDownloadUrl } from '#utils/S3/generate-presigned-download-url.js';
 import { generatePresignedUploadUrl } from '#utils/S3/generate-presigned-upload-url.js';
 import { validateUpdateStatus } from '#utils/validateUpdateStatus.js';
 
@@ -25,7 +26,18 @@ export class ChallengeService implements IChallengeService {
   };
 
   getChallengeById = async (id: string): Promise<Challenge | null> => {
-    return await this.challengeRepository.findById(id);
+    const expiresIn = 3600;
+    const challenge = await this.challengeRepository.findById(id);
+    if (!challenge) {
+      throw new Error();
+    }
+    const imageUrl = await generatePresignedDownloadUrl(challenge.imageUrl, expiresIn);
+    const imageUrl2 = challenge.imageUrl2 ? await generatePresignedDownloadUrl(challenge.imageUrl2, expiresIn) : null;
+    return {
+      ...challenge,
+      imageUrl,
+      imageUrl2,
+    };
   };
 
   createChallenge = async (
