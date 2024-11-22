@@ -3,7 +3,6 @@ import { assert } from 'superstruct';
 import { getStorage } from '#middlewares/asyncLocalStorage.js';
 import type { WorkService } from '#services/work.service.js';
 import type { Request } from '#types/common.types.js';
-//import type { Request } from '#types/common.types.js';
 import type { BasicOptions, BasicStringOptions } from '#types/common.types.js';
 import { NotFound } from '#types/http-error.types.js';
 import { type CreateWorkDTO, type RequestCreateWorkDTO, WorkOrder } from '#types/work.types.js';
@@ -72,7 +71,7 @@ export class WorkController {
     // res.json(user);
   };
 
-  deleteChallege = async (req: Request<{ params: { id: string } }>, res: Response, next: NextFunction) => {
+  deleteWork = async (req: Request<{ params: { id: string } }>, res: Response, next: NextFunction) => {
     const { id } = req.params;
 
     const user = await this.WorkService.deleteWork(id);
