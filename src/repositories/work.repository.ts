@@ -1,7 +1,10 @@
 import type { ChallengeWork } from '@prisma/client';
+import type { ChallengeWork, PrismaClient } from '@prisma/client';
+import { randomUUID } from 'crypto';
 import type { IWorkRepository } from '#interfaces/repositories/work.repository.interface.js';
 import type { ExtendedPrismaClient } from '#types/common.types.js';
 import { type CreateWorkDTO, type GetWorksOptions, type UpdateWorkDTO, WorkOrder } from '#types/work.types.js';
+import { generatePresignedUploadUrl } from '#utils/S3/generate-presigned-upload-url.js';
 
 export class WorkRepository implements IWorkRepository {
   constructor(private challengeWork: ExtendedPrismaClient['challengeWork']) {}
@@ -19,7 +22,7 @@ export class WorkRepository implements IWorkRepository {
       where: { challengeId },
       include: {
         owner: { select: { id: true, name: true, email: true, role: true } },
-        images: true,
+        images: { select: { imageUrl: true } },
       },
     });
     return works;
@@ -33,15 +36,31 @@ export class WorkRepository implements IWorkRepository {
       where: { id },
       include: {
         owner: { select: { id: true, name: true, email: true, role: true } },
-        images: true,
+        images: { select: { imageUrl: true } },
       },
     });
     return work;
   };
 
   create = async (data: CreateWorkDTO): Promise<ChallengeWork> => {
-    const work = await this.challengeWork.create({ data });
-
+    const { challengeId, ownerId, images, title, content } = data;
+    // const files = images.map((image, index) => ({ //겸사겸사 이렇게 쓰는게 맞는지도 봐주세요
+    //   key: `userId/${randomUUID()}_${index}`, // S3에 저장할 고유한 키 생성
+    //   contentType: 'image/png', // MIME 타입 설정
+    // }));
+    // const uploadUrls = await Promise.all(files.map(file => generatePresignedUploadUrl(file.key, file.contentType)));
+    const work = await this.challengeWork.create({
+      data: {
+        title,
+        content,
+        challenge: { connect: { id: challengeId } },
+        owner: { connect: { id: ownerId } },
+        images: {
+          create: images.map(image => ({ imageUrl: image })),
+        },
+      },
+      include: { images: { select: { imageUrl: true } } },
+    });
     return work;
   };
 

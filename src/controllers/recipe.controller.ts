@@ -1,3 +1,4 @@
+import { Category } from '@prisma/client';
 import type { NextFunction, Response } from 'express';
 import type { RecipeService } from '#services/recipe.service.js';
 import type { Request } from '#types/common.types.js';
@@ -7,7 +8,34 @@ export class RecipeController {
   constructor(private recipeService: RecipeService) {}
 
   getRecipes = async (req: Request<{ query: RecipeQueries }>, res: Response) => {
-    const { orderBy = 'highest', category, keyword, page = '1', pageSize = '10' } = req.query;
+    const { filter = 'like highest', keyword, page = '1', pageSize = '10' } = req.query;
+    let orderBy;
+    let category;
+
+    switch (filter) {
+      case 'traditional':
+        category = Category.Traditional;
+        break;
+      case 'bunsik':
+        category = Category.Bunsik;
+        break;
+      case 'banchan':
+        category = Category.BanChan;
+        break;
+      case 'dessert':
+        category = Category.Dessert;
+        break;
+      case 'noodle':
+        category = Category.Noodle;
+        break;
+      case 'like highest':
+        orderBy = 'highest';
+        break;
+      case 'like lowest':
+        orderBy = 'lowest';
+        break;
+      default:
+    }
 
     const options: RecipeOptions = {
       orderBy,
