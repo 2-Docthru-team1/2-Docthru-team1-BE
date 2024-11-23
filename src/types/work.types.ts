@@ -1,14 +1,13 @@
 import type { ChallengeWork, Status, User, WorkImage } from '@prisma/client';
 
 export interface CreateWorkDTO {
-  status: Status;
-  likeCount: number;
   title: string;
   content: string;
-  deadline: Date;
+  images: string[];
   ownerId: string;
   challengeId: string;
 }
+export type RequestCreateWorkDTO = Omit<CreateWorkDTO, 'challengeId' | 'ownerId'>;
 
 export interface UpdateWorkDTO {
   status?: Status;

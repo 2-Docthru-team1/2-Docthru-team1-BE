@@ -68,7 +68,7 @@ model ChallengeWork {
 
   title     String
   content   String
-  likeCount Int
+  likeCount Int    @default(0)
 
   images    WorkImage[]
   likeUsers User[]      @relation(name: "likeRelation")
