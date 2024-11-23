@@ -19,7 +19,7 @@ export class WorkRepository implements IWorkRepository {
       skip: (page - 1) * pageSize,
       take: pageSize,
       orderBy: orderResult,
-      where: { challengeId, deletedAt: null },
+      where: { challengeId },
       include: {
         owner: { select: { id: true, name: true, email: true, role: true } },
         images: { select: { imageUrl: true } },
@@ -28,12 +28,12 @@ export class WorkRepository implements IWorkRepository {
     return works;
   };
   totalCount = async (challengeId: string): Promise<number | null> => {
-    const totalCount = await this.challengeWork.count({ where: { challengeId, deletedAt: null } });
+    const totalCount = await this.challengeWork.count({ where: { challengeId } });
     return totalCount;
   };
   findById = async (id: string): Promise<ChallengeWork | null> => {
     const work = await this.challengeWork.findUnique({
-      where: { id, deletedAt: null },
+      where: { id },
       include: {
         owner: { select: { id: true, name: true, email: true, role: true } },
         images: { select: { imageUrl: true } },
@@ -67,7 +67,7 @@ export class WorkRepository implements IWorkRepository {
   update = async (id: string, data: UpdateWorkDTO): Promise<ChallengeWork> => {
     const { images, ...other } = data;
     const work = await this.challengeWork.update({
-      where: { id, deletedAt: null },
+      where: { id },
       data: {
         ...other,
       },
@@ -85,7 +85,7 @@ export class WorkRepository implements IWorkRepository {
   };
 
   delete = async (id: string): Promise<ChallengeWork> => {
-    const work = await this.challengeWork.update({ where: { id, deletedAt: null }, data: { deletedAt: new Date() } });
+    const work = await this.challengeWork.update({ where: { id }, data: { deletedAt: new Date() } });
 
     return work;
   };

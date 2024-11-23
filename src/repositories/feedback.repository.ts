@@ -7,7 +7,9 @@ export class FeedbackRepository implements IFeedbackRepository {
   constructor(private feedback: PrismaClient['feedback']) {}
 
   getCount = async (userId?: string): Promise<number> => {
-    const count = await this.feedback.count({ where: { deletedAt: null, ownerId: userId } });
+    const count = await this.feedback.count({
+      where: { ownerId: userId },
+    });
 
     return count;
   };
@@ -27,7 +29,7 @@ export class FeedbackRepository implements IFeedbackRepository {
     }
 
     const feedbacks = await this.feedback.findMany({
-      where: { deletedAt: null, ownerId: userId },
+      where: { ownerId: userId },
       orderBy: orderOptions,
       skip: (page - 1) * pageSize,
       take: pageSize,
@@ -39,7 +41,7 @@ export class FeedbackRepository implements IFeedbackRepository {
 
   findById = async (id: string): Promise<Feedback | null> => {
     const feedback = await this.feedback.findUnique({
-      where: { id, deletedAt: null },
+      where: { id },
       include: { owner: { select: { name: true } } },
     });
 
@@ -53,19 +55,19 @@ export class FeedbackRepository implements IFeedbackRepository {
   };
 
   update = async (id: string, data: UpdateFeedbackDTO): Promise<Feedback> => {
-    const feedback = await this.feedback.update({ where: { id, deletedAt: null }, data });
+    const feedback = await this.feedback.update({ where: { id }, data });
 
     return feedback;
   };
 
   delete = async (id: string): Promise<Feedback> => {
-    const feedback = await this.feedback.update({ where: { id, deletedAt: null }, data: { deletedAt: new Date() } });
+    const feedback = await this.feedback.update({ where: { id }, data: { deletedAt: new Date() } });
 
     return feedback;
   };
 
   isDeleted = async (id: string): Promise<boolean> => {
-    const feedback = await this.feedback.findUnique({ where: { id, deletedAt: null } });
+    const feedback = await this.feedback.findUnique({ where: { id } });
 
     return !!feedback?.deletedAt;
   };
