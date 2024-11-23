@@ -109,6 +109,9 @@ export class ChallengeService implements IChallengeService {
         if (i === 0) imageUrl = s3Key;
         if (i === 1) imageUrl2 = s3Key;
       }
+      if (imageCount === 1) {
+        imageUrl2 = undefined;
+      }
     }
 
     const updatedChallengeInput: UpdateChallengeDTO = {
