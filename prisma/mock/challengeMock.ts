@@ -1,4 +1,5 @@
 import { MediaType, Status } from '@prisma/client';
+import USERS from './userMock.js';
 
 export const CHALLENGES = [
   {
@@ -62,7 +63,7 @@ export const CHALLENGES = [
     imageUrl: 'https://hancook-bucket.s3.ap-northeast-2.amazonaws.com/exampleImg.jfif',
     imageUrl2: null,
     embedUrl: 'https://www.10000recipe.com/recipe/6839413?srsltid=AfmBOoo1WVFH0fOZPSO12VEKA5JdeZaN8SGABYKZE570DDfddsUUsg8b',
-    mediaType: MediaType.socialMedia,
+    mediaType: MediaType.youtube,
     requestUserId: 'e8394ccc-7359-4c16-ab37-4ed9671146a4',
   },
   {
@@ -78,7 +79,7 @@ export const CHALLENGES = [
     imageUrl: 'https://hancook-bucket.s3.ap-northeast-2.amazonaws.com/exampleImg.jfif',
     imageUrl2: null,
     embedUrl: 'https://www.10000recipe.com/recipe/6839413?srsltid=AfmBOoo1WVFH0fOZPSO12VEKA5JdeZaN8SGABYKZE570DDfddsUUsg8b',
-    mediaType: MediaType.socialMedia,
+    mediaType: MediaType.blog,
     requestUserId: 'e8394ccc-7359-4c16-ab37-4ed9671146a4',
   },
   {

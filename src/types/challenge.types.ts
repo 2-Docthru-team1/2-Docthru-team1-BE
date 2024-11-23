@@ -13,7 +13,7 @@ export interface GetChallengesQuery {
 
 export interface getChallengesOptions {
   status?: Status;
-  mediaType?: MediaType;
+  mediaType?: MediaType[];
   orderBy: Order;
   keyword: string;
   page: number;
@@ -74,4 +74,3 @@ export interface ValidateUpdateStatusInput {
   userId: string;
   userRole?: Role;
 }
-

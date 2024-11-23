@@ -5,7 +5,7 @@ import { Order } from '#utils/constants/enum.js';
 export interface IChallengeRepository {
   findMany(options: {
     status?: Status;
-    mediaType?: MediaType;
+    mediaType?: MediaType[];
     orderBy: Order;
     keyword: string;
     page: Number;
@@ -13,7 +13,7 @@ export interface IChallengeRepository {
   }): Promise<Challenge[] | null>;
   totalCount(options: {
     status?: Status;
-    mediaType?: MediaType;
+    mediaType?: MediaType[];
     keyword: string;
     page: number;
     pageSize: number;
