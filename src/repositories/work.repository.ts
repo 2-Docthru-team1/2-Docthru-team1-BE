@@ -1,10 +1,7 @@
 import type { ChallengeWork } from '@prisma/client';
-import type { ChallengeWork, PrismaClient } from '@prisma/client';
-import { randomUUID } from 'crypto';
 import type { IWorkRepository } from '#interfaces/repositories/work.repository.interface.js';
 import type { ExtendedPrismaClient } from '#types/common.types.js';
 import { type CreateWorkDTO, type GetWorksOptions, type UpdateWorkDTO, WorkOrder } from '#types/work.types.js';
-import { generatePresignedUploadUrl } from '#utils/S3/generate-presigned-upload-url.js';
 
 export class WorkRepository implements IWorkRepository {
   constructor(private challengeWork: ExtendedPrismaClient['challengeWork']) {}
