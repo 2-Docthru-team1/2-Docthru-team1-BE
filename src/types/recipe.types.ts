@@ -2,8 +2,7 @@ import { Category } from '@prisma/client';
 import type { BasicOptions, BasicQueries } from '#types/common.types.js';
 
 export interface RecipeQueries extends Omit<BasicQueries, 'orderBy'> {
-  orderBy?: string;
-  category?: Category;
+  filter?: string;
   keyword?: string;
 }
 
