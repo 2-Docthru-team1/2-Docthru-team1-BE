@@ -1,10 +1,10 @@
-import { type Feedback, Prisma, type PrismaClient } from '@prisma/client';
+import { type Feedback, Prisma } from '@prisma/client';
 import type { IFeedbackRepository } from '#interfaces/repositories/feedback.repository.interface.js';
-import type { BasicOptions } from '#types/common.types.js';
+import type { BasicOptions, ExtendedPrismaClient } from '#types/common.types.js';
 import type { CreateFeedbackDTO, UpdateFeedbackDTO } from '#types/feedback.types.js';
 
 export class FeedbackRepository implements IFeedbackRepository {
-  constructor(private feedback: PrismaClient['feedback']) {}
+  constructor(private feedback: ExtendedPrismaClient['feedback']) {}
 
   getCount = async (userId?: string): Promise<number> => {
     const count = await this.feedback.count({

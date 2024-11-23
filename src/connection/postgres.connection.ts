@@ -25,22 +25,12 @@ baseClient.$on('error', e => {
   console.log(e);
 });
 
-// const prismaClient = baseClient.$extends({
-//   query: {
-//     $allOperations: async ({ model, operation, args, query }) => {
-//       args.where = { deletedAt: null, ...args.where };
-
-//       return query(args);
-//     },
-//   },
-// });
 const prismaClient = baseClient.$extends({
   query: {
     $allOperations: async ({ model, operation, args, query }) => {
-      if (operation !== 'create') {
+      if (!['create', 'createMany'].includes(operation)) {
         args.where = { deletedAt: null, ...args.where };
       }
-
       return query(args);
     },
   },

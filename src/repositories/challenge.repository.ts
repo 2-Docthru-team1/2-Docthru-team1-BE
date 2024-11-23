@@ -1,14 +1,15 @@
-import type { AbortReason, Challenge, MediaType, PrismaClient, Status } from '@prisma/client';
+import type { AbortReason, Challenge, MediaType, Status } from '@prisma/client';
 import baseClient from '#connection/postgres.connection.js';
 import type { IChallengeRepository } from '#interfaces/repositories/challenge.repository.interface.js';
 import type { ChallengeInput, ChallengeStatusInput, UpdateChallengeDTO, getChallengesOptions } from '#types/challenge.types.js';
+import type { ExtendedPrismaClient } from '#types/common.types.js';
 import { Order } from '#utils/constants/enum.js';
 
 export class ChallengeRepository implements IChallengeRepository {
-  private challenge: PrismaClient['challenge'];
-  private abortReason: PrismaClient['abortReason'];
+  private challenge: ExtendedPrismaClient['challenge'];
+  private abortReason: ExtendedPrismaClient['abortReason'];
 
-  constructor(client: PrismaClient) {
+  constructor(client: ExtendedPrismaClient) {
     this.challenge = client.challenge;
     this.abortReason = client.abortReason;
   }
