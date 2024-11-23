@@ -131,7 +131,7 @@ model Recipe {
   benefits    String[]
   likeCount   Int
   category    Category
-  direction   String[] // 조리법: 개행을 어떻게 처리할지 프론트랑 다시 논의해야함
+  direction   String[]
   servings    Int // 몇인분인가
   // 아래 정보는 1인분 기준
   calories    Int
