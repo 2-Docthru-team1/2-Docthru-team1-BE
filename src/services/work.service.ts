@@ -87,7 +87,7 @@ export class WorkService implements IWorkService {
     return resultWork;
   };
 
-  deleteWork = async (id: string): Promise<ChallengeWork> => {
+  deleteWork = async (id: string): Promise<ResultChallengeWork> => {
     const storage = getStorage();
     const userId = storage.userId;
     const foundWork = await this.WorkRepository.findById(id);
@@ -99,6 +99,16 @@ export class WorkService implements IWorkService {
     }
     //본인 인증 하고
     const deletedWork = await this.WorkRepository.delete(id);
-    return deletedWork;
+    const { ownerId, ...otherWorkField } = deletedWork || {};
+    const changedWork = { ...otherWorkField } as ResultChallengeWork;
+    const updatedImages = await Promise.all(
+      changedWork.images.map(async workImage => {
+        const url = workImage.imageUrl;
+        const resultUrl = await generatePresignedDownloadUrl(url);
+        workImage.imageUrl = resultUrl;
+        return workImage;
+      }),
+    );
+    return { ...otherWorkField, images: updatedImages };
   };
 }

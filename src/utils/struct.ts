@@ -63,8 +63,6 @@ export const CreateRequest = object({});
 export const PatchRequest = object({});
 
 export const CreateWork = object({
-  challengeId: Uuid,
-  ownerId: Uuid,
   title: string(),
   content: string(),
   images: array(string()),

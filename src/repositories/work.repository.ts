@@ -85,8 +85,11 @@ export class WorkRepository implements IWorkRepository {
   };
 
   delete = async (id: string): Promise<ChallengeWork> => {
-    const work = await this.challengeWork.update({ where: { id }, data: { deletedAt: new Date() } });
-
+    const work = await this.challengeWork.update({
+      where: { id },
+      data: { deletedAt: new Date() },
+      include: { owner: { select: { id: true, name: true, email: true, role: true } }, images: true },
+    });
     return work;
   };
 }
