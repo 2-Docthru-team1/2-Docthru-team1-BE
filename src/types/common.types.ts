@@ -1,4 +1,5 @@
 import type { Request as expressRequest } from 'express';
+import type prismaClient from '#connection/postgres.connection.js';
 
 export interface IStorage {
   [key: string]: any;
@@ -11,6 +12,8 @@ export interface Request<T = { params: {}; response: {}; body: {}; query: {} }>
     T extends { body: infer BodyType } ? BodyType : {},
     T extends { query: infer QueryType } ? QueryType : {}
   > {}
+
+export type ExtendedPrismaClient = typeof prismaClient;
 
 export interface BasicOptions {
   orderBy: string;

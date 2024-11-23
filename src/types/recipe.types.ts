@@ -14,7 +14,7 @@ export interface RecipeOptions extends Omit<BasicOptions, 'orderBy'> {
 
 export interface CreateRecipeDTO {
   title: string;
-  ingredients: String[];
+  ingredients: string[];
   benefits: JSON;
   likeCount: number;
   category: Category;
@@ -32,7 +32,7 @@ export interface CreateRecipeDTO {
 
 export interface UpdateRecipeDTO {
   title?: string;
-  ingredients?: String[];
+  ingredients?: string[];
   benefits?: JSON;
   likeCount?: number;
   category?: Category;
