@@ -1,8 +1,15 @@
 import type { ChallengeWork } from '@prisma/client';
 import type { IWorkService } from '#interfaces/services/work.service.interface.js';
+import { getStorage } from '#middlewares/asyncLocalStorage.js';
 import type { WorkRepository } from '#repositories/work.repository.js';
-import { NotFound } from '#types/http-error.types.js';
-import type { CreateWorkDTO, GetWorksOptions, ResultChallengeWork, UpdateWorkDTO } from '#types/work.types.js';
+import { Forbidden, NotFound } from '#types/http-error.types.js';
+import type {
+  ChallengeWorkWithImages,
+  CreateWorkDTO,
+  GetWorksOptions,
+  ResultChallengeWork,
+  UpdateWorkDTO,
+} from '#types/work.types.js';
 import { generatePresignedDownloadUrl } from '#utils/S3/generate-presigned-download-url.js';
 import MESSAGES from '#utils/constants/messages.js';
 
@@ -62,21 +69,36 @@ export class WorkService implements IWorkService {
     return Work;
   };
 
-  updateWork = async (id: string, WorkData: UpdateWorkDTO): Promise<ChallengeWork> => {
-    const Work = await this.WorkRepository.update(id, WorkData);
-    if (!Work || Work.deletedAt) {
+  updateWork = async (id: string, workData: UpdateWorkDTO): Promise<ChallengeWork> => {
+    const storage = getStorage();
+    const userId = storage.userId;
+    const FoundWork = await this.WorkRepository.findById(id);
+    if (!FoundWork || FoundWork.deletedAt) {
       throw new NotFound(MESSAGES.NOT_FOUND);
     }
-
-    return Work;
+    if (userId !== FoundWork.ownerId) {
+      throw new Forbidden(MESSAGES.FORBIDDEN);
+    }
+    const work = await this.WorkRepository.update(id, workData);
+    const changedWork = work as ChallengeWorkWithImages;
+    const { images, ownerId, ...other } = changedWork;
+    const imageUrls = images.map(image => image.imageUrl);
+    const resultWork = { ...other, images: { imageUrls } };
+    return resultWork;
   };
 
   deleteWork = async (id: string): Promise<ChallengeWork> => {
-    const Work = await this.WorkRepository.delete(id);
-    if (!Work || Work.deletedAt) {
+    const storage = getStorage();
+    const userId = storage.userId;
+    const foundWork = await this.WorkRepository.findById(id);
+    if (!foundWork || foundWork.deletedAt) {
       throw new NotFound(MESSAGES.NOT_FOUND);
     }
-
-    return Work;
+    if (userId !== foundWork.ownerId) {
+      throw new Forbidden(MESSAGES.FORBIDDEN);
+    }
+    //본인 인증 하고
+    const deletedWork = await this.WorkRepository.delete(id);
+    return deletedWork;
   };
 }

@@ -65,18 +65,14 @@ export class WorkController {
   patchWork = async (req: Request<{ params: { id: string } }>, res: Response, next: NextFunction) => {
     const { id } = req.params;
     assert(req.body, PatchWork, MESSAGES.WRONG_FORMAT);
-
-    // const user = await this.WorkService.updateWork(id, req.body);
-
-    // res.json(user);
+    const work = await this.WorkService.updateWork(id, req.body);
+    res.json(work);
   };
 
   deleteWork = async (req: Request<{ params: { id: string } }>, res: Response, next: NextFunction) => {
     const { id } = req.params;
-
-    const user = await this.WorkService.deleteWork(id);
-
-    res.json(user);
+    const work = await this.WorkService.deleteWork(id);
+    res.sendStatus(204);
   };
 }
 
