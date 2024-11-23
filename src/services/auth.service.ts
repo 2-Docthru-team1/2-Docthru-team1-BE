@@ -43,6 +43,11 @@ export class AuthService implements IAuthService {
   };
 
   createUser = async (data: CreateUserDTO): Promise<SafeUser> => {
+    const target = await this.userRepository.findByEmail(data.email);
+    if (target) {
+      throw new BadRequest(MESSAGES.USER_EXISTS);
+    }
+
     const user = await this.userRepository.create(data);
 
     return filterSensitiveData(user);
