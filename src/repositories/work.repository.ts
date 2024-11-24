@@ -1,8 +1,8 @@
 import type { ChallengeWork, PrismaClient, WorkImage } from '@prisma/client';
 import { randomUUID } from 'crypto';
 import type { IWorkRepository } from '#interfaces/repositories/work.repository.interface.js';
-import type { ExtendedPrismaClient } from '#types/common.types.js';
 import { type CreateWorkDTO, type GetWorksOptions, type UpdateWorkDTO, WorkOrder } from '#types/work.types.js';
+import { generatePresignedUploadUrl } from '#utils/S3/generate-presigned-upload-url.js';
 
 export class WorkRepository implements IWorkRepository {
   constructor(
@@ -75,7 +75,8 @@ export class WorkRepository implements IWorkRepository {
     });
     if (!!images) {
       const existingWorkImages = work.images;
-      await Promise.all(existingWorkImages.map(workImage => this.workImage.delete({ where: { id: workImage.id } })));
+      const existingWorkImagesIds = existingWorkImages.map(workImage => workImage.id);
+      await this.workImage.deleteMany({ where: { workId: id } });
       const newWorkImages = await Promise.all(
         images.map(image => this.workImage.create({ data: { imageUrl: image, workId: id } })),
       );
