@@ -1,5 +1,5 @@
 import type { ValidateUpdateStatusInput } from '#types/challenge.types.js';
-import { NotFound } from '#types/http-error.types.js';
+import { BadRequest, Forbidden, NotFound } from '#types/http-error.types.js';
 import MESSAGES from '#utils/constants/messages.js';
 
 export const validateUpdateStatus = ({ challenge, status, abortReason, userId, userRole }: ValidateUpdateStatusInput) => {
@@ -10,27 +10,27 @@ export const validateUpdateStatus = ({ challenge, status, abortReason, userId, u
   switch (status) {
     case 'onGoing':
       if (userRole !== 'admin') {
-        throw new Error();
+        throw new Forbidden(MESSAGES.FORBIDDEN);
       }
       break;
     case 'denied':
     case 'aborted':
       if (userRole !== 'admin') {
-        throw new Error();
+        throw new Forbidden(MESSAGES.FORBIDDEN);
       }
       if (!abortReason) {
-        throw new Error();
+        throw new BadRequest(MESSAGES.MISSING_FIELDS);
       }
       break;
     case 'canceled':
       if (userRole !== 'normal') {
-        throw new Error();
+        throw new Forbidden(MESSAGES.FORBIDDEN);
       }
       if (challenge.requestUserId !== userId) {
-        throw new Error();
+        throw new Forbidden(MESSAGES.FORBIDDEN);
       }
       break;
     default:
-      throw new Error();
+      throw new BadRequest(MESSAGES.BAD_REQUEST);
   }
 };

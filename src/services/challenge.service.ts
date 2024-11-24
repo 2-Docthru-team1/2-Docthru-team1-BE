@@ -8,7 +8,7 @@ import type {
   UpdateChallengeDTO,
   getChallengesOptions,
 } from '#types/challenge.types.js';
-import { NotFound } from '#types/http-error.types.js';
+import { BadRequest, Forbidden, NotFound } from '#types/http-error.types.js';
 import { generatePresignedDownloadUrl } from '#utils/S3/generate-presigned-download-url.js';
 import { generatePresignedUploadUrl } from '#utils/S3/generate-presigned-upload-url.js';
 import MESSAGES from '#utils/constants/messages.js';
@@ -46,6 +46,9 @@ export class ChallengeService implements IChallengeService {
     challengeData: CreateChallengeDTO,
     userId: string,
   ): Promise<{ challenge: Challenge; uploadUrls: { uploadUrl: string }[] }> => {
+    if (!userId) {
+      throw new BadRequest(MESSAGES.UNAUTHORIZED);
+    }
     const { imageCount, ...restChallengeData } = challengeData;
     const uploadUrls: { uploadUrl: string }[] = [];
     let imageUrl: string = '';
@@ -85,13 +88,13 @@ export class ChallengeService implements IChallengeService {
 
     const challenge = await this.challengeRepository.findById(id);
     if (!userId) {
-      throw new Error();
+      throw new BadRequest(MESSAGES.UNAUTHORIZED);
     }
     if (!challenge || challenge.deletedAt) {
       throw new NotFound(MESSAGES.NOT_FOUND);
     }
     if (challenge.requestUserId !== userId) {
-      throw new Error();
+      throw new Forbidden(MESSAGES.FORBIDDEN);
     }
 
     const uploadUrls: { uploadUrl: string }[] = [];
@@ -146,6 +149,9 @@ export class ChallengeService implements IChallengeService {
 
   getAbortReason = async (id: string): Promise<AbortReason | null> => {
     const abortReason = await this.challengeRepository.findAbortReason(id);
+    if (!abortReason) {
+      throw new NotFound(MESSAGES.NOT_FOUND);
+    }
     return abortReason;
   };
 }
