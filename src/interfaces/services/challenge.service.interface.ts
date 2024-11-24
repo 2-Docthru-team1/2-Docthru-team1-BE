@@ -5,7 +5,7 @@ import { Order } from '#utils/constants/enum.js';
 export interface IChallengeService {
   getChallenges(options: {
     status?: Status;
-    mediaType?: MediaType;
+    mediaType?: MediaType[];
     keyword: string;
     orderBy: Order;
     page: number;

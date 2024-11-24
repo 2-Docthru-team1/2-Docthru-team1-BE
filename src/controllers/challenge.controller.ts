@@ -15,9 +15,17 @@ export class ChallengeController {
 
   getChallenges = async (req: Request<{}, {}, {}, GetChallengesQuery>, res: Response, next: NextFunction) => {
     const { status, mediaType, orderBy = 'latestFirst', keyword = '', page = '1', pageSize = '10' } = req.query;
+    let mediaTypeEnum;
+    if (Array.isArray(mediaType)) {
+      mediaTypeEnum = mediaType as MediaType[];
+    } else if (!!mediaType) {
+      mediaTypeEnum = [mediaType] as MediaType[];
+    } else {
+      mediaTypeEnum = undefined;
+    }
     const statusEnum = status ? (status as Status) : undefined;
-    const mediaTypeEnum = mediaType ? (mediaType as MediaType) : undefined;
     const orderEnum = orderBy as Order;
+
     const options = {
       status: statusEnum,
       mediaType: mediaTypeEnum,

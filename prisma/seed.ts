@@ -20,15 +20,23 @@ async function main() {
     skipDuplicates: true,
   });
 
-  await prisma.challenge.createMany({
-    data: CHALLENGES,
-    skipDuplicates: true,
-  });
-
+  // await prisma.challenge.createMany({
+  //   data: CHALLENGES,
+  //   skipDuplicates: true,
+  // });
+  for (const challenge of CHALLENGES) {
+    await prisma.challenge.create({
+      data: {
+        ...challenge,
+        participants: { connect: { id: challenge.requestUserId } },
+      },
+    });
+  }
   await prisma.challengeWork.createMany({
     data: CHALLENGE_WORKS,
     skipDuplicates: true,
   });
+
   await prisma.workImage.createMany({
     data: WORK_IMAGES,
     skipDuplicates: true,
