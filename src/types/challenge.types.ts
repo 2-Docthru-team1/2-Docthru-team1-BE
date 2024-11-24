@@ -13,7 +13,7 @@ export interface GetChallengesQuery {
 
 export interface getChallengesOptions {
   status?: Status;
-  mediaType?: MediaType;
+  mediaType?: MediaType[];
   orderBy: Order;
   keyword: string;
   page: number;
@@ -28,6 +28,7 @@ export interface CreateChallengeDTO {
   imageUrl: string;
   imageUrl2?: string;
   mediaType: MediaType;
+  imageCount: number;
 }
 
 export interface ChallengeInput {
@@ -52,6 +53,7 @@ export interface UpdateChallengeDTO {
   imageUrl?: string;
   imageUrl2?: string;
   mediaType?: MediaType;
+  imageCount?: number;
 }
 
 export interface UpdateChallengeStatusDTO {
@@ -74,4 +76,3 @@ export interface ValidateUpdateStatusInput {
   userId: string;
   userRole?: Role;
 }
-

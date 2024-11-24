@@ -1,11 +1,14 @@
-import type { ChallengeWork } from '@prisma/client';
+import type { ChallengeWork, PrismaClient, WorkImage } from '@prisma/client';
+import { randomUUID } from 'crypto';
 import type { IWorkRepository } from '#interfaces/repositories/work.repository.interface.js';
-import type { ExtendedPrismaClient } from '#types/common.types.js';
 import { type CreateWorkDTO, type GetWorksOptions, type UpdateWorkDTO, WorkOrder } from '#types/work.types.js';
+import { generatePresignedUploadUrl } from '#utils/S3/generate-presigned-upload-url.js';
 
 export class WorkRepository implements IWorkRepository {
-  constructor(private challengeWork: ExtendedPrismaClient['challengeWork']) {}
-
+  constructor(
+    private challengeWork: PrismaClient['challengeWork'],
+    private workImage: PrismaClient['workImage'],
+  ) {}
   // 이 아래로 직접 DB와 통신하는 코드를 작성합니다.
   // 여기서 DB와 통신해 받아온 데이터를 위로(service로) 올려줍니다.
   findMany = async (options: GetWorksOptions): Promise<ChallengeWork[] | null> => {
@@ -62,14 +65,32 @@ export class WorkRepository implements IWorkRepository {
   };
 
   update = async (id: string, data: UpdateWorkDTO): Promise<ChallengeWork> => {
-    const work = await this.challengeWork.update({ where: { id }, data });
-
+    const { images, ...other } = data;
+    const work = await this.challengeWork.update({
+      where: { id },
+      data: {
+        ...other,
+      },
+      include: { owner: { select: { id: true, name: true, email: true, role: true } }, images: true },
+    });
+    if (!!images) {
+      const existingWorkImages = work.images;
+      const existingWorkImagesIds = existingWorkImages.map(workImage => workImage.id);
+      await this.workImage.deleteMany({ where: { workId: id } });
+      const newWorkImages = await Promise.all(
+        images.map(image => this.workImage.create({ data: { imageUrl: image, workId: id } })),
+      );
+      work.images = newWorkImages;
+    }
     return work;
   };
 
   delete = async (id: string): Promise<ChallengeWork> => {
-    const work = await this.challengeWork.update({ where: { id }, data: { deletedAt: new Date() } });
-
+    const work = await this.challengeWork.update({
+      where: { id },
+      data: { deletedAt: new Date() },
+      include: { owner: { select: { id: true, name: true, email: true, role: true } }, images: { select: { imageUrl: true } } },
+    });
     return work;
   };
 }

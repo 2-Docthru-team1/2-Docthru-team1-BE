@@ -34,28 +34,20 @@ export class ChallengeRepository implements IChallengeRepository {
         applyOrderBy.createdAt = 'desc';
     }
     const whereCondition: {
-      mediaType?: MediaType;
+      mediaType?: { in: MediaType[] };
       status?: Status;
-      OR?: Array<{
-        title?: { contains: string; mode: 'insensitive' };
-        description?: { contains: string; mode: 'insensitive' };
-      }>;
+      title?: { contains: string };
     } = {
-      ...(mediaType ? { mediaType } : {}),
+      ...(Array.isArray(mediaType) ? { mediaType: { in: mediaType } } : {}),
       ...(status ? { status } : {}),
-      ...(keyword
-        ? {
-            OR: [
-              { title: { contains: keyword, mode: 'insensitive' } },
-              { description: { contains: keyword, mode: 'insensitive' } },
-            ],
-          }
-        : {}),
+      ...(keyword ? { title: { contains: keyword } } : {}),
     };
+
     const challenges = await this.challenge.findMany({
       skip: (page - 1) * pageSize,
       take: pageSize,
       where: whereCondition,
+      include: { works: true },
       orderBy: applyOrderBy,
     });
     return challenges;
@@ -64,21 +56,13 @@ export class ChallengeRepository implements IChallengeRepository {
   totalCount = async (options: getChallengesOptions): Promise<number | null> => {
     const { status, mediaType, keyword } = options;
     const whereCondition: {
-      mediaType?: MediaType;
+      mediaType?: { in: MediaType[] };
       status?: Status;
-      OR?: Array<{
-        title?: { contains: string; mode: 'insensitive' };
-        description?: { contains: string; mode: 'insensitive' };
-      }>;
+      title?: { contains: string };
     } = {
-      ...(mediaType ? { mediaType } : {}),
+      ...(Array.isArray(mediaType) ? { mediaType: { in: mediaType } } : {}),
       ...(status ? { status } : {}),
-      ...(keyword && {
-        OR: [
-          { title: { contains: options.keyword, mode: 'insensitive' } },
-          { description: { contains: options.keyword, mode: 'insensitive' } },
-        ],
-      }),
+      ...(keyword ? { title: { contains: keyword } } : {}),
     };
     const totalCount = await this.challenge.count({ where: whereCondition });
     return totalCount;
@@ -88,7 +72,7 @@ export class ChallengeRepository implements IChallengeRepository {
     return await baseClient.challenge.findUnique({
       where: { id },
       include: {
-        participants: true,
+        participants: { select: { id: true, name: true, role: true } },
         works: true,
         abortReason: true,
       },

@@ -15,9 +15,17 @@ export class ChallengeController {
 
   getChallenges = async (req: Request<{}, {}, {}, GetChallengesQuery>, res: Response, next: NextFunction) => {
     const { status, mediaType, orderBy = 'latestFirst', keyword = '', page = '1', pageSize = '10' } = req.query;
+    let mediaTypeEnum;
+    if (Array.isArray(mediaType)) {
+      mediaTypeEnum = mediaType as MediaType[];
+    } else if (!!mediaType) {
+      mediaTypeEnum = [mediaType] as MediaType[];
+    } else {
+      mediaTypeEnum = undefined;
+    }
     const statusEnum = status ? (status as Status) : undefined;
-    const mediaTypeEnum = mediaType ? (mediaType as MediaType) : undefined;
     const orderEnum = orderBy as Order;
+
     const options = {
       status: statusEnum,
       mediaType: mediaTypeEnum,
@@ -41,12 +49,14 @@ export class ChallengeController {
     const userId = storage.userId;
     const challengeData = req.body;
     const newChallenge = await this.challengeService.createChallenge(challengeData, userId);
-    res.json(newChallenge);
+    res.status(201).json(newChallenge);
   };
 
   patchChallenge = async (req: Request<{ id: string }, {}, UpdateChallengeDTO>, res: Response) => {
     const { id } = req.params;
-    const updateChallenge = await this.challengeService.updateChallenge(id, req.body);
+    const storage = getStorage();
+    const userId = storage.userId;
+    const updateChallenge = await this.challengeService.updateChallenge(id, req.body, userId);
     res.json(updateChallenge);
   };
 

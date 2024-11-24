@@ -10,11 +10,9 @@ export interface CreateWorkDTO {
 export type RequestCreateWorkDTO = Omit<CreateWorkDTO, 'challengeId' | 'ownerId'>;
 
 export interface UpdateWorkDTO {
-  status?: Status;
-  likeCount?: number;
   title?: string;
   content?: string;
-  deadline?: Date;
+  images?: string[];
 }
 
 export interface CreateImageDTO {
@@ -22,9 +20,6 @@ export interface CreateImageDTO {
   workId: string;
 }
 
-export interface UpdateWorkDTO {
-  image: string;
-}
 export interface GetWorksOptions {
   challengeId: string;
   orderBy: WorkOrder;
@@ -35,4 +30,7 @@ export type ResultChallengeWork = Omit<ChallengeWork, 'ownerId'> & { images: Wor
 export enum WorkOrder {
   recent = 'recent',
   favoritest = 'favoritest',
+}
+export interface ChallengeWorkWithImages extends ChallengeWork {
+  images: WorkImage[];
 }
