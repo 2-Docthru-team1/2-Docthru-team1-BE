@@ -1,9 +1,9 @@
-import type { PrismaClient } from '@prisma/client/extension';
 import type { IRecipeRepository } from '#interfaces/repositories/recipe.repository.interface.js';
+import type { ExtendedPrismaClient } from '#types/common.types.js';
 import type { CreateRecipeDTO, RecipeOptions, UpdateRecipeDTO } from '#types/recipe.types.js';
 
 export class RecipeRepository implements IRecipeRepository {
-  constructor(private recipe: PrismaClient['recipe']) {}
+  constructor(private recipe: ExtendedPrismaClient['recipe']) {}
 
   getCount = async (options: RecipeOptions) => {
     const { category, keyword } = options;
