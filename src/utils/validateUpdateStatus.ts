@@ -1,8 +1,10 @@
 import type { ValidateUpdateStatusInput } from '#types/challenge.types.js';
+import { NotFound } from '#types/http-error.types.js';
+import MESSAGES from '#utils/constants/messages.js';
 
 export const validateUpdateStatus = ({ challenge, status, abortReason, userId, userRole }: ValidateUpdateStatusInput) => {
-  if (!challenge) {
-    throw new Error();
+  if (!challenge || challenge.deletedAt) {
+    throw new NotFound(MESSAGES.NOT_FOUND);
   }
   // 에러는 추후 처리할 예정입니다!
   switch (status) {
