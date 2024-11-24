@@ -1,14 +1,16 @@
-import type { ChallengeWork, PrismaClient, WorkImage } from '@prisma/client';
-import { randomUUID } from 'crypto';
+import type { ChallengeWork } from '@prisma/client';
 import type { IWorkRepository } from '#interfaces/repositories/work.repository.interface.js';
+import type { ExtendedPrismaClient } from '#types/common.types.js';
 import { type CreateWorkDTO, type GetWorksOptions, type UpdateWorkDTO, WorkOrder } from '#types/work.types.js';
-import { generatePresignedUploadUrl } from '#utils/S3/generate-presigned-upload-url.js';
 
 export class WorkRepository implements IWorkRepository {
-  constructor(
-    private challengeWork: PrismaClient['challengeWork'],
-    private workImage: PrismaClient['workImage'],
-  ) {}
+  challengeWork: ExtendedPrismaClient['challengeWork'];
+  workImage: ExtendedPrismaClient['workImage'];
+
+  constructor(client: ExtendedPrismaClient) {
+    this.challengeWork = client.challengeWork;
+    this.workImage = client.workImage;
+  }
   // 이 아래로 직접 DB와 통신하는 코드를 작성합니다.
   // 여기서 DB와 통신해 받아온 데이터를 위로(service로) 올려줍니다.
   findMany = async (options: GetWorksOptions): Promise<ChallengeWork[] | null> => {

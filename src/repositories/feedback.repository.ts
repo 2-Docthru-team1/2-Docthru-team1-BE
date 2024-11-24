@@ -39,6 +39,15 @@ export class FeedbackRepository implements IFeedbackRepository {
     return feedbacks;
   };
 
+  findById = async (id: string): Promise<Feedback | null> => {
+    const feedback = await this.feedback.findUnique({
+      where: { id },
+      include: { owner: { select: { name: true } } },
+    });
+
+    return feedback;
+  };
+
   create = async (data: CreateFeedbackDTO): Promise<Feedback> => {
     const feedback = await this.feedback.create({ data });
 

@@ -9,6 +9,7 @@ import type {
   GetWorksOptions,
   ResultChallengeWork,
   UpdateWorkDTO,
+  WorkResponse,
 } from '#types/work.types.js';
 import { generatePresignedDownloadUrl } from '#utils/S3/generate-presigned-download-url.js';
 import MESSAGES from '#utils/constants/messages.js';
@@ -69,7 +70,7 @@ export class WorkService implements IWorkService {
     return Work;
   };
 
-  updateWork = async (id: string, workData: UpdateWorkDTO): Promise<ChallengeWork> => {
+  updateWork = async (id: string, workData: UpdateWorkDTO): Promise<WorkResponse> => {
     const storage = getStorage();
     const userId = storage.userId;
     const FoundWork = await this.WorkRepository.findById(id);
@@ -84,7 +85,7 @@ export class WorkService implements IWorkService {
     const { images, ownerId, ...other } = changedWork;
     const imageUrls = images.map(image => image.imageUrl);
     const resultWork = { ...other, images: { imageUrls } };
-    return resultWork;
+    return resultWork as WorkResponse;
   };
 
   deleteWork = async (id: string): Promise<ResultChallengeWork> => {

@@ -1,4 +1,4 @@
-import type { ChallengeWork, Status, User, WorkImage } from '@prisma/client';
+import type { ChallengeWork, WorkImage } from '@prisma/client';
 
 export interface CreateWorkDTO {
   title: string;
@@ -33,4 +33,10 @@ export enum WorkOrder {
 }
 export interface ChallengeWorkWithImages extends ChallengeWork {
   images: WorkImage[];
+}
+
+export interface WorkResponse extends Omit<ChallengeWork, 'ownerId' | 'images'> {
+  images: {
+    imageUrls: string[];
+  };
 }

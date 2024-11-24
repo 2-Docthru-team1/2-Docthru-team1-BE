@@ -32,8 +32,8 @@
     "alwaysStrict": true, // strict mode 선언 필요없음
     "suppressImplicitAnyIndexErrors": false, // 암시적 any 인덱스 에러 무시 여부
     // 빌드 관련
-    "noEmit": false, // 검사 후 js파일 생성 여부
-    "noEmitOnError": false, // 타입 에러 발생 시 빌드 가능
+    "noEmit": true, // 검사 후 js파일 생성 여부
+    "noEmitOnError": true, // 타입 에러 발생 시 빌드 가능
     "incremental": true,
     "removeComments": true,
     "outDir": "./dist",
