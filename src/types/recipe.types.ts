@@ -2,8 +2,7 @@ import { Category } from '@prisma/client';
 import type { BasicOptions, BasicQueries } from '#types/common.types.js';
 
 export interface RecipeQueries extends Omit<BasicQueries, 'orderBy'> {
-  orderBy?: string;
-  category?: Category;
+  filter?: string;
   keyword?: string;
 }
 
@@ -15,11 +14,11 @@ export interface RecipeOptions extends Omit<BasicOptions, 'orderBy'> {
 
 export interface CreateRecipeDTO {
   title: string;
-  ingredients: String[];
-  benefits: JSON;
+  ingredients: string[];
+  benefits: string[];
   likeCount: number;
   category: Category;
-  direction: string;
+  direction: string[];
   servings: number;
   calories: number;
   carbs: number;
@@ -33,11 +32,11 @@ export interface CreateRecipeDTO {
 
 export interface UpdateRecipeDTO {
   title?: string;
-  ingredients?: String[];
-  benefits?: JSON;
+  ingredients?: string[];
+  benefits?: string[];
   likeCount?: number;
   category?: Category;
-  direction?: string;
+  direction?: string[];
   servings?: number;
   calories?: number;
   carbs?: number;

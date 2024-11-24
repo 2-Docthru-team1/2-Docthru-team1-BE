@@ -22,6 +22,6 @@ challengeRouter
 challengeRouter.patch('/:id/status', tokenVerifier.verifyAccessToken, challengeController.patchChallengeStatus);
 challengeRouter.get('/:id/reason', challengeController.getChallengeAbortReason);
 
-challengeRouter.route('/:id/works').get(workController.getWorks);
+challengeRouter.route('/:id/works').get(workController.getWorks).post(tokenVerifier.verifyAccessToken, workController.postWork);
 
 export default challengeRouter;

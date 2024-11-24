@@ -1,9 +1,10 @@
-import type { ChallengeWork, PrismaClient } from '@prisma/client';
+import type { ChallengeWork } from '@prisma/client';
 import type { IWorkRepository } from '#interfaces/repositories/work.repository.interface.js';
+import type { ExtendedPrismaClient } from '#types/common.types.js';
 import { type CreateWorkDTO, type GetWorksOptions, type UpdateWorkDTO, WorkOrder } from '#types/work.types.js';
 
 export class WorkRepository implements IWorkRepository {
-  constructor(private challengeWork: PrismaClient['challengeWork']) {}
+  constructor(private challengeWork: ExtendedPrismaClient['challengeWork']) {}
 
   // 이 아래로 직접 DB와 통신하는 코드를 작성합니다.
   // 여기서 DB와 통신해 받아온 데이터를 위로(service로) 올려줍니다.
@@ -18,7 +19,7 @@ export class WorkRepository implements IWorkRepository {
       where: { challengeId },
       include: {
         owner: { select: { id: true, name: true, email: true, role: true } },
-        images: true,
+        images: { select: { imageUrl: true } },
       },
     });
     return works;
@@ -32,15 +33,31 @@ export class WorkRepository implements IWorkRepository {
       where: { id },
       include: {
         owner: { select: { id: true, name: true, email: true, role: true } },
-        images: true,
+        images: { select: { imageUrl: true } },
       },
     });
     return work;
   };
 
   create = async (data: CreateWorkDTO): Promise<ChallengeWork> => {
-    const work = await this.challengeWork.create({ data });
-
+    const { challengeId, ownerId, images, title, content } = data;
+    // const files = images.map((image, index) => ({ //겸사겸사 이렇게 쓰는게 맞는지도 봐주세요
+    //   key: `userId/${randomUUID()}_${index}`, // S3에 저장할 고유한 키 생성
+    //   contentType: 'image/png', // MIME 타입 설정
+    // }));
+    // const uploadUrls = await Promise.all(files.map(file => generatePresignedUploadUrl(file.key, file.contentType)));
+    const work = await this.challengeWork.create({
+      data: {
+        title,
+        content,
+        challenge: { connect: { id: challengeId } },
+        owner: { connect: { id: ownerId } },
+        images: {
+          create: images.map(image => ({ imageUrl: image })),
+        },
+      },
+      include: { images: { select: { imageUrl: true } } },
+    });
     return work;
   };
 

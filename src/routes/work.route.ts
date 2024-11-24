@@ -1,4 +1,5 @@
 import express from 'express';
+import tokenVerifier from '#containers/verify.container.js';
 import workController from '#containers/work.container.js';
 
 export const workRouter = express.Router();
@@ -8,7 +9,7 @@ export const workRouter = express.Router();
 // app.method로 입력하지 않도록 주의해주세요. router.method입니다.
 //workRouter.route('/').get;
 workRouter.route('/').get(workController.getWorks);
-workRouter.route('/:id').get(workController.getWorkById);
+workRouter.route('/:id').get(workController.getWorkById).delete(tokenVerifier.verifyAccessToken, workController.deleteWork);
 
 // app에서 사용할 수 있도록 export 해주어야 합니다.
 export default workRouter;
