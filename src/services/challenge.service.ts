@@ -52,8 +52,8 @@ export class ChallengeService implements IChallengeService {
     let imageUrl2: string | undefined = undefined;
 
     for (let i = 0; i < imageCount; i++) {
-      const uniqueFileName = `${Date.now()}-image-${i}.jpg`;
-      const s3Key = `challenges/${uniqueFileName}`;
+      const uniqueFileName = `${userId}/${Date.now()}-image-${i}.jpg`;
+      const s3Key = `${uniqueFileName}`;
       const contentType = 'image/jpeg';
       const expiresIn = 3600;
       const uploadUrl = await generatePresignedUploadUrl(s3Key, contentType, expiresIn);
@@ -100,8 +100,8 @@ export class ChallengeService implements IChallengeService {
 
     if (imageCount !== undefined && imageCount > 0) {
       for (let i = 0; i < imageCount; i++) {
-        const uniqueFileName = `${Date.now()}-image-${i}.jpg`;
-        const s3Key = `challenges/${uniqueFileName}`;
+        const uniqueFileName = `${userId}/${Date.now()}-image-${i}.jpg`;
+        const s3Key = `${uniqueFileName}`;
         const contentType = 'image/jpeg';
         const expiresIn = 3600;
         const uploadUrl = await generatePresignedUploadUrl(s3Key, contentType, expiresIn);
