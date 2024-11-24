@@ -47,6 +47,7 @@ export class WorkController {
 
   postWork = async (req: Request<{ params: { id: string }; body: RequestCreateWorkDTO }>, res: Response, next: NextFunction) => {
     const { id } = req.params;
+    assert(req.body, CreateWork, MESSAGES.WRONG_FORMAT);
     const { title, content, images } = req.body;
     const storage = getStorage();
     const userId = storage.userId;
@@ -57,7 +58,6 @@ export class WorkController {
       content,
       images,
     };
-    assert(workData, CreateWork, MESSAGES.WRONG_FORMAT);
     const work = await this.WorkService.createWork(workData);
     res.json(work);
   };
@@ -65,18 +65,14 @@ export class WorkController {
   patchWork = async (req: Request<{ params: { id: string } }>, res: Response, next: NextFunction) => {
     const { id } = req.params;
     assert(req.body, PatchWork, MESSAGES.WRONG_FORMAT);
-
-    // const user = await this.WorkService.updateWork(id, req.body);
-
-    // res.json(user);
+    const work = await this.WorkService.updateWork(id, req.body);
+    res.json(work);
   };
 
   deleteWork = async (req: Request<{ params: { id: string } }>, res: Response, next: NextFunction) => {
     const { id } = req.params;
-
-    const user = await this.WorkService.deleteWork(id);
-
-    res.json(user);
+    const work = await this.WorkService.deleteWork(id);
+    res.json(work);
   };
 }
 

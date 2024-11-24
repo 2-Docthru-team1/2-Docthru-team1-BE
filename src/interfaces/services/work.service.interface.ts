@@ -6,5 +6,5 @@ export interface IWorkService {
   getWorkById(id: string): Promise<ResultChallengeWork | null>;
   createWork(WorkData: CreateWorkDTO): Promise<ChallengeWork>;
   updateWork(id: string, WorkData: UpdateWorkDTO): Promise<ChallengeWork>;
-  deleteWork(id: string): Promise<ChallengeWork>;
+  deleteWork(id: string): Promise<ResultChallengeWork>;
 }
