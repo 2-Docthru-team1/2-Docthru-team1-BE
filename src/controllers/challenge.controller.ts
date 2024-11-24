@@ -49,7 +49,7 @@ export class ChallengeController {
     const userId = storage.userId;
     const challengeData = req.body;
     const newChallenge = await this.challengeService.createChallenge(challengeData, userId);
-    res.json(newChallenge);
+    res.status(201).json(newChallenge);
   };
 
   patchChallenge = async (req: Request<{ id: string }, {}, UpdateChallengeDTO>, res: Response) => {
