@@ -12,8 +12,11 @@ import feedbackRouter from '#routes/feedback.route.js';
 import recipeRouter from '#routes/recipe.route.js';
 import userRouter from '#routes/user.route.js';
 import workRouter from '#routes/work.route.js';
+import { startJob } from '#utils/jobs/index.js';
 
 const app = express();
+
+startJob();
 
 /*********************************************************************************** middlewares **********************************************************************************************/
 app.use(express.json());
