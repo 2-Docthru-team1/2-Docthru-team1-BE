@@ -18,5 +18,5 @@ workRouter
 
 workRouter.route('/:id/feedbacks').get(feedbackController.getFeedbacks);
 
-// app에서 사용할 수 있도록 export 해주어야 합니다.
+// app에서 사용할 수 있도록 export 해주어야 합니다
 export default workRouter;
