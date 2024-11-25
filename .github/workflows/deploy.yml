@@ -59,11 +59,11 @@ jobs:
             git reset --hard origin/main
 
             # Node 프로세스 정리
-            rm -rf node_modules package-lock.json
+            rm -rf node_modules package-lock.json dist
             npm cache clean --force
 
-            # 의존성 설치
-            NODE_OPTIONS="--max-old-space-size=384" npm install
+            # 의존성 설치 (프로덕션 모드)
+            NODE_ENV=production NODE_OPTIONS="--max-old-space-size=256" npm install --production
 
             # 환경 설정
             source /etc/profile.d/HanCook-env.sh
@@ -71,9 +71,9 @@ jobs:
             export DATABASE_URL="$DATABASE_URL"
 
             # Prisma 작업
-            npx prisma generate
-            npx prisma migrate deploy
-            npx prisma db seed
+            NODE_OPTIONS="--max-old-space-size=256" npx prisma generate
+            NODE_OPTIONS="--max-old-space-size=256" npx prisma migrate deploy
+            NODE_OPTIONS="--max-old-space-size=256" npx prisma db seed
 
             # 서버 실행 준비
             echo "" > app.log
@@ -81,19 +81,19 @@ jobs:
             sudo chmod 777 /etc/authbind/byport/80 /etc/authbind/byport/443
 
             # 서버 실행
-            NODE_OPTIONS="--max-old-space-size=384" nohup authbind --deep npm run dev > app.log 2>&1 &
+            NODE_OPTIONS="--max-old-space-size=256" nohup authbind --deep npm run dev > app.log 2>&1 &
             new_pid=$!
             echo $new_pid > ./server.pid
 
             # 서버 시작 확인
-            for i in {1..6}; do
+            for i in {1..12}; do
               if ps -p $new_pid > /dev/null; then
                 echo "서버 시작 성공 (PID: $new_pid)"
                 free -m
                 ps aux | grep node
                 exit 0
               fi
-              echo "서버 시작 대기 중... ($i/6)"
+              echo "서버 시작 대기 중... ($i/12)"
               sleep 5
             done
 
