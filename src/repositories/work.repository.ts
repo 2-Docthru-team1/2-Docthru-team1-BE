@@ -9,7 +9,6 @@ import {
   type RepositoryCreateWorkDTO,
   type UpdateWorkDTO,
   type UpdateWorkDTOWithUrls,
-  WorkOrder,
 } from '#types/work.types.js';
 
 export class WorkRepository implements IWorkRepository {
@@ -23,13 +22,11 @@ export class WorkRepository implements IWorkRepository {
   // 이 아래로 직접 DB와 통신하는 코드를 작성합니다.
   // 여기서 DB와 통신해 받아온 데이터를 위로(service로) 올려줍니다.
   findMany = async (options: GetWorksOptions): Promise<ChallengeWork[] | null> => {
-    const { challengeId, orderBy, page, pageSize } = options;
-    const orderResult: { createdAt: 'desc' } | { likeCount: 'desc' } =
-      orderBy === WorkOrder.recent ? { createdAt: 'desc' } : { likeCount: 'desc' };
+    const { challengeId, page, pageSize } = options;
     const works = await this.challengeWork.findMany({
       skip: (page - 1) * pageSize,
       take: pageSize,
-      orderBy: orderResult,
+      orderBy: { likeCount: 'desc' },
       where: { challengeId },
       include: {
         owner: { select: { id: true, name: true, email: true, role: true } },

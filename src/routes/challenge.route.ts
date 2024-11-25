@@ -11,7 +11,7 @@ export const challengeRouter = express.Router();
 // app.method로 입력하지 않도록 주의해주세요. router.method입니다.
 challengeRouter
   .route('/')
-  .get(validatePaginationOptions, challengeController.getChallenges)
+  .get(validatePaginationOptions, tokenVerifier.optionalVerifyAccessToken, challengeController.getChallenges)
   .post(tokenVerifier.verifyAccessToken, validateCreateChallenge, challengeController.postChallenge);
 
 challengeRouter
