@@ -31,15 +31,13 @@ jobs:
           script: |
             cd ~/2-Docthru-team1-BE
 
-            # 메모리 정리
+            # 시스템 메모리 정리
             sudo sync && sudo sysctl -w vm.drop_caches=3
+            sudo swapoff -a && sudo swapon -a || true
 
-            # 불필요한 시스템 프로세스 정리
-            sudo service docker stop || true
-            sudo service containerd stop || true
-
-            # 모든 node 프로세스 정리
+            # 불필요한 프로세스 정리
             pkill -9 node || true
+            pkill -9 npm || true
             pkill -9 -f "tsx.*src/app.ts" || true
 
             if [ -f ./server.pid ]; then
@@ -59,29 +57,36 @@ jobs:
             rm -rf node_modules package-lock.json dist
             npm cache clean --force
 
-            # 단계별 의존성 설치
-            NODE_ENV=production NODE_OPTIONS="--max-old-space-size=128" npm install --production --no-optional
+            # 메모리 상태 확인
+            echo "의존성 설치 전 메모리 상태:"
+            free -m
 
-            # 환경 설정
-            source /etc/profile.d/HanCook-env.sh
-            export NODE_ENV=production
-            export DATABASE_URL="$DATABASE_URL"
+            # 의존성 설치 (분할 실행)
+            NODE_ENV=production NODE_OPTIONS="--max-old-space-size=128" npm install --production --no-optional --no-audit
 
-            # Prisma 작업 (단계별 실행)
+            # Prisma 작업 (분할 실행)
+            echo "Prisma 생성 시작..."
             NODE_OPTIONS="--max-old-space-size=128" npx prisma generate
-            sleep 2
+            sleep 3
+
+            echo "Prisma 마이그레이션 시작..."
             NODE_OPTIONS="--max-old-space-size=128" npx prisma migrate deploy
-            sleep 2
+            sleep 3
+
+            echo "Prisma 시딩 시작..."
             NODE_OPTIONS="--max-old-space-size=128" npx prisma db seed
-            sleep 2
+            sleep 3
 
             # 서버 실행 준비
             echo "" > app.log
             sudo touch /etc/authbind/byport/80 /etc/authbind/byport/443
             sudo chmod 777 /etc/authbind/byport/80 /etc/authbind/byport/443
 
+            echo "서버 시작 전 메모리 상태:"
+            free -m
+
             # 서버 실행
-            NODE_OPTIONS="--max-old-space-size=128" nohup authbind --deep npm run dev > app.log 2>&1 &
+            NODE_OPTIONS="--gc-interval=100 --max-old-space-size=128" nohup authbind --deep npm run dev > app.log 2>&1 &
             new_pid=$!
             echo $new_pid > ./server.pid
 
