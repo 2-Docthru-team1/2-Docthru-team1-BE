@@ -57,6 +57,48 @@ jobs:
             rm -rf node_modules package-lock.json dist
             npm cache clean --force
 
+            # 의존성 설치 (더 작은 단위로 분할)
+            echo "프로덕션 의존성 설치 중..."
+            NODE_ENV=production NODE_OPTIONS="--max-old-space-size=96" npm install --production --no-optional --no-audit --prefer-offline
+
+            # 환경 설정
+            source /etc/profile.d/HanCook-env.sh
+            export NODE_ENV=production
+            export DATABASE_URL="$DATABASE_URL"
+
+            # Prisma 작업 (더 작은 단위로 분할)
+            echo "Prisma 클라이언트 생성 중..."
+            NODE_OPTIONS="--max-old-space-size=96" npx prisma generate
+            sleep 5
+
+            echo "메모리 정리 중..."
+            sudo sync && sudo sysctl -w vm.drop_caches=3
+            sleep 2
+
+            echo "Prisma 마이그레이션 실행 중..."
+            NODE_OPTIONS="--max-old-space-size=96" npx prisma migrate deploy
+            sleep 5
+
+            echo "메모리 정리 중..."
+            sudo sync && sudo sysctl -w vm.drop_caches=3
+            sleep 2
+
+            echo "Prisma 시딩 실행 중..."
+            NODE_OPTIONS="--max-old-space-size=96" npx prisma db seed
+            sleep 5
+
+            # 서버 실행 준비
+            echo "" > app.log
+            sudo touch /etc/authbind/byport/80 /etc/authbind/byport/443
+            sudo chmod 777 /etc/authbind/byport/80 /etc/authbind/byport/443
+
+            echo "최종 메모리 정리 중..."
+            sudo sync && sudo sysctl -w vm.drop_caches=3
+            sleep 2
+
+            # 서버 실행
+            NODE_OPTIONS="--gc-interval=50 --max-old-space-size=96" nohup authbind --deep npm run dev > app.log 2>&1 &
+
             # 메모리 상태 확인
             echo "의존성 설치 전 메모리 상태:"
             free -m
