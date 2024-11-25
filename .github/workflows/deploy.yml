@@ -22,6 +22,8 @@ jobs:
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.0.3
         with:
+          timeout: 60m # 타임아웃 시간 증가
+          command_timeout: 30m # 각 커맨드의 타임아웃 시간 설정
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
