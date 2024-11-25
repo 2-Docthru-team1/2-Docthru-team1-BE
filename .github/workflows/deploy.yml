@@ -36,20 +36,39 @@ jobs:
 
             # 기존 프로세스 종료
             pkill -f "tsx.*src/app.ts" || true
+            sleep 2  # 프로세스가 완전히 종료될 때까지 대기
 
             npm install
             export DATABASE_URL="$DATABASE_URL" && npx prisma migrate dev
 
             # authbind 설정
-            sudo touch /etc/authbind/byport/80
-            sudo touch /etc/authbind/byport/443
-            sudo chmod 777 /etc/authbind/byport/80
-            sudo chmod 777 /etc/authbind/byport/443
+            sudo touch /etc/authbind/byport/80 /etc/authbind/byport/443
+            sudo chmod 777 /etc/authbind/byport/80 /etc/authbind/byport/443
 
-            # nohup으로 authbind와 함께 dev 스크립트 실행
-            nohup authbind --deep npm run dev > app.log 2>&1 &
+            # 서버 시작 스크립트 생성
+            cat > start-server.sh << 'EOL'
+            #!/bin/bash
+            source /etc/profile.d/HanCook-env.sh
+            cd ~/2-Docthru-team1-BE
+            authbind --deep npm run dev > app.log 2>&1
+            EOL
 
-            # 프로세스 상태 확인
-            sleep 5  # 프로세스가 시작될 때까지 잠시 대기
-            ps aux | grep "tsx.*src/app.ts"
-            echo "Deployment completed. Check app.log for details."
+            chmod +x start-server.sh
+
+            # nohup으로 시작 스크립트 실행
+            nohup ./start-server.sh &
+
+            # 프로세스가 시작되었는지 확인
+            for i in {1..30}; do
+              if pgrep -f "tsx.*src/app.ts" > /dev/null; then
+                echo "Server started successfully"
+                ps aux | grep "tsx.*src/app.ts" | grep -v grep
+                exit 0
+              fi
+              echo "Waiting for server to start... ($i/30)"
+              sleep 2
+            done
+
+            echo "Failed to start server"
+            tail -n 50 app.log
+            exit 1
