@@ -31,24 +31,37 @@ jobs:
           script: |
             cd ~/2-Docthru-team1-BE
 
-            # 시스템 정리
-            sudo systemctl stop nginx || true
-            sudo systemctl stop mysql || true
-
-            # 메모리 캐시 정리
+            # 메모리 정리
             sudo sync && sudo sysctl -w vm.drop_caches=3
             free -m
 
-            # 기존 프로세스 정리
+            # 이전 프로세스 정리 (더 안전한 방식)
             if [ -f ./server.pid ]; then
-              pid=$(cat ./server.pid)
-              kill -15 $pid 2>/dev/null || true
-              sleep 3
-              kill -9 $pid 2>/dev/null || true
+              old_pid=$(cat ./server.pid)
+              if ps -p $old_pid > /dev/null; then
+                echo "종료 중인 프로세스: $old_pid"
+                kill -15 $old_pid
+                sleep 5
+                if ps -p $old_pid > /dev/null; then
+                  echo "프로세스 강제 종료: $old_pid"
+                  kill -9 $old_pid
+                fi
+              fi
               rm -f ./server.pid
             fi
-            pkill -f "tsx.*src/app.ts" || true
-            sleep 3
+
+            # 남은 프로세스 정리
+            for pid in $(pgrep -f "tsx.*src/app.ts"); do
+              echo "추가 프로세스 종료: $pid"
+              kill -15 $pid
+            done
+            sleep 5
+
+            # Git 작업 전 상태 확인
+            echo "현재 메모리 상태:"
+            free -m
+            echo "현재 실행 중인 Node 프로세스:"
+            ps aux | grep node
 
             # Git 작업
             git fetch origin main
@@ -57,7 +70,7 @@ jobs:
             # 의존성 설치
             rm -rf node_modules
             npm cache clean --force
-            NODE_OPTIONS="--max-old-space-size=512" npm install
+            NODE_OPTIONS="--max-old-space-size=384" npm install
 
             # 환경 설정
             source /etc/profile.d/HanCook-env.sh
@@ -74,19 +87,16 @@ jobs:
             sudo touch /etc/authbind/byport/80 /etc/authbind/byport/443
             sudo chmod 777 /etc/authbind/byport/80 /etc/authbind/byport/443
 
-            NODE_OPTIONS="--max-old-space-size=512" nohup authbind --deep npm run dev > app.log 2>&1 &
+            NODE_OPTIONS="--max-old-space-size=384" nohup authbind --deep npm run dev > app.log 2>&1 &
             pid=$!
             echo $pid > ./server.pid
 
-            # 서비스 재시작
-            sudo systemctl start mysql || true
-            sudo systemctl start nginx || true
-
             # 프로세스 확인
-            sleep 10
+            sleep 15
             if ps -p $pid > /dev/null; then
               echo "서버 시작 성공 (PID: $pid)"
               free -m
+              ps aux | grep node
               exit 0
             else
               echo "서버 시작 실패. 로그:"
