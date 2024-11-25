@@ -33,13 +33,14 @@ jobs:
 
             # 메모리 정리
             sudo sync && sudo sysctl -w vm.drop_caches=3
-            free -m
 
-            # 모든 관련 프로세스 강제 종료
-            for pid in $(pgrep -f "tsx.*src/app.ts"); do
-              echo "프로세스 강제 종료: $pid"
-              kill -9 $pid || true
-            done
+            # 불필요한 시스템 프로세스 정리
+            sudo service docker stop || true
+            sudo service containerd stop || true
+
+            # 모든 node 프로세스 정리
+            pkill -9 node || true
+            pkill -9 -f "tsx.*src/app.ts" || true
 
             if [ -f ./server.pid ]; then
               pid=$(cat ./server.pid)
@@ -47,12 +48,8 @@ jobs:
               rm -f ./server.pid
             fi
 
-            # 프로세스 종료 확인
-            sleep 10
-            if pgrep -f "tsx.*src/app.ts" > /dev/null; then
-              echo "남은 프로세스 강제 종료"
-              pkill -9 -f "tsx.*src/app.ts" || true
-            fi
+            sleep 5
+            free -m
 
             # Git 작업
             git fetch origin main
@@ -62,18 +59,21 @@ jobs:
             rm -rf node_modules package-lock.json dist
             npm cache clean --force
 
-            # 의존성 설치 (프로덕션 모드)
-            NODE_ENV=production NODE_OPTIONS="--max-old-space-size=256" npm install --production
+            # 단계별 의존성 설치
+            NODE_ENV=production NODE_OPTIONS="--max-old-space-size=128" npm install --production --no-optional
 
             # 환경 설정
             source /etc/profile.d/HanCook-env.sh
             export NODE_ENV=production
             export DATABASE_URL="$DATABASE_URL"
 
-            # Prisma 작업
-            NODE_OPTIONS="--max-old-space-size=256" npx prisma generate
-            NODE_OPTIONS="--max-old-space-size=256" npx prisma migrate deploy
-            NODE_OPTIONS="--max-old-space-size=256" npx prisma db seed
+            # Prisma 작업 (단계별 실행)
+            NODE_OPTIONS="--max-old-space-size=128" npx prisma generate
+            sleep 2
+            NODE_OPTIONS="--max-old-space-size=128" npx prisma migrate deploy
+            sleep 2
+            NODE_OPTIONS="--max-old-space-size=128" npx prisma db seed
+            sleep 2
 
             # 서버 실행 준비
             echo "" > app.log
@@ -81,7 +81,7 @@ jobs:
             sudo chmod 777 /etc/authbind/byport/80 /etc/authbind/byport/443
 
             # 서버 실행
-            NODE_OPTIONS="--max-old-space-size=256" nohup authbind --deep npm run dev > app.log 2>&1 &
+            NODE_OPTIONS="--max-old-space-size=128" nohup authbind --deep npm run dev > app.log 2>&1 &
             new_pid=$!
             echo $new_pid > ./server.pid
 
