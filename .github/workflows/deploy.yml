@@ -31,56 +31,62 @@ jobs:
           script: |
             cd ~/2-Docthru-team1-BE
 
-            # 시스템 메모리 상태 확인
+            # 시스템 정리
+            sudo systemctl stop nginx || true
+            sudo systemctl stop mysql || true
+
+            # 메모리 캐시 정리
+            sudo sync && sudo sysctl -w vm.drop_caches=3
             free -m
 
             # 기존 프로세스 정리
             if [ -f ./server.pid ]; then
               pid=$(cat ./server.pid)
-              if ps -p $pid > /dev/null; then
-                echo "종료할 프로세스: $pid"
-                kill -15 $pid
-                sleep 5
-                if ps -p $pid > /dev/null; then
-                  echo "강제 종료: $pid"
-                  kill -9 $pid
-                fi
-              fi
+              kill -15 $pid 2>/dev/null || true
+              sleep 3
+              kill -9 $pid 2>/dev/null || true
               rm -f ./server.pid
             fi
-
-            # Node 프로세스 정리
             pkill -f "tsx.*src/app.ts" || true
-            sleep 5
+            sleep 3
 
             # Git 작업
             git fetch origin main
             git reset --hard origin/main
 
-            # Node 캐시 정리
-            npm cache clean --force
+            # 의존성 설치
             rm -rf node_modules
+            npm cache clean --force
+            NODE_OPTIONS="--max-old-space-size=512" npm install
 
-            # 의존성 설치 및 DB 마이그레이션
-            npm install
+            # 환경 설정
             source /etc/profile.d/HanCook-env.sh
             export NODE_ENV=production
             export DATABASE_URL="$DATABASE_URL"
+
+            # Prisma 작업
             npx prisma generate
-            npx prisma migrate dev
+            npx prisma migrate deploy
+            npx prisma db seed
 
             # 서버 실행
             echo "" > app.log
             sudo touch /etc/authbind/byport/80 /etc/authbind/byport/443
             sudo chmod 777 /etc/authbind/byport/80 /etc/authbind/byport/443
 
-            NODE_OPTIONS="--max-old-space-size=2048" nohup authbind --deep npm run dev > app.log 2>&1 &
-            echo $! > ./server.pid
+            NODE_OPTIONS="--max-old-space-size=512" nohup authbind --deep npm run dev > app.log 2>&1 &
+            pid=$!
+            echo $pid > ./server.pid
 
-            # 프로세스 상태 확인
-            sleep 15
-            if ps -p $(cat ./server.pid) > /dev/null; then
-              echo "서버 시작 성공 (PID: $(cat ./server.pid))"
+            # 서비스 재시작
+            sudo systemctl start mysql || true
+            sudo systemctl start nginx || true
+
+            # 프로세스 확인
+            sleep 10
+            if ps -p $pid > /dev/null; then
+              echo "서버 시작 성공 (PID: $pid)"
+              free -m
               exit 0
             else
               echo "서버 시작 실패. 로그:"
