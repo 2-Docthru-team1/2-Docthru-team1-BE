@@ -6,12 +6,18 @@ import { Forbidden, NotFound } from '#types/http-error.types.js';
 import type {
   ChallengeWorkWithImages,
   CreateWorkDTO,
+  CreateWorkDTOWithId,
   GetWorksOptions,
+  RepositoryCreateWorkDTO,
+  RequestCreateService,
   ResultChallengeWork,
-  UpdateWorkDTO,
+  UpdateWorkDTO, //UpdateWorkDTOWithId,
   WorkResponse,
 } from '#types/work.types.js';
 import { generatePresignedDownloadUrl } from '#utils/S3/generate-presigned-download-url.js';
+import { generatePresignedUploadUrl } from '#utils/S3/generate-presigned-upload-url.js';
+import { generateS3ImageArray } from '#utils/S3/generateS3ImageArray.js';
+import { chageTypeWorkCreate } from '#utils/changeTypeWork.js';
 import MESSAGES from '#utils/constants/messages.js';
 
 export class WorkService implements IWorkService {
@@ -65,14 +71,19 @@ export class WorkService implements IWorkService {
     return { ...changedWork, images: updatedImages };
   };
 
-  createWork = async (WorkData: CreateWorkDTO): Promise<ChallengeWork> => {
-    const Work = await this.WorkRepository.create(WorkData);
-    return Work;
+  createWork = async (workData: CreateWorkDTOWithId): Promise<Omit<ChallengeWork, 'ownerId'>> => {
+    const { imageCount, ...restWorkData } = workData;
+    const imagesData = await generateS3ImageArray(imageCount);
+    const repositoryWork = { ...restWorkData, imagesData };
+    const work = await this.WorkRepository.create(repositoryWork);
+    const workWithUploadUrls = chageTypeWorkCreate({ ...work, imagesData });
+    return workWithUploadUrls;
   };
 
   updateWork = async (id: string, workData: UpdateWorkDTO): Promise<WorkResponse> => {
     const storage = getStorage();
     const userId = storage.userId;
+    const { imageCount, ...other } = workData;
     const FoundWork = await this.WorkRepository.findById(id);
     if (!FoundWork || FoundWork.deletedAt) {
       throw new NotFound(MESSAGES.NOT_FOUND);
@@ -80,12 +91,11 @@ export class WorkService implements IWorkService {
     if (userId !== FoundWork.ownerId) {
       throw new Forbidden(MESSAGES.FORBIDDEN);
     }
-    const work = await this.WorkRepository.update(id, workData);
-    const changedWork = work as ChallengeWorkWithImages;
-    const { images, ownerId, ...other } = changedWork;
-    const imageUrls = images.map(image => image.imageUrl);
-    const resultWork = { ...other, images: { imageUrls } };
-    return resultWork as WorkResponse;
+    const imagesData = await generateS3ImageArray(imageCount!);
+    const repositoryWork = { imagesData, ...other };
+    const work = await this.WorkRepository.update(id, repositoryWork);
+    const workWithUploadUrls = chageTypeWorkCreate({ ...work, imagesData });
+    return workWithUploadUrls;
   };
 
   deleteWork = async (id: string): Promise<ResultChallengeWork> => {

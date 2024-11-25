@@ -1,7 +1,16 @@
-import type { ChallengeWork } from '@prisma/client';
+import type { ChallengeWork, WorkImage } from '@prisma/client';
 import type { IWorkRepository } from '#interfaces/repositories/work.repository.interface.js';
+import { getStorage } from '#middlewares/asyncLocalStorage.js';
 import type { ExtendedPrismaClient } from '#types/common.types.js';
-import { type CreateWorkDTO, type GetWorksOptions, type UpdateWorkDTO, WorkOrder } from '#types/work.types.js';
+import {
+  type CreateWorkDTO,
+  type CreateWorkDTOWithS3Data,
+  type GetWorksOptions,
+  type RepositoryCreateWorkDTO,
+  type UpdateWorkDTO,
+  type UpdateWorkDTOWithUrls,
+  WorkOrder,
+} from '#types/work.types.js';
 
 export class WorkRepository implements IWorkRepository {
   challengeWork: ExtendedPrismaClient['challengeWork'];
@@ -44,46 +53,42 @@ export class WorkRepository implements IWorkRepository {
     return work;
   };
 
-  create = async (data: CreateWorkDTO): Promise<ChallengeWork> => {
-    const { challengeId, ownerId, images, title, content } = data;
-    // const files = images.map((image, index) => ({ //겸사겸사 이렇게 쓰는게 맞는지도 봐주세요
-    //   key: `userId/${randomUUID()}_${index}`, // S3에 저장할 고유한 키 생성
-    //   contentType: 'image/png', // MIME 타입 설정
-    // }));
-    // const uploadUrls = await Promise.all(files.map(file => generatePresignedUploadUrl(file.key, file.contentType)));
+  create = async (data: CreateWorkDTOWithS3Data): Promise<ChallengeWork> => {
+    const { challengeId, imagesData, title, content } = data;
+    const storage = getStorage();
+    const userId = storage.userId;
     const work = await this.challengeWork.create({
       data: {
         title,
         content,
         challenge: { connect: { id: challengeId } },
-        owner: { connect: { id: ownerId } },
+        owner: { connect: { id: userId } },
         images: {
-          create: images.map(image => ({ imageUrl: image })),
+          create: imagesData.map(imageData => ({ imageUrl: imageData.s3Key })),
         },
       },
-      include: { images: { select: { imageUrl: true } } },
+      include: { images: true, owner: { select: { id: true, name: true, role: true, email: true } } },
     });
     return work;
   };
 
-  update = async (id: string, data: UpdateWorkDTO): Promise<ChallengeWork> => {
-    const { images, ...other } = data;
+  update = async (id: string, data: UpdateWorkDTOWithUrls): Promise<ChallengeWork> => {
+    const { imagesData, ...other } = data;
     const work = await this.challengeWork.update({
       where: { id },
       data: {
         ...other,
       },
-      include: { owner: { select: { id: true, name: true, email: true, role: true } }, images: true },
+      include: { owner: { select: { id: true, name: true, role: true, email: true } }, images: true },
     });
-    if (!!images) {
-      const existingWorkImages = work.images;
-      const existingWorkImagesIds = existingWorkImages.map(workImage => workImage.id);
+    if (imagesData?.length) {
+      const existngWorkImages = work.images;
       await this.workImage.deleteMany({ where: { workId: id } });
       const newWorkImages = await Promise.all(
-        images.map(image => this.workImage.create({ data: { imageUrl: image, workId: id } })),
+        imagesData.map(imageData => this.workImage.create({ data: { imageUrl: imageData.s3Key, workId: id } })),
       );
-      work.images = newWorkImages;
     }
+
     return work;
   };
 
