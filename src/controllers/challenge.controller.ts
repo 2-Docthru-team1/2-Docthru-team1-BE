@@ -45,10 +45,8 @@ export class ChallengeController {
   };
 
   postChallenge = async (req: Request<{}, {}, CreateChallengeDTO>, res: Response) => {
-    const storage = getStorage();
-    const userId = storage.userId;
     const challengeData = req.body;
-    const newChallenge = await this.challengeService.createChallenge(challengeData, userId);
+    const newChallenge = await this.challengeService.createChallenge(challengeData);
     res.status(201).json(newChallenge);
   };
 

@@ -84,8 +84,11 @@ export class ChallengeRepository implements IChallengeRepository {
       data: {
         ...data,
         participants: {
-          connect: [{ id: data.participants[0].id }],
+          connect: [],
         },
+      },
+      include: {
+        requestUser: { select: { id: true, name: true } },
       },
     });
   };

@@ -1,10 +1,12 @@
 import type { AbortReason, Challenge } from '@prisma/client';
 import type { IChallengeService } from '#interfaces/services/challenge.service.interface.js';
+import { getStorage } from '#middlewares/asyncLocalStorage.js';
 import type { ChallengeRepository } from '#repositories/challenge.repository.js';
 import type {
   ChallengeInput,
   ChallengeStatusInput,
   CreateChallengeDTO,
+  CustomChallenge,
   UpdateChallengeDTO,
   getChallengesOptions,
 } from '#types/challenge.types.js';
@@ -44,8 +46,9 @@ export class ChallengeService implements IChallengeService {
 
   createChallenge = async (
     challengeData: CreateChallengeDTO,
-    userId: string,
-  ): Promise<{ challenge: Challenge; uploadUrls: { uploadUrl: string }[] }> => {
+  ): Promise<{ challenge: CustomChallenge; uploadUrls: { uploadUrl: string }[] }> => {
+    const storage = getStorage();
+    const userId = storage.userId;
     if (!userId) {
       throw new BadRequest(MESSAGES.UNAUTHORIZED);
     }
@@ -70,13 +73,14 @@ export class ChallengeService implements IChallengeService {
       status: 'pending',
       isHidden: false,
       requestUserId: userId,
-      participants: [{ id: userId }],
+      participants: [],
       imageUrl,
       imageUrl2,
     };
 
     const challenge = await this.challengeRepository.create(ChallengeInput);
-    return { challenge, uploadUrls };
+    const { isHidden, requestUserId, ...rest } = challenge;
+    return { challenge: { ...rest }, uploadUrls };
   };
 
   updateChallenge = async (

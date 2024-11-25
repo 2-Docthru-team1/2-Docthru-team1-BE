@@ -1,6 +1,8 @@
 import type { Challenge, MediaType, Role, Status } from '@prisma/client';
 import { Order } from '#utils/constants/enum.js';
 
+export type CustomChallenge = Omit<Challenge, 'isHidden' | 'requestUserId'>;
+
 export interface GetChallengesQuery {
   status?: string;
   mediaType?: string;
