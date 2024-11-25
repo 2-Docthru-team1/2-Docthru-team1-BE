@@ -4,6 +4,7 @@ import type { CreateFeedbackDTO, UpdateFeedbackDTO } from '#types/feedback.types
 
 export interface IFeedbackRepository {
   getCount(): Promise<number>;
+  getCountByWorkId(workId: string): Promise<number>;
   findMany(options: BasicOptions): Promise<Feedback[] | null>;
   findById(id: string): Promise<Feedback | null>;
   create(FeedbackData: CreateFeedbackDTO): Promise<Feedback>;

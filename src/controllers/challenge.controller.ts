@@ -18,7 +18,7 @@ export class ChallengeController {
     let mediaTypeEnum;
     if (Array.isArray(mediaType)) {
       mediaTypeEnum = mediaType as MediaType[];
-    } else if (!!mediaType) {
+    } else if (mediaType?.length) {
       mediaTypeEnum = [mediaType] as MediaType[];
     } else {
       mediaTypeEnum = undefined;

@@ -13,7 +13,10 @@ export class FeedbackRepository implements IFeedbackRepository {
 
     return count;
   };
-
+  getCountByWorkId = async (workId: string): Promise<number> => {
+    const count = await this.feedback.count({ where: { workId: workId } });
+    return count;
+  };
   findMany = async (options: BasicOptions, userId?: string): Promise<Feedback[] | null> => {
     const { orderBy, page, pageSize } = options;
 
