@@ -22,8 +22,8 @@ jobs:
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.0.3
         with:
-          timeout: 60m # 타임아웃 시간 증가
-          command_timeout: 30m # 각 커맨드의 타임아웃 시간 설정
+          timeout: 60m
+          command_timeout: 30m
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
@@ -36,9 +36,13 @@ jobs:
             # 환경 변수 파일 로드
             source /etc/profile.d/HanCook-env.sh
 
-            # 기존 프로세스 종료
+            # 기존 프로세스 종료를 더 안전하게 처리
+            if [ -f ./server.pid ]; then
+              kill -15 $(cat ./server.pid) || true
+              rm ./server.pid
+            fi
             pkill -f "tsx.*src/app.ts" || true
-            sleep 2
+            sleep 5
 
             npm install
             export DATABASE_URL="$DATABASE_URL" && npx prisma migrate dev
@@ -47,36 +51,25 @@ jobs:
             sudo touch /etc/authbind/byport/80 /etc/authbind/byport/443
             sudo chmod 777 /etc/authbind/byport/80 /etc/authbind/byport/443
 
+            # 서버 실행 전 로그 파일 초기화
+            echo "" > app.log
+
             # 환경 변수와 함께 서버 실행
             export NODE_ENV=production
-            cd ~/2-Docthru-team1-BE
-            authbind --deep npm run dev > app.log 2>&1 &
+            nohup authbind --deep npm run dev > app.log 2>&1 &
 
             # PID 파일 생성
             echo $! > ./server.pid
 
-            # 서버 시작 확인
-            COUNTER=0
-            while [ $COUNTER -lt 30 ]; do
-                if pgrep -f "tsx.*src/app.ts" > /dev/null; then
-                    echo "Server started successfully with PID $(cat ./server.pid)"
-                    ps aux | grep "tsx.*src/app.ts" | grep -v grep
-                    exit 0
-                fi
-                echo "Attempt $((COUNTER + 1))/30: Waiting for server to start..."
-                sleep 2
-                COUNTER=$((COUNTER + 1))
-            done
+            # 서버 시작 대기 시간 증가
+            sleep 10
 
-            echo "Server failed to start. Last 50 lines of log:"
-            tail -n 50 app.log
-            exit 1
-
-            # 프로세스 상태 최종 확인
+            # 프로세스 상태 확인
             if ps -p $(cat ./server.pid) > /dev/null; then
-                echo "Server is running with PID $(cat ./server.pid)"
-                exit 0
+              echo "서버가 성공적으로 시작되었습니다. PID: $(cat ./server.pid)"
+              exit 0
             else
-                echo "Server failed to start"
-                exit 1
+              echo "서버 시작 실패. 로그 확인:"
+              tail -n 50 app.log
+              exit 1
             fi
