@@ -35,41 +35,34 @@ jobs:
             sudo sync && sudo sysctl -w vm.drop_caches=3
             free -m
 
-            # 이전 프로세스 정리 (더 안전한 방식)
+            # 모든 관련 프로세스 강제 종료
+            for pid in $(pgrep -f "tsx.*src/app.ts"); do
+              echo "프로세스 강제 종료: $pid"
+              kill -9 $pid || true
+            done
+
             if [ -f ./server.pid ]; then
-              old_pid=$(cat ./server.pid)
-              if ps -p $old_pid > /dev/null; then
-                echo "종료 중인 프로세스: $old_pid"
-                kill -15 $old_pid
-                sleep 5
-                if ps -p $old_pid > /dev/null; then
-                  echo "프로세스 강제 종료: $old_pid"
-                  kill -9 $old_pid
-                fi
-              fi
+              pid=$(cat ./server.pid)
+              kill -9 $pid 2>/dev/null || true
               rm -f ./server.pid
             fi
 
-            # 남은 프로세스 정리
-            for pid in $(pgrep -f "tsx.*src/app.ts"); do
-              echo "추가 프로세스 종료: $pid"
-              kill -15 $pid
-            done
-            sleep 5
-
-            # Git 작업 전 상태 확인
-            echo "현재 메모리 상태:"
-            free -m
-            echo "현재 실행 중인 Node 프로세스:"
-            ps aux | grep node
+            # 프로세스 종료 확인
+            sleep 10
+            if pgrep -f "tsx.*src/app.ts" > /dev/null; then
+              echo "남은 프로세스 강제 종료"
+              pkill -9 -f "tsx.*src/app.ts" || true
+            fi
 
             # Git 작업
             git fetch origin main
             git reset --hard origin/main
 
-            # 의존성 설치
-            rm -rf node_modules
+            # Node 프로세스 정리
+            rm -rf node_modules package-lock.json
             npm cache clean --force
+
+            # 의존성 설치
             NODE_OPTIONS="--max-old-space-size=384" npm install
 
             # 환경 설정
@@ -82,24 +75,28 @@ jobs:
             npx prisma migrate deploy
             npx prisma db seed
 
-            # 서버 실행
+            # 서버 실행 준비
             echo "" > app.log
             sudo touch /etc/authbind/byport/80 /etc/authbind/byport/443
             sudo chmod 777 /etc/authbind/byport/80 /etc/authbind/byport/443
 
+            # 서버 실행
             NODE_OPTIONS="--max-old-space-size=384" nohup authbind --deep npm run dev > app.log 2>&1 &
-            pid=$!
-            echo $pid > ./server.pid
+            new_pid=$!
+            echo $new_pid > ./server.pid
 
-            # 프로세스 확인
-            sleep 15
-            if ps -p $pid > /dev/null; then
-              echo "서버 시작 성공 (PID: $pid)"
-              free -m
-              ps aux | grep node
-              exit 0
-            else
-              echo "서버 시작 실패. 로그:"
-              tail -n 50 app.log
-              exit 1
-            fi
+            # 서버 시작 확인
+            for i in {1..6}; do
+              if ps -p $new_pid > /dev/null; then
+                echo "서버 시작 성공 (PID: $new_pid)"
+                free -m
+                ps aux | grep node
+                exit 0
+              fi
+              echo "서버 시작 대기 중... ($i/6)"
+              sleep 5
+            done
+
+            echo "서버 시작 실패. 로그:"
+            tail -n 50 app.log
+            exit 1
