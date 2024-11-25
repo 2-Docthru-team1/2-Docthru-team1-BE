@@ -1,4 +1,5 @@
 import express from 'express';
+import feedbackController from '#containers/feedback.container.js';
 import tokenVerifier from '#containers/verify.container.js';
 import workController from '#containers/work.container.js';
 
@@ -14,6 +15,8 @@ workRouter
   .get(workController.getWorkById)
   .patch(tokenVerifier.verifyAccessToken, workController.patchWork)
   .delete(tokenVerifier.verifyAccessToken, workController.deleteWork);
+
+workRouter.route('/:id/feedbacks').get(feedbackController.getFeedbacks);
 
 // app에서 사용할 수 있도록 export 해주어야 합니다.
 export default workRouter;
