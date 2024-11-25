@@ -35,11 +35,10 @@ jobs:
             source /etc/profile.d/HanCook-env.sh
 
             # 기존 프로세스 종료
-            pkill -f "node dist/src/app.js" || true
+            pkill -f "tsx.*src/app.ts" || true
 
             npm install
             export DATABASE_URL="$DATABASE_URL" && npx prisma migrate dev
-            npx tsc
 
             # authbind 설정
             sudo touch /etc/authbind/byport/80
@@ -47,9 +46,10 @@ jobs:
             sudo chmod 777 /etc/authbind/byport/80
             sudo chmod 777 /etc/authbind/byport/443
 
-            # nohup으로 서버 시작
-            nohup authbind --deep node dist/src/app.js > app.log 2>&1 &
+            # nohup으로 authbind와 함께 dev 스크립트 실행
+            nohup authbind --deep npm run dev > app.log 2>&1 &
 
             # 프로세스 상태 확인
-            ps aux | grep "node dist/src/app.js"
+            sleep 5  # 프로세스가 시작될 때까지 잠시 대기
+            ps aux | grep "tsx.*src/app.ts"
             echo "Deployment completed. Check app.log for details."
