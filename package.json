@@ -18,7 +18,7 @@
     "@/*": "./dist/*"
   },
   "scripts": {
-    "start": "node --env-file=.env dist/app.ts",
+    "start": "node --env-file=.env dist/src/app.js",
     "dev": "tsx --env-file=.env --watch src/app.ts",
     "build": "npx tsc",
     "lint": "eslint .",
@@ -46,7 +46,6 @@
     "is-uuid": "^1.0.2",
     "jsonwebtoken": "^9.0.2",
     "node-cron": "^3.0.3",
-    "prisma": "^5.22.0",
     "superstruct": "^2.0.2"
   },
   "devDependencies": {
@@ -68,6 +67,7 @@
     "eslint-plugin-prettier": "^5.2.1",
     "globals": "^15.12.0",
     "prettier": "^3.3.3",
+    "prisma": "^5.22.0",
     "ts-node": "^10.9.2",
     "tsx": "^4.19.2",
     "typescript": "^5.6.3",
