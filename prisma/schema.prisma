@@ -132,12 +132,10 @@ model Recipe {
   likeCount   Int
   category    Category
   direction   String[]
-  servings    Int // 몇인분인가
-  // 아래 정보는 1인분 기준
   calories    Int
-  carbs       Float // 탄
-  protein     Float // 단
-  fat         Float // 지
+  carbs       Float
+  protein     Float
+  fat         Float
   sugars      Float
   sodium      Float
   fiber       Float

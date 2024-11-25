@@ -1,24 +1,20 @@
 import type { Feedback } from '@prisma/client';
 import type { IFeedbackService } from '#interfaces/services/feedback.service.interface.js';
+import { getStorage } from '#middlewares/asyncLocalStorage.js';
 import type { FeedbackRepository } from '#repositories/feedback.repository.js';
 import type { BasicOptions } from '#types/common.types.js';
 import type { CreateFeedbackDTO, UpdateFeedbackDTO } from '#types/feedback.types.js';
-import { NotFound } from '#types/http-error.types.js';
+import { Forbidden, NotFound } from '#types/http-error.types.js';
 import MESSAGES from '#utils/constants/messages.js';
 
 export class FeedbackService implements IFeedbackService {
   constructor(private feedbackRepository: FeedbackRepository) {}
 
-  getFeedbacks = async (options: BasicOptions, userId?: string): Promise<{ totalCount: number; list: Feedback[] | null }> => {
+  getFeedbacks = async (options: BasicOptions, workId: string): Promise<{ totalCount: number; list: Feedback[] | null }> => {
     let totalCount: number;
     let feedbacks: Feedback[] | null;
-    if (userId) {
-      totalCount = await this.feedbackRepository.getCount(userId);
-      feedbacks = await this.feedbackRepository.findMany(options, userId);
-    } else {
-      totalCount = await this.feedbackRepository.getCount();
-      feedbacks = await this.feedbackRepository.findMany(options);
-    }
+    totalCount = await this.feedbackRepository.getCount(workId);
+    feedbacks = await this.feedbackRepository.findMany(options, workId);
 
     return { totalCount, list: feedbacks };
   };
@@ -43,6 +39,11 @@ export class FeedbackService implements IFeedbackService {
     if (!targetFeedback || targetFeedback.deletedAt) {
       throw new NotFound(MESSAGES.NOT_FOUND);
     }
+    const storage = getStorage();
+    const userId = storage.userId;
+    if (userId !== targetFeedback.ownerId) {
+      throw new Forbidden(MESSAGES.FORBIDDEN);
+    }
 
     const feedback = await this.feedbackRepository.update(id, feedbackData);
 
@@ -53,6 +54,11 @@ export class FeedbackService implements IFeedbackService {
     const targetFeedback = await this.feedbackRepository.findById(id);
     if (!targetFeedback || targetFeedback.deletedAt) {
       throw new NotFound(MESSAGES.NOT_FOUND);
+    }
+    const storage = getStorage();
+    const userId = storage.userId;
+    if (userId !== targetFeedback.ownerId) {
+      throw new Forbidden(MESSAGES.FORBIDDEN);
     }
 
     const feedback = await this.feedbackRepository.delete(id);
