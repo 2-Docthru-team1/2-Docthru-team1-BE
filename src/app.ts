@@ -22,7 +22,7 @@ startJob();
 
 /*********************************************************************************** middlewares **********************************************************************************************/
 app.use(express.json());
-app.use(cors({ credentials: true, origin: true }));
+app.use(cors({ credentials: true, origin: '*' }));
 app.use(cookieParser());
 app.use(validatePaginationOptions);
 app.use(runAsyncLocalStorage);
