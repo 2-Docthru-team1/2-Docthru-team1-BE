@@ -25,6 +25,12 @@ app.use(cookieParser());
 app.use(validatePaginationOptions);
 app.use(runAsyncLocalStorage);
 
+app.use((req, res, next) => {
+  console.log(`Request Path: ${req.path}`);
+  console.log(`Request Method: ${req.method}`);
+  next();
+});
+
 /*********************************************************************************** routes **********************************************************************************************/
 app.use('/auth', authRouter);
 app.use('/challenges', challengeRouter);

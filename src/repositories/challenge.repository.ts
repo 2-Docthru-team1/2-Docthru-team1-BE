@@ -14,8 +14,8 @@ export class ChallengeRepository implements IChallengeRepository {
     this.abortReason = client.abortReason;
   }
 
-  findMany = async (options: getChallengesOptions): Promise<Challenge[] | null> => {
-    const { status, mediaType, orderBy, keyword, page, pageSize } = options;
+  findMany = async (options: getChallengesOptions & { admin: boolean }): Promise<Challenge[] | null> => {
+    const { status, mediaType, orderBy, keyword, page, pageSize, admin } = options;
     const applyOrderBy: {
       deadline?: 'asc' | 'desc';
       createdAt?: 'asc' | 'desc';
@@ -37,32 +37,36 @@ export class ChallengeRepository implements IChallengeRepository {
       mediaType?: { in: MediaType[] };
       status?: Status;
       title?: { contains: string };
+      isHidden?: boolean;
     } = {
       ...(Array.isArray(mediaType) ? { mediaType: { in: mediaType } } : {}),
       ...(status ? { status } : {}),
       ...(keyword ? { title: { contains: keyword } } : {}),
+      ...(admin ? {} : { isHidden: false }),
     };
 
     const challenges = await this.challenge.findMany({
       skip: (page - 1) * pageSize,
       take: pageSize,
       where: whereCondition,
-      include: { works: true },
       orderBy: applyOrderBy,
+      include: { requestUser: { select: { id: true, name: true } } },
     });
     return challenges;
   };
 
-  totalCount = async (options: getChallengesOptions): Promise<number | null> => {
-    const { status, mediaType, keyword } = options;
+  totalCount = async (options: getChallengesOptions & { admin: boolean }): Promise<number | null> => {
+    const { status, mediaType, keyword, admin } = options;
     const whereCondition: {
       mediaType?: { in: MediaType[] };
       status?: Status;
       title?: { contains: string };
+      isHidden?: boolean;
     } = {
       ...(Array.isArray(mediaType) ? { mediaType: { in: mediaType } } : {}),
       ...(status ? { status } : {}),
       ...(keyword ? { title: { contains: keyword } } : {}),
+      ...(admin ? {} : { isHidden: false }),
     };
     const totalCount = await this.challenge.count({ where: whereCondition });
     return totalCount;

@@ -10,8 +10,8 @@ export interface IChallengeService {
     orderBy: Order;
     page: number;
     pageSize: number;
-  }): Promise<{ list: Challenge[]; totalCount: number }>;
-  getChallengeById(id: string): Promise<CustomChallenge | null>;
+  }): Promise<{ list: Omit<Challenge, 'isHidden' | 'requestUserId'>[]; totalCount: number }>;
+  getChallengeById(id: string): Promise<Challenge | null>;
   createChallenge(
     challengeData: CreateChallengeDTO,
   ): Promise<{ challenge: CustomChallenge; uploadUrls: { uploadUrl: string }[] }>;
