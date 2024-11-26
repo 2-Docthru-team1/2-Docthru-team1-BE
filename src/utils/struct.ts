@@ -3,6 +3,7 @@ import isEmail from 'is-email';
 import isUuid from 'is-uuid';
 import { define, enums, integer, number, object, optional, partial, size, string } from 'superstruct';
 
+
 // prisma의 enum 타입을 js string[]로 변환
 const roleEnumValues = Object.values(Role) as string[];
 
@@ -70,8 +71,6 @@ export const PatchWork = partial(CreateWork);
 
 export const CreateFeedback = object({
   content: string(),
-  ownerId: Uuid,
-  workId: Uuid,
 });
 
 export const PatchFeedback = object({

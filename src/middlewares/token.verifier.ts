@@ -1,10 +1,9 @@
 import type { NextFunction, Response } from 'express';
-import { UnauthorizedError, expressjwt } from 'express-jwt';
+import { expressjwt } from 'express-jwt';
 import { jwtSecret } from '#configs/auth.config.js';
 import { getStorage } from '#middlewares/asyncLocalStorage.js';
 import type { UserService } from '#services/user.service.js';
 import type { Request } from '#types/common.types.js';
-import { Unauthorized } from '#types/http-error.types.js';
 
 export class TokenVerifier {
   constructor(private userService: UserService) {}
@@ -26,10 +25,7 @@ export class TokenVerifier {
         requestProperty: 'user',
       })(req, res, async err => {
         if (err) {
-          if (err.name === 'UnauthorizedError') {
-            throw new Unauthorized(err.message);
-          }
-          
+          next(err);
           return;
         }
 
