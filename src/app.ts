@@ -19,6 +19,7 @@ import { startJob } from '#utils/jobs/index.js';
 const app = express();
 
 startJob();
+console.log('start');
 
 /*********************************************************************************** middlewares **********************************************************************************************/
 app.use(express.json());
@@ -32,8 +33,10 @@ app.use((req, res, next) => {
   console.log(`Request Method: ${req.method}`);
   next();
 });
+console.log('middlewares');
 
 /*********************************************************************************** routes **********************************************************************************************/
+console.log('routes');
 app.use('/auth', authRouter);
 app.use('/challenges', challengeRouter);
 app.use('/users', userRouter);

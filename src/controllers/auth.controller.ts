@@ -11,8 +11,6 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   signIn = async (req: Request<{ body: SignInDTO }>, res: Response, next: NextFunction) => {
-    res.json({ message: 'signIn' });
-    return;
     assert(req.body, SignIn, MESSAGES.WRONG_FORMAT);
     const { email, password } = req.body;
 
