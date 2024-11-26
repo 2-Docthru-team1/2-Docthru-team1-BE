@@ -1,5 +1,5 @@
 import type { NextFunction, Response } from 'express';
-import { expressjwt } from 'express-jwt';
+import { UnauthorizedError, expressjwt } from 'express-jwt';
 import { jwtSecret } from '#configs/auth.config.js';
 import { getStorage } from '#middlewares/asyncLocalStorage.js';
 import type { UserService } from '#services/user.service.js';
@@ -29,6 +29,7 @@ export class TokenVerifier {
           if (err.name === 'UnauthorizedError') {
             throw new Unauthorized(err.message);
           }
+          
           return;
         }
 
