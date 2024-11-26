@@ -33,14 +33,7 @@ export interface CreateChallengeDTO {
   imageCount: number;
 }
 
-export interface ChallengeInput {
-  title: string;
-  description: string;
-  deadline: Date;
-  embedUrl: string;
-  imageUrl: string;
-  imageUrl2?: string;
-  mediaType: MediaType;
+export interface ChallengeInput extends CreateChallengeDTO {
   status: Status;
   isHidden: boolean;
   requestUserId: string;
@@ -58,10 +51,7 @@ export interface UpdateChallengeDTO {
   imageCount?: number;
 }
 
-export interface UpdateChallengeStatusDTO {
-  status: Status;
-  abortReason?: string;
-}
+export interface UpdateChallengeStatusDTO extends ChallengeStatusInput {}
 
 export interface ChallengeStatusInput {
   challengeId: string;
