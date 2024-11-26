@@ -11,7 +11,7 @@ export interface IChallengeService {
     page: number;
     pageSize: number;
   }): Promise<{ list: Challenge[]; totalCount: number }>;
-  getChallengeById(id: string): Promise<Challenge | null>;
+  getChallengeById(id: string): Promise<CustomChallenge | null>;
   createChallenge(
     challengeData: CreateChallengeDTO,
   ): Promise<{ challenge: CustomChallenge; uploadUrls: { uploadUrl: string }[] }>;

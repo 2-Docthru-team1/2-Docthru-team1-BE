@@ -72,9 +72,8 @@ export class ChallengeRepository implements IChallengeRepository {
     return await baseClient.challenge.findUnique({
       where: { id },
       include: {
-        participants: { select: { id: true, name: true, role: true } },
-        works: true,
-        abortReason: true,
+        participants: { select: { id: true } },
+        requestUser: { select: { id: true, name: true } },
       },
     });
   };

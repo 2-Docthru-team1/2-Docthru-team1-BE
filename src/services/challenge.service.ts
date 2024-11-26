@@ -29,16 +29,17 @@ export class ChallengeService implements IChallengeService {
     return { list, totalCount };
   };
 
-  getChallengeById = async (id: string): Promise<Challenge | null> => {
+  getChallengeById = async (id: string): Promise<CustomChallenge | null> => {
     const expiresIn = 3600;
     const challenge = await this.challengeRepository.findById(id);
     if (!challenge || challenge.deletedAt) {
       throw new NotFound(MESSAGES.NOT_FOUND);
     }
+    const { isHidden, requestUserId, ...rest } = challenge;
     const imageUrl = await generatePresignedDownloadUrl(challenge.imageUrl, expiresIn);
     const imageUrl2 = challenge.imageUrl2 ? await generatePresignedDownloadUrl(challenge.imageUrl2, expiresIn) : null;
     return {
-      ...challenge,
+      ...rest,
       imageUrl,
       imageUrl2,
     };
