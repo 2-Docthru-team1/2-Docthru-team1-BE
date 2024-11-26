@@ -97,9 +97,7 @@ export class ChallengeRepository implements IChallengeRepository {
       where: { id },
       data,
       include: {
-        participants: true,
-        works: true,
-        abortReason: true,
+        requestUser: { select: { id: true, name: true } },
       },
     });
     return challenge;
@@ -125,7 +123,9 @@ export class ChallengeRepository implements IChallengeRepository {
     return await this.challenge.update({
       where: { id: challengeId },
       data: newStatus,
-      include: { abortReason: true },
+      include: {
+        requestUser: { select: { id: true, name: true } },
+      },
     });
   };
 

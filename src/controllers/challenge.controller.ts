@@ -52,24 +52,17 @@ export class ChallengeController {
 
   patchChallenge = async (req: Request<{ id: string }, {}, UpdateChallengeDTO>, res: Response) => {
     const { id } = req.params;
-    const storage = getStorage();
-    const userId = storage.userId;
-    const updateChallenge = await this.challengeService.updateChallenge(id, req.body, userId);
+    const updateChallenge = await this.challengeService.updateChallenge(id, req.body);
     res.json(updateChallenge);
   };
 
   patchChallengeStatus = async (req: Request<{ id: string }, {}, UpdateChallengeStatusDTO>, res: Response) => {
-    const storage = getStorage();
-    const userId = storage.userId;
-    const userRole = storage.userRole;
     const { id: challengeId } = req.params;
     const { status, abortReason } = req.body;
     const updatedChallenge = await this.challengeService.updateStatus({
       challengeId,
       status,
       abortReason,
-      userId,
-      userRole,
     });
     res.json(updatedChallenge);
   };

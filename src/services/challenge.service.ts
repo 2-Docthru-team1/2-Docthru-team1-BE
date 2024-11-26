@@ -87,11 +87,12 @@ export class ChallengeService implements IChallengeService {
   updateChallenge = async (
     id: string,
     challengeData: UpdateChallengeDTO,
-    userId: string,
   ): Promise<{ challenge: Challenge; uploadUrls: { uploadUrl: string }[] }> => {
     const { imageCount, ...restChallengeData } = challengeData;
-
+    const storage = getStorage();
+    const userId = storage.userId;
     const challenge = await this.challengeRepository.findById(id);
+
     if (!userId) {
       throw new BadRequest(MESSAGES.UNAUTHORIZED);
     }
@@ -132,8 +133,11 @@ export class ChallengeService implements IChallengeService {
     return { challenge: updatedChallenge, uploadUrls };
   };
 
-  updateStatus = async (data: ChallengeStatusInput): Promise<Challenge | null> => {
-    const { challengeId, status, abortReason, userId, userRole } = data;
+  updateStatus = async (data: ChallengeStatusInput): Promise<CustomChallenge | null> => {
+    const storage = getStorage();
+    const userId = storage.userId;
+    const userRole = storage.userRole;
+    const { challengeId, status, abortReason } = data;
     const challenge = await this.challengeRepository.findById(challengeId);
 
     validateUpdateStatus({
@@ -144,12 +148,15 @@ export class ChallengeService implements IChallengeService {
       userRole,
     });
 
-    return await this.challengeRepository.updateStatus({
+    const updateChallenge = await this.challengeRepository.updateStatus({
       challengeId,
       status,
       abortReason,
       userId,
     });
+
+    const { isHidden, requestUserId, ...rest } = updateChallenge;
+    return { ...rest };
   };
 
   getAbortReason = async (id: string): Promise<AbortReason | null> => {
