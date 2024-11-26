@@ -1,7 +1,4 @@
-<p align="center">
-  <b style="font-size:32px;">1팀-HanCook</b><br>
-  <span style="font-size:24px;">백엔드 레포지토리</span>
-</p>
+# 1팀- HanCook
 
 ## 프로젝트 소개
 
