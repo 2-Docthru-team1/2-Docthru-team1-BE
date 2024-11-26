@@ -9,15 +9,10 @@ export type RepositoryCreateWorkDTO = Omit<CreateWorkDTO, 'images' | 'imageCount
 
 export interface GetWorksOptions {
   challengeId: string;
-  orderBy: WorkOrder;
   page: number;
   pageSize: number;
 }
 export type ResultChallengeWork = Omit<ChallengeWork, 'ownerId'> & { images: WorkImage[] };
-export enum WorkOrder {
-  recent = 'recent',
-  favoritest = 'favoritest',
-}
 export interface ChallengeWorkWithImages extends ChallengeWork {
   images: WorkImage[];
 }

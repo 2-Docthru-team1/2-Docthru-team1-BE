@@ -1,27 +1,27 @@
 import type { ChallengeWork } from '@prisma/client';
 import type { IWorkService } from '#interfaces/services/work.service.interface.js';
 import { getStorage } from '#middlewares/asyncLocalStorage.js';
+import type { FeedbackRepository } from '#repositories/feedback.repository.js';
 import type { WorkRepository } from '#repositories/work.repository.js';
 import { Forbidden, NotFound } from '#types/http-error.types.js';
 import type {
-  ChallengeWorkWithImages,
   CreateWorkDTO,
   CreateWorkDTOWithId,
   GetWorksOptions,
-  RepositoryCreateWorkDTO,
-  RequestCreateService,
   ResultChallengeWork,
   UpdateWorkDTO, //UpdateWorkDTOWithId,
   WorkResponse,
 } from '#types/work.types.js';
 import { generatePresignedDownloadUrl } from '#utils/S3/generate-presigned-download-url.js';
-import { generatePresignedUploadUrl } from '#utils/S3/generate-presigned-upload-url.js';
 import { generateS3ImageArray } from '#utils/S3/generateS3ImageArray.js';
 import { chageTypeWorkCreate } from '#utils/changeTypeWork.js';
 import MESSAGES from '#utils/constants/messages.js';
 
 export class WorkService implements IWorkService {
-  constructor(private WorkRepository: WorkRepository) {} // 이 부분에 Repository를 연결합니다.
+  constructor(
+    private WorkRepository: WorkRepository,
+    private FeedbackRepository: FeedbackRepository,
+  ) {} // 이 부분에 Repository를 연결합니다.
 
   // 이 아래로 데이터를 가공하는 코드를 작성합니다.
   // 비즈니스 로직, DB에서 가져온 데이터를 가공하는 코드가 주로 작성됩니다.
@@ -31,13 +31,15 @@ export class WorkService implements IWorkService {
       this.WorkRepository.findMany(options),
       this.WorkRepository.totalCount(options.challengeId),
     ]);
-    const changedList =
-      list?.map(work => {
+    const changedList = await Promise.all(
+      list?.map(async work => {
+        const feedbackCount = await this.FeedbackRepository.getCountByWorkId(work.id);
         const { ownerId, ...other } = work;
-        return { ...other };
-      }) || []; //owner 속성에 ownerId가 드가 있기 때문에 필터링
+        return { feedbackCount, ...other };
+      }) || [],
+    ); //owner 속성에 ownerId가 드가 있기 때문에 필터링
     const promises = changedList?.map(async work => {
-      const changedWork = work as ResultChallengeWork;
+      const changedWork = work as ResultChallengeWork & { feedbackCount: number };
       const updatedImages = await Promise.all(
         changedWork.images.map(async workImage => {
           const url = workImage.imageUrl;

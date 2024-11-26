@@ -5,7 +5,7 @@ import type { WorkService } from '#services/work.service.js';
 import type { Request } from '#types/common.types.js';
 import type { BasicOptions, BasicStringOptions } from '#types/common.types.js';
 import { NotFound } from '#types/http-error.types.js';
-import { type CreateWorkDTO, type RequestCreateWorkDTO, type UpdateWorkDTO, WorkOrder } from '#types/work.types.js';
+import { type CreateWorkDTO, type RequestCreateWorkDTO, type UpdateWorkDTO } from '#types/work.types.js';
 import { generatePresignedDownloadUrl } from '#utils/S3/generate-presigned-download-url.js';
 import { Order } from '#utils/constants/enum.js';
 import MESSAGES from '#utils/constants/messages.js';
@@ -23,11 +23,9 @@ export class WorkController {
 
   getWorks = async (req: Request<{ params: { id: string }; query: BasicStringOptions }>, res: Response, next: NextFunction) => {
     const { id } = req.params;
-    const { orderBy = 'favoritest', page = '1', pageSize = '4' } = req.query;
-    const finalOrderBy: WorkOrder = orderBy in WorkOrder ? (orderBy as WorkOrder) : WorkOrder.recent;
-    const options: { challengeId: string; orderBy: WorkOrder; page: number; pageSize: number } = {
+    const { page = '1', pageSize = '4' } = req.query;
+    const options: { challengeId: string; page: number; pageSize: number } = {
       challengeId: id,
-      orderBy: finalOrderBy,
       page: parseInt(page, 10),
       pageSize: parseInt(pageSize, 10),
     };
@@ -49,7 +47,6 @@ export class WorkController {
     const { id } = req.params;
     assert(req.body, CreateWork, MESSAGES.WRONG_FORMAT);
     const { title, content, imageCount } = req.body;
-    const storage = getStorage();
     const workData = {
       challengeId: id,
       title,

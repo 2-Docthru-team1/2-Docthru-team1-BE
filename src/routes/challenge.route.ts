@@ -9,7 +9,7 @@ export const challengeRouter = express.Router();
 
 challengeRouter
   .route('/')
-  .get(validatePaginationOptions, challengeController.getChallenges)
+  .get(validatePaginationOptions, tokenVerifier.optionalVerifyAccessToken, challengeController.getChallenges)
   .post(tokenVerifier.verifyAccessToken, validateCreateChallenge, challengeController.postChallenge);
 
 challengeRouter.route('/:id').get(challengeController.getChallengeById);

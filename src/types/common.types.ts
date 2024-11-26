@@ -21,7 +21,6 @@ export interface BasicOptions {
   pageSize: number;
 }
 export interface BasicStringOptions {
-  orderBy: string;
   page: string;
   pageSize: string;
 }
