@@ -84,7 +84,6 @@ export class ChallengeService implements IChallengeService {
       status: 'pending',
       isHidden: false,
       requestUserId: userId,
-      participants: [],
       imageUrl,
       imageUrl2,
     };

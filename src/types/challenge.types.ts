@@ -37,7 +37,6 @@ export interface ChallengeInput extends Omit<CreateChallengeDTO, 'imageCount'> {
   status: Status;
   isHidden: boolean;
   requestUserId: string;
-  participants: { id: string }[];
 }
 
 export interface UpdateChallengeDTO {

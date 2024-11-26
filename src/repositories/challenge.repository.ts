@@ -86,9 +86,6 @@ export class ChallengeRepository implements IChallengeRepository {
     return await this.challenge.create({
       data: {
         ...data,
-        participants: {
-          connect: [],
-        },
       },
       include: {
         requestUser: { select: { id: true, name: true } },
