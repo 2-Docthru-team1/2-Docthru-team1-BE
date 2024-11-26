@@ -49,12 +49,21 @@ app.get('/hello', (req, res) => {
 app.use(errorHandler);
 
 if (port === '443') {
-  const options = {
-    key: fs.readFileSync('/etc/ssl/private/private.key'),
-    cert: fs.readFileSync('/etc/ssl/certs/certificate.crt'),
-    // key: fs.readFileSync('D:/ssl/private.key'),
-    // cert: fs.readFileSync('D:/ssl/certificate.crt'),
-  };
+  let sslOptions;
+
+  try {
+    sslOptions = {
+      key: fs.readFileSync('/etc/ssl/private/private.key'),
+      cert: fs.readFileSync('/etc/ssl/certs/certificate.crt'),
+    };
+  } catch (error) {
+    sslOptions = {
+      key: fs.readFileSync('D:/ssl/private.key'),
+      cert: fs.readFileSync('D:/ssl/certificate.crt'),
+    };
+  }
+
+  const options = sslOptions;
 
   // HTTPS 리다이렉션 미들웨어
   app.use((req, res, next) => {
