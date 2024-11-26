@@ -26,10 +26,10 @@ export class TokenVerifier {
         requestProperty: 'user',
       })(req, res, async err => {
         if (err) {
-          if (err instanceof UnauthorizedError) {
-            next(new Unauthorized(err.message));
+          if (err.name === 'UnauthorizedError') {
+            throw new Unauthorized(err.message);
           }
-
+          
           return;
         }
 

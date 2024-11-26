@@ -6,31 +6,20 @@ import type { CreateFeedbackDTO, UpdateFeedbackDTO } from '#types/feedback.types
 export class FeedbackRepository implements IFeedbackRepository {
   constructor(private feedback: ExtendedPrismaClient['feedback']) {}
 
-  getCount = async (userId?: string): Promise<number> => {
+  getCount = async (workId: string): Promise<number> => {
     const count = await this.feedback.count({
-      where: { ownerId: userId },
+      where: { workId },
     });
 
     return count;
   };
 
-  findMany = async (options: BasicOptions, userId?: string): Promise<Feedback[] | null> => {
-    const { orderBy, page, pageSize } = options;
-
-    let orderOptions;
-    switch (orderBy) {
-      case 'oldest':
-        orderOptions = { createdAt: Prisma.SortOrder.asc };
-        break;
-      case 'latest':
-      default:
-        // NOTE orderBy는 Prisma SortOrder 타입을 사용해야 함
-        orderOptions = { createdAt: Prisma.SortOrder.desc };
-    }
+  findMany = async (options: BasicOptions, workId: string): Promise<Feedback[] | null> => {
+    const { page, pageSize } = options;
 
     const feedbacks = await this.feedback.findMany({
-      where: { ownerId: userId },
-      orderBy: orderOptions,
+      where: { workId },
+      orderBy: { createdAt: Prisma.SortOrder.desc },
       skip: (page - 1) * pageSize,
       take: pageSize,
       include: { owner: { select: { name: true } } },
