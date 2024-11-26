@@ -1,6 +1,8 @@
 import type { Challenge, MediaType, Role, Status } from '@prisma/client';
 import { Order } from '#utils/constants/enum.js';
 
+export type CustomChallenge = Omit<Challenge, 'isHidden' | 'requestUserId'>;
+
 export interface GetChallengesQuery {
   status?: string;
   mediaType?: string;
@@ -31,18 +33,10 @@ export interface CreateChallengeDTO {
   imageCount: number;
 }
 
-export interface ChallengeInput {
-  title: string;
-  description: string;
-  deadline: Date;
-  embedUrl: string;
-  imageUrl: string;
-  imageUrl2?: string;
-  mediaType: MediaType;
+export interface ChallengeInput extends Omit<CreateChallengeDTO, 'imageCount'> {
   status: Status;
   isHidden: boolean;
   requestUserId: string;
-  participants: { id: string }[];
 }
 
 export interface UpdateChallengeDTO {
@@ -56,16 +50,13 @@ export interface UpdateChallengeDTO {
   imageCount?: number;
 }
 
-export interface UpdateChallengeStatusDTO {
-  status: Status;
-  abortReason?: string;
-}
+export interface UpdateChallengeStatusDTO extends ChallengeStatusInput {}
 
 export interface ChallengeStatusInput {
   challengeId: string;
   status: Status;
   abortReason?: string;
-  userId: string;
+  userId?: string;
   userRole?: Role;
 }
 

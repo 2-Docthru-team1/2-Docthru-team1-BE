@@ -76,9 +76,8 @@ export class ChallengeRepository implements IChallengeRepository {
     return await baseClient.challenge.findUnique({
       where: { id },
       include: {
-        participants: { select: { id: true, name: true, role: true } },
-        works: true,
-        abortReason: true,
+        participants: { select: { id: true } },
+        requestUser: { select: { id: true, name: true } },
       },
     });
   };
@@ -87,9 +86,9 @@ export class ChallengeRepository implements IChallengeRepository {
     return await this.challenge.create({
       data: {
         ...data,
-        participants: {
-          connect: [{ id: data.participants[0].id }],
-        },
+      },
+      include: {
+        requestUser: { select: { id: true, name: true } },
       },
     });
   };
@@ -99,9 +98,7 @@ export class ChallengeRepository implements IChallengeRepository {
       where: { id },
       data,
       include: {
-        participants: true,
-        works: true,
-        abortReason: true,
+        requestUser: { select: { id: true, name: true } },
       },
     });
     return challenge;
@@ -127,7 +124,9 @@ export class ChallengeRepository implements IChallengeRepository {
     return await this.challenge.update({
       where: { id: challengeId },
       data: newStatus,
-      include: { abortReason: true },
+      include: {
+        requestUser: { select: { id: true, name: true } },
+      },
     });
   };
 

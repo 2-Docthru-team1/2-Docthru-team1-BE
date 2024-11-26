@@ -6,6 +6,7 @@ import type {
   ChallengeInput,
   ChallengeStatusInput,
   CreateChallengeDTO,
+  CustomChallenge,
   UpdateChallengeDTO,
   getChallengesOptions,
 } from '#types/challenge.types.js';
@@ -38,16 +39,17 @@ export class ChallengeService implements IChallengeService {
     return { list: listWithoutIsHidden, totalCount };
   };
 
-  getChallengeById = async (id: string): Promise<Challenge | null> => {
+  getChallengeById = async (id: string): Promise<CustomChallenge | null> => {
     const expiresIn = 3600;
     const challenge = await this.challengeRepository.findById(id);
     if (!challenge || challenge.deletedAt) {
       throw new NotFound(MESSAGES.NOT_FOUND);
     }
+    const { isHidden, requestUserId, ...rest } = challenge;
     const imageUrl = await generatePresignedDownloadUrl(challenge.imageUrl, expiresIn);
     const imageUrl2 = challenge.imageUrl2 ? await generatePresignedDownloadUrl(challenge.imageUrl2, expiresIn) : null;
     return {
-      ...challenge,
+      ...rest,
       imageUrl,
       imageUrl2,
     };
@@ -55,8 +57,9 @@ export class ChallengeService implements IChallengeService {
 
   createChallenge = async (
     challengeData: CreateChallengeDTO,
-    userId: string,
-  ): Promise<{ challenge: Challenge; uploadUrls: { uploadUrl: string }[] }> => {
+  ): Promise<{ challenge: CustomChallenge; uploadUrls: { uploadUrl: string }[] }> => {
+    const storage = getStorage();
+    const userId = storage.userId;
     if (!userId) {
       throw new BadRequest(MESSAGES.UNAUTHORIZED);
     }
@@ -81,23 +84,24 @@ export class ChallengeService implements IChallengeService {
       status: 'pending',
       isHidden: false,
       requestUserId: userId,
-      participants: [{ id: userId }],
       imageUrl,
       imageUrl2,
     };
 
     const challenge = await this.challengeRepository.create(ChallengeInput);
-    return { challenge, uploadUrls };
+    const { isHidden, requestUserId, ...rest } = challenge;
+    return { challenge: { ...rest }, uploadUrls };
   };
 
   updateChallenge = async (
     id: string,
     challengeData: UpdateChallengeDTO,
-    userId: string,
-  ): Promise<{ challenge: Challenge; uploadUrls: { uploadUrl: string }[] }> => {
+  ): Promise<{ challenge: CustomChallenge; uploadUrls: { uploadUrl: string }[] }> => {
     const { imageCount, ...restChallengeData } = challengeData;
-
+    const storage = getStorage();
+    const userId = storage.userId;
     const challenge = await this.challengeRepository.findById(id);
+
     if (!userId) {
       throw new BadRequest(MESSAGES.UNAUTHORIZED);
     }
@@ -135,11 +139,15 @@ export class ChallengeService implements IChallengeService {
     };
 
     const updatedChallenge = await this.challengeRepository.update(id, updatedChallengeInput);
-    return { challenge: updatedChallenge, uploadUrls };
+    const { isHidden, requestUserId, ...rest } = updatedChallenge;
+    return { challenge: { ...rest }, uploadUrls };
   };
 
-  updateStatus = async (data: ChallengeStatusInput): Promise<Challenge | null> => {
-    const { challengeId, status, abortReason, userId, userRole } = data;
+  updateStatus = async (data: ChallengeStatusInput): Promise<CustomChallenge | null> => {
+    const storage = getStorage();
+    const userId = storage.userId;
+    const userRole = storage.userRole;
+    const { challengeId, status, abortReason } = data;
     const challenge = await this.challengeRepository.findById(challengeId);
 
     validateUpdateStatus({
@@ -150,12 +158,15 @@ export class ChallengeService implements IChallengeService {
       userRole,
     });
 
-    return await this.challengeRepository.updateStatus({
+    const updateChallenge = await this.challengeRepository.updateStatus({
       challengeId,
       status,
       abortReason,
       userId,
     });
+
+    const { isHidden, requestUserId, ...rest } = updateChallenge;
+    return { ...rest };
   };
 
   getAbortReason = async (id: string): Promise<AbortReason | null> => {

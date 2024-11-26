@@ -23,9 +23,6 @@ export const validateUpdateStatus = ({ challenge, status, abortReason, userId, u
       }
       break;
     case 'canceled':
-      if (userRole !== 'normal') {
-        throw new Forbidden(MESSAGES.FORBIDDEN);
-      }
       if (challenge.requestUserId !== userId) {
         throw new Forbidden(MESSAGES.FORBIDDEN);
       }

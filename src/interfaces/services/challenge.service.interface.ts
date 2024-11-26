@@ -1,5 +1,5 @@
 import type { AbortReason, Challenge, MediaType, Status } from '@prisma/client';
-import type { ChallengeStatusInput, CreateChallengeDTO, UpdateChallengeDTO } from '#types/challenge.types.js';
+import type { ChallengeStatusInput, CreateChallengeDTO, CustomChallenge, UpdateChallengeDTO } from '#types/challenge.types.js';
 import { Order } from '#utils/constants/enum.js';
 
 export interface IChallengeService {
@@ -11,16 +11,14 @@ export interface IChallengeService {
     page: number;
     pageSize: number;
   }): Promise<{ list: Omit<Challenge, 'isHidden' | 'requestUserId'>[]; totalCount: number }>;
-  getChallengeById(id: string): Promise<Challenge | null>;
+  getChallengeById(id: string): Promise<CustomChallenge | null>;
   createChallenge(
     challengeData: CreateChallengeDTO,
-    userId: string,
-  ): Promise<{ challenge: Challenge; uploadUrls: { uploadUrl: string }[] }>;
+  ): Promise<{ challenge: CustomChallenge; uploadUrls: { uploadUrl: string }[] }>;
   updateChallenge(
     id: string,
     challengeData: UpdateChallengeDTO,
-    userId: string,
-  ): Promise<{ challenge: Challenge; uploadUrls: { uploadUrl: string }[] }>;
-  updateStatus(data: ChallengeStatusInput): Promise<Challenge | null>;
+  ): Promise<{ challenge: CustomChallenge; uploadUrls: { uploadUrl: string }[] }>;
+  updateStatus(data: ChallengeStatusInput): Promise<CustomChallenge | null>;
   getAbortReason(id: string): Promise<AbortReason | null>;
 }

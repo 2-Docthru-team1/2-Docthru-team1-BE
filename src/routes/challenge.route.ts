@@ -4,6 +4,7 @@ import tokenVerifier from '#containers/verify.container.js';
 import workController from '#containers/work.container.js';
 import validatePaginationOptions from '#middlewares/pagination.validation.js';
 import { validateCreateChallenge } from '#middlewares/validateChallenge.js';
+import { validateUpdateChallenge } from '#middlewares/validateChallenge.js';
 
 export const challengeRouter = express.Router();
 
@@ -12,7 +13,10 @@ challengeRouter
   .get(validatePaginationOptions, tokenVerifier.optionalVerifyAccessToken, challengeController.getChallenges)
   .post(tokenVerifier.verifyAccessToken, validateCreateChallenge, challengeController.postChallenge);
 
-challengeRouter.route('/:id').get(challengeController.getChallengeById);
+challengeRouter
+  .route('/:id')
+  .get(challengeController.getChallengeById)
+  .patch(tokenVerifier.verifyAccessToken, validateUpdateChallenge, challengeController.patchChallenge);
 
 challengeRouter.patch('/:id/status', tokenVerifier.verifyAccessToken, challengeController.patchChallengeStatus);
 challengeRouter.get('/:id/reason', challengeController.getChallengeAbortReason);
