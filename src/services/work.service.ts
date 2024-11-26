@@ -1,9 +1,9 @@
-import type { ChallengeWork } from '@prisma/client';
+import type { ChallengeWork, User } from '@prisma/client';
 import type { IWorkService } from '#interfaces/services/work.service.interface.js';
 import { getStorage } from '#middlewares/asyncLocalStorage.js';
 import type { FeedbackRepository } from '#repositories/feedback.repository.js';
 import type { WorkRepository } from '#repositories/work.repository.js';
-import { Forbidden, NotFound } from '#types/http-error.types.js';
+import { BadRequest, Forbidden, NotFound } from '#types/http-error.types.js';
 import type {
   CreateWorkDTO,
   CreateWorkDTOWithId,
@@ -61,7 +61,7 @@ export class WorkService implements IWorkService {
     }
 
     const { ownerId, ...otherWorkField } = work || {};
-    const changedWork = { ...otherWorkField } as ResultChallengeWork;
+    const changedWork = { ...otherWorkField } as ResultChallengeWork & { likeUsers: { id: string }[] };
     const updatedImages = await Promise.all(
       changedWork.images.map(async workImage => {
         const url = workImage.imageUrl;
@@ -123,5 +123,33 @@ export class WorkService implements IWorkService {
       }),
     );
     return { ...otherWorkField, images: updatedImages };
+  };
+  likeWork = async (id: string): Promise<ChallengeWork> => {
+    const storage = getStorage();
+    const userId = storage.userId;
+    const foundWork = await this.WorkRepository.findById(id); // 여기서 가져와서 체크
+    if (!foundWork || foundWork?.deletedAt) {
+      throw new NotFound(MESSAGES.NOT_FOUND);
+    }
+    const isLike = foundWork!.likeUsers.some(user => user.id === userId);
+    if (isLike) {
+      throw new BadRequest(MESSAGES.ALREADY_LIKED_MESSAGE);
+    }
+    const updatedWork = await this.WorkRepository.addLike(id, userId);
+    return updatedWork;
+  };
+  unlikeWork = async (id: string): Promise<ChallengeWork> => {
+    const storage = getStorage();
+    const userId = storage.userId;
+    const foundWork = await this.WorkRepository.findById(id);
+    if (!foundWork || foundWork?.deletedAt) {
+      throw new NotFound(MESSAGES.NOT_FOUND);
+    }
+    const isLike = foundWork!.likeUsers.some(user => user.id === userId);
+    if (!isLike) {
+      throw new BadRequest(MESSAGES.UNLIKE_NOT_CURRENTLY_LIKED);
+    }
+    const updatedWork = await this.WorkRepository.removeLike(id, userId);
+    return updatedWork;
   };
 }

@@ -11,7 +11,10 @@ workRouter
   .patch(tokenVerifier.verifyAccessToken, workController.patchWork)
   .delete(tokenVerifier.verifyAccessToken, workController.deleteWork);
 
-workRouter.route('/:id/like').post().delete();
+workRouter
+  .route('/:id/like')
+  .post(tokenVerifier.verifyAccessToken, workController.likeWork)
+  .delete(tokenVerifier.verifyAccessToken, workController.unlikeWork);
 
 workRouter
   .route('/:id/feedbacks')
