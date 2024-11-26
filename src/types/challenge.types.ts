@@ -33,7 +33,7 @@ export interface CreateChallengeDTO {
   imageCount: number;
 }
 
-export interface ChallengeInput extends CreateChallengeDTO {
+export interface ChallengeInput extends Omit<CreateChallengeDTO, 'imageCount'> {
   status: Status;
   isHidden: boolean;
   requestUserId: string;

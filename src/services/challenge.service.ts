@@ -87,7 +87,7 @@ export class ChallengeService implements IChallengeService {
   updateChallenge = async (
     id: string,
     challengeData: UpdateChallengeDTO,
-  ): Promise<{ challenge: Challenge; uploadUrls: { uploadUrl: string }[] }> => {
+  ): Promise<{ challenge: CustomChallenge; uploadUrls: { uploadUrl: string }[] }> => {
     const { imageCount, ...restChallengeData } = challengeData;
     const storage = getStorage();
     const userId = storage.userId;
@@ -130,7 +130,8 @@ export class ChallengeService implements IChallengeService {
     };
 
     const updatedChallenge = await this.challengeRepository.update(id, updatedChallengeInput);
-    return { challenge: updatedChallenge, uploadUrls };
+    const { isHidden, requestUserId, ...rest } = updatedChallenge;
+    return { challenge: { ...rest }, uploadUrls };
   };
 
   updateStatus = async (data: ChallengeStatusInput): Promise<CustomChallenge | null> => {
