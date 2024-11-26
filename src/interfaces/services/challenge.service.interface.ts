@@ -10,7 +10,7 @@ export interface IChallengeService {
     orderBy: Order;
     page: number;
     pageSize: number;
-  }): Promise<{ list: Challenge[]; totalCount: number }>;
+  }): Promise<{ list: Omit<Challenge, 'isHidden' | 'requestUserId'>[]; totalCount: number }>;
   getChallengeById(id: string): Promise<CustomChallenge | null>;
   createChallenge(
     challengeData: CreateChallengeDTO,

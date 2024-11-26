@@ -13,10 +13,6 @@ authRouter.get('/me', tokenVerifier.verifyAccessToken, authController.getMe);
 authRouter.post('/signUp', hashPassword, authController.signUp);
 authRouter.post('/refresh', tokenVerifier.verifyRefreshToken, authController.refreshToken);
 
-// 로그인한 사용자만 접근 가능
-// authRouter.get('/profile', verifyAccessToken, authController.getProfile);
-// authRouter.get('/settings', verifyAccessToken, authController.getSettings);
-
 /*********************************************************************************** test **********************************************************************************************/
 authRouter.get('/test/createToken', async (req: Request, res: Response, next: NextFunction) => {
   const prisma = new PrismaClient();
