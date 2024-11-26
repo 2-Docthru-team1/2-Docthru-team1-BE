@@ -5,14 +5,14 @@
 소개<br>
 <b>[HanCook 사이트 바로가기](<https://www.figma.com/design/CdALCm6ocpye0ldqTfVAvf/%5BTEAM-1%5D-HanCook-(Copy)?node-id=0-1&node-type=canvas&t=DWSDbH9clBOT8QhG-0>)</b><br>
 <b>[HanCook API 명세서](https://app.swaggerhub.com/apis-docs/CHESHIREBIZZ/HanCook/1.0.3#/)</b> <br>
-<b>[HanCook 팀 협업 문서 Notion](https://app.swaggerhub.com/apis-docs/CHESHIREBIZZ/HanCook/1.0.3#/)</b> <br>
+<b>[HanCook 팀 협업 문서 Notion](https://www.notion.so/ca92bf8470a145829f4dd4e966f78c4c)</b> <br>
 
 ## 목차
 
-1. [팀원 구성](#팀원_구성)
-2. [기술 스택](#기술_스택)
-3. [R&R](#R&R)
-4. [팀원별 구현 기능 상세](#팀원별_구현_기능_상세)
+1. [팀원 구성](#팀원-구성)
+2. [기술 스택](#기술-스택)
+3. [R&R](#rr)
+4. [팀원별 구현 기능 상세](#팀원별-구현-기능-상세)
 
 ## 팀원 구성
 
