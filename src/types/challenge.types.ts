@@ -67,7 +67,7 @@ export interface ChallengeStatusInput {
   challengeId: string;
   status: Status;
   abortReason?: string;
-  userId: string;
+  userId?: string;
   userRole?: Role;
 }
 
