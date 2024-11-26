@@ -1,7 +1,7 @@
-<div align=center style="font-size:24px; font-weight:bold;">1팀-HanCook</div>
-<div align=center style="font-size:18px; font-weight:bold;"> 백엔드 레포지토리 </div>
-
----
+<p align="center">
+  <b style="font-size:32px;">1팀-HanCook</b><br>
+  <span style="font-size:24px;">백엔드 레포지토리</span>
+</p>
 
 ## 프로젝트 소개
 
