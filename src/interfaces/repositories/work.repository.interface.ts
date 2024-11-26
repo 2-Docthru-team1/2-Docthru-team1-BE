@@ -8,4 +8,6 @@ export interface IWorkRepository {
   update(id: string, workData: UpdateWorkDTO): Promise<ChallengeWork>;
   delete(id: string): Promise<ChallengeWork>;
   totalCount(challengeId: string): Promise<number | null>;
+  addLike(id: string, userId: string): Promise<ChallengeWork>;
+  removeLike(id: string, userId: string): Promise<ChallengeWork>;
 }

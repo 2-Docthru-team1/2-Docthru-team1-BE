@@ -39,12 +39,13 @@ export class WorkRepository implements IWorkRepository {
     const totalCount = await this.challengeWork.count({ where: { challengeId } });
     return totalCount;
   };
-  findById = async (id: string): Promise<ChallengeWork | null> => {
+  findById = async (id: string): Promise<(ChallengeWork & { likeUsers: { id: string }[] }) | null> => {
     const work = await this.challengeWork.findUnique({
       where: { id },
       include: {
         owner: { select: { id: true, name: true, email: true, role: true } },
         images: { select: { imageUrl: true } },
+        likeUsers: { select: { id: true } },
       },
     });
     return work;
@@ -94,6 +95,20 @@ export class WorkRepository implements IWorkRepository {
       where: { id },
       data: { deletedAt: new Date() },
       include: { owner: { select: { id: true, name: true, email: true, role: true } }, images: { select: { imageUrl: true } } },
+    });
+    return work;
+  };
+  addLike = async (id: string, userId: string): Promise<ChallengeWork> => {
+    const work = await this.challengeWork.update({
+      where: { id },
+      data: { likeCount: { increment: 1 }, likeUsers: { connect: { id: userId } } },
+    });
+    return work;
+  };
+  removeLike = async (id: string, userId: string): Promise<ChallengeWork> => {
+    const work = await this.challengeWork.update({
+      where: { id },
+      data: { likeCount: { decrement: 1 }, likeUsers: { disconnect: { id: userId } } },
     });
     return work;
   };
