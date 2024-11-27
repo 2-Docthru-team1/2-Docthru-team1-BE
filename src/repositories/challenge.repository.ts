@@ -15,7 +15,7 @@ export class ChallengeRepository implements IChallengeRepository {
   }
 
   findMany = async (options: getChallengesOptions): Promise<Challenge[] | null> => {
-    const { status, mediaType, orderBy, keyword, page, pageSize, admin, userId } = options;
+    const { status, mediaType, orderBy, keyword, page, pageSize, admin, requestUserId, participantId } = options;
     const applyOrderBy: {
       deadline?: 'asc' | 'desc';
       createdAt?: 'asc' | 'desc';
@@ -35,15 +35,17 @@ export class ChallengeRepository implements IChallengeRepository {
     }
     const whereCondition: {
       mediaType?: { in: MediaType[] };
-      status?: Status;
+      status?: { in: Status[] };
       title?: { contains: string };
       isHidden?: boolean;
     } = {
       ...(Array.isArray(mediaType) ? { mediaType: { in: mediaType } } : {}),
-      ...(status ? { status } : {}),
+      ...(Array.isArray(status) ? { status: { in: status } } : {}),
+      // ...(status ? { status } : {}),
       ...(keyword ? { title: { contains: keyword } } : {}),
       ...(admin ? {} : { isHidden: false }),
-      ...(userId ? { requestUserId: userId } : {}),
+      ...(requestUserId ? { requestUserId } : {}),
+      ...(participantId ? { participants: { some: { id: participantId } } } : {}),
     };
 
     const challenges = await this.challenge.findMany({
@@ -57,17 +59,21 @@ export class ChallengeRepository implements IChallengeRepository {
   };
 
   totalCount = async (options: getChallengesOptions): Promise<number | null> => {
-    const { status, mediaType, keyword, admin } = options;
+    const { status, mediaType, keyword, admin, requestUserId, participantId } = options;
     const whereCondition: {
       mediaType?: { in: MediaType[] };
-      status?: Status;
+      status?: { in: Status[] };
+      // status?: Status;
       title?: { contains: string };
       isHidden?: boolean;
     } = {
       ...(Array.isArray(mediaType) ? { mediaType: { in: mediaType } } : {}),
-      ...(status ? { status } : {}),
+      ...(Array.isArray(status) ? { status: { in: status } } : {}),
+      // ...(status ? { status } : {}),
       ...(keyword ? { title: { contains: keyword } } : {}),
       ...(admin ? {} : { isHidden: false }),
+      ...(requestUserId ? { requestUserId } : {}),
+      ...(participantId ? { participants: { some: { id: participantId } } } : {}),
     };
     const totalCount = await this.challenge.count({ where: whereCondition });
     return totalCount;

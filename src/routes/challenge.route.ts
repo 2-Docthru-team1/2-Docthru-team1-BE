@@ -3,8 +3,7 @@ import challengeController from '#containers/challenge.container.js';
 import tokenVerifier from '#containers/verify.container.js';
 import workController from '#containers/work.container.js';
 import validatePaginationOptions from '#middlewares/pagination.validation.js';
-import { validateCreateChallenge } from '#middlewares/validateChallenge.js';
-import { validateUpdateChallenge } from '#middlewares/validateChallenge.js';
+import { validateCreateChallenge, validateUpdateChallenge } from '#middlewares/validateChallenge.js';
 
 export const challengeRouter = express.Router();
 
@@ -12,6 +11,9 @@ challengeRouter
   .route('/')
   .get(validatePaginationOptions, tokenVerifier.optionalVerifyAccessToken, challengeController.getChallenges)
   .post(tokenVerifier.verifyAccessToken, validateCreateChallenge, challengeController.postChallenge);
+
+challengeRouter.route('/participation').get(tokenVerifier.verifyAccessToken, challengeController.getMyParticipations);
+challengeRouter.route('/my-requests').get(tokenVerifier.verifyAccessToken, challengeController.getMyRequests);
 
 challengeRouter
   .route('/:id')

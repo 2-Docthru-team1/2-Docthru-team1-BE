@@ -8,13 +8,16 @@ import type {
   UpdateChallengeStatusDTO,
 } from '#types/challenge.types.js';
 import type { Request } from '#types/common.types.js';
+import { BadRequest } from '#types/http-error.types.js';
 import { Order } from '#utils/constants/enum.js';
+import MESSAGES from '#utils/constants/messages.js';
 
 export class ChallengeController {
   constructor(private challengeService: ChallengeService) {}
 
   getChallenges = async (req: Request<{ query: GetChallengesQuery }>, res: Response, next: NextFunction) => {
     const { status, mediaType, orderBy = 'latestFirst', keyword = '', page = '1', pageSize = '10' } = req.query;
+    console.log('🚀 ~ ChallengeController ~ getChallenges= ~ status:', status);
     let mediaTypeEnum;
     if (Array.isArray(mediaType)) {
       mediaTypeEnum = mediaType as MediaType[];
@@ -23,7 +26,18 @@ export class ChallengeController {
     } else {
       mediaTypeEnum = undefined;
     }
-    const statusEnum = status ? (status as Status) : undefined;
+
+    let statusEnum;
+    if (status === 'Approved') {
+      statusEnum = ['onGoing', 'finished'] as Status[];
+    } else if (Array.isArray(status)) {
+      statusEnum = status as Status[];
+    } else if (status?.length) {
+      statusEnum = [status] as Status[];
+    } else {
+      statusEnum = undefined;
+    }
+    // const statusEnum = status ? (status as Status) : undefined;
     const orderEnum = orderBy as Order;
 
     const options = {
@@ -34,33 +48,64 @@ export class ChallengeController {
       pageSize: Number(pageSize),
       keyword,
     };
-    const { list, totalCount } = await this.challengeService.getChallenges(options);
-    res.json({ list, totalCount });
+    const { totalCount, list } = await this.challengeService.getChallenges(options);
+    res.json({ totalCount, list });
   };
 
-  getMyChallenges = async (req: Request<{ query: GetChallengesQuery }>, res: Response, next: NextFunction) => {
-    const { status, mediaType, orderBy = 'latestFirst', keyword = '', page = '1', pageSize = '10' } = req.query;
-    let mediaTypeEnum;
-    if (Array.isArray(mediaType)) {
-      mediaTypeEnum = mediaType as MediaType[];
-    } else if (mediaType?.length) {
-      mediaTypeEnum = [mediaType] as MediaType[];
+  getMyParticipations = async (req: Request<{ query: GetChallengesQuery }>, res: Response, next: NextFunction) => {
+    const { status, orderBy = 'latestFirst', keyword = '', page = '1', pageSize = '10' } = req.query;
+    const participantId = req.user?.userId;
+
+    let statusEnum;
+    if (status === 'onGoing' || status === 'finished') {
+      statusEnum = [status] as Status[];
     } else {
-      mediaTypeEnum = undefined;
+      throw new BadRequest(MESSAGES.BAD_REQUEST);
     }
-    const statusEnum = status ? (status as Status) : undefined;
     const orderEnum = orderBy as Order;
 
     const options = {
       status: statusEnum,
-      mediaType: mediaTypeEnum,
       orderBy: orderEnum,
       page: Number(page),
       pageSize: Number(pageSize),
       keyword,
+      participantId,
+    };
+
+    const { totalCount, list } = await this.challengeService.getChallenges(options);
+
+    res.json({ totalCount, list });
+  };
+
+  getMyRequests = async (req: Request<{ query: GetChallengesQuery }>, res: Response, next: NextFunction) => {
+    const { status, orderBy = 'latestFirst', keyword = '', page = '1', pageSize = '10' } = req.query;
+    console.log('🚀 ~ ChallengeController ~ getMyRequests= ~ orderBy:', orderBy);
+    const requestUserId = req.user?.userId;
+
+    let statusEnum;
+    if (status === 'Approved') {
+      statusEnum = ['onGoing', 'finished'] as Status[];
+    } else if (Array.isArray(status)) {
+      statusEnum = status as Status[];
+    } else if (status?.length) {
+      statusEnum = [status] as Status[];
+    } else {
+      statusEnum = undefined;
+    }
+    // const statusEnum = status ? (status as Status) : undefined;
+    const orderEnum = orderBy as Order;
+
+    const options = {
+      status: statusEnum,
+      orderBy: orderEnum,
+      page: Number(page),
+      pageSize: Number(pageSize),
+      keyword,
+      requestUserId,
     };
     const { list, totalCount } = await this.challengeService.getChallenges(options);
-    res.json({ list, totalCount });
+    res.json({ totalCount, list });
   };
 
   getChallengeById = async (req: Request<{ params: { id: string } }>, res: Response) => {
