@@ -15,7 +15,7 @@ export class ChallengeRepository implements IChallengeRepository {
   }
 
   findMany = async (options: getChallengesOptions): Promise<Challenge[] | null> => {
-    const { status, mediaType, orderBy, keyword, page, pageSize, admin } = options;
+    const { status, mediaType, orderBy, keyword, page, pageSize, admin, userId } = options;
     const applyOrderBy: {
       deadline?: 'asc' | 'desc';
       createdAt?: 'asc' | 'desc';
@@ -43,6 +43,7 @@ export class ChallengeRepository implements IChallengeRepository {
       ...(status ? { status } : {}),
       ...(keyword ? { title: { contains: keyword } } : {}),
       ...(admin ? {} : { isHidden: false }),
+      ...(userId ? { requestUserId: userId } : {}),
     };
 
     const challenges = await this.challenge.findMany({
