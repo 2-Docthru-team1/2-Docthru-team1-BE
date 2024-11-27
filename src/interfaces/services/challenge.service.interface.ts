@@ -3,6 +3,7 @@ import type {
   ChallengeStatusInput,
   CreateChallengeDTO,
   CustomChallenge,
+  GetMonthlyChallengeOption,
   UpdateChallengeDTO,
   filteredChallenge,
   getChallengesOptions,
@@ -20,4 +21,5 @@ export interface IChallengeService {
   ): Promise<{ challenge: CustomChallenge; uploadUrls: { uploadUrl: string }[] }>;
   updateStatus(data: ChallengeStatusInput): Promise<CustomChallenge | null>;
   getAbortReason(id: string): Promise<AbortReason | null>;
+  getMonthlyChallenge(option: GetMonthlyChallengeOption): Promise<CustomChallenge[] | null>;
 }

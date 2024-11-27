@@ -12,8 +12,7 @@ challengeRouter
   .get(validatePaginationOptions, tokenVerifier.optionalVerifyAccessToken, challengeController.getChallenges)
   .post(tokenVerifier.verifyAccessToken, validateCreateChallenge, challengeController.postChallenge);
 
-challengeRouter.route('/participation').get(tokenVerifier.verifyAccessToken, challengeController.getMyParticipations);
-challengeRouter.route('/my-requests').get(tokenVerifier.verifyAccessToken, challengeController.getMyRequests);
+challengeRouter.get('/monthly', challengeController.getMonthlyChallenge);
 
 challengeRouter
   .route('/:id')
@@ -24,5 +23,8 @@ challengeRouter.patch('/:id/status', tokenVerifier.verifyAccessToken, challengeC
 challengeRouter.get('/:id/reason', challengeController.getChallengeAbortReason);
 
 challengeRouter.route('/:id/works').get(workController.getWorks).post(tokenVerifier.verifyAccessToken, workController.postWork);
+
+challengeRouter.route('/participation').get(tokenVerifier.verifyAccessToken, challengeController.getMyParticipations);
+challengeRouter.route('/my-requests').get(tokenVerifier.verifyAccessToken, challengeController.getMyRequests);
 
 export default challengeRouter;
