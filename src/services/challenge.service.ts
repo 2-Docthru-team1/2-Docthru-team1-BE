@@ -7,6 +7,7 @@ import type {
   ChallengeStatusInput,
   CreateChallengeDTO,
   CustomChallenge,
+  GetMonthlyChallengeOption,
   UpdateChallengeDTO,
   filteredChallenge,
   getChallengesOptions,
@@ -175,9 +176,10 @@ export class ChallengeService implements IChallengeService {
     return abortReason;
   };
 
-  getMonthlyChallenge = async (): Promise<CustomChallenge[] | null> => {
-    const monthlyChallenge = await this.challengeRepository.findMonthlyChallenge();
-    if (!monthlyChallenge) {
+  getMonthlyChallenge = async (option: GetMonthlyChallengeOption): Promise<CustomChallenge[] | null> => {
+    const currentYear = new Date().getFullYear();
+    const monthlyChallenge = await this.challengeRepository.findMonthlyChallenge(option, currentYear);
+    if (!monthlyChallenge || monthlyChallenge.length === 0) {
       throw new NotFound(MESSAGES.NOT_FOUND);
     }
     const filteredMonthlyChallenge = monthlyChallenge.map(({ isHidden, requestUserId, ...rest }) => rest);

@@ -1,4 +1,4 @@
-import { MediaType, Status } from '@prisma/client';
+import { MediaType, MonthlyType, Status } from '@prisma/client';
 import USERS from './userMock.js';
 
 export const CHALLENGES = [
@@ -197,7 +197,7 @@ export const CHALLENGES = [
     imageUrl2: null,
     embedUrl: 'https://m.blog.naver.com/es1975/222681705656',
     mediaType: MediaType.blog,
-    monthly: true,
+    monthly: MonthlyType.November,
     requestUserId: 'a666a76c-46a1-4aa2-9741-bdbb20785fc4',
   },
   {
@@ -215,7 +215,7 @@ export const CHALLENGES = [
     imageUrl2: null,
     embedUrl: 'https://m.blog.naver.com/es1975/222681705656',
     mediaType: MediaType.blog,
-    monthly: true,
+    monthly: MonthlyType.November,
     requestUserId: 'a666a76c-46a1-4aa2-9741-bdbb20785fc4',
   },
   {
@@ -233,7 +233,7 @@ export const CHALLENGES = [
     imageUrl2: null,
     embedUrl: 'https://m.blog.naver.com/es1975/222681705656',
     mediaType: MediaType.blog,
-    monthly: true,
+    monthly: MonthlyType.November,
     requestUserId: 'a666a76c-46a1-4aa2-9741-bdbb20785fc4',
   },
 ];

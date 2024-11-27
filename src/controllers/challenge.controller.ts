@@ -1,9 +1,10 @@
-import type { MediaType, Status } from '@prisma/client';
+import type { MediaType, MonthlyType, Status } from '@prisma/client';
 import type { NextFunction, Response } from 'express';
 import type { ChallengeService } from '#services/challenge.service.js';
 import type {
   CreateChallengeDTO,
   GetChallengesQuery,
+  GetMonthlyChallengeOption,
   UpdateChallengeDTO,
   UpdateChallengeStatusDTO,
 } from '#types/challenge.types.js';
@@ -143,8 +144,9 @@ export class ChallengeController {
     res.json(abortReason);
   };
 
-  getMonthlyChallenge = async (req: Request, res: Response) => {
-    const monthlyChallenge = await this.challengeService.getMonthlyChallenge();
+  getMonthlyChallenge = async (req: Request<{ query: GetMonthlyChallengeOption }>, res: Response) => {
+    const { monthly } = req.query;
+    const monthlyChallenge = await this.challengeService.getMonthlyChallenge({ monthly });
     res.json(monthlyChallenge);
   };
 }
