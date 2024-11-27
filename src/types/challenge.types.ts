@@ -20,7 +20,11 @@ export interface getChallengesOptions {
   keyword: string;
   page: number;
   pageSize: number;
+  admin?: boolean;
+  userId?: string;
 }
+
+export interface filteredChallenge extends Omit<Challenge, 'isHidden' | 'requestUserId'> {}
 
 export interface CreateChallengeDTO {
   title: string;

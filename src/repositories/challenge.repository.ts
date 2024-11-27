@@ -14,7 +14,7 @@ export class ChallengeRepository implements IChallengeRepository {
     this.abortReason = client.abortReason;
   }
 
-  findMany = async (options: getChallengesOptions & { admin: boolean }): Promise<Challenge[] | null> => {
+  findMany = async (options: getChallengesOptions): Promise<Challenge[] | null> => {
     const { status, mediaType, orderBy, keyword, page, pageSize, admin } = options;
     const applyOrderBy: {
       deadline?: 'asc' | 'desc';
@@ -55,7 +55,7 @@ export class ChallengeRepository implements IChallengeRepository {
     return challenges;
   };
 
-  totalCount = async (options: getChallengesOptions & { admin: boolean }): Promise<number | null> => {
+  totalCount = async (options: getChallengesOptions): Promise<number | null> => {
     const { status, mediaType, keyword, admin } = options;
     const whereCondition: {
       mediaType?: { in: MediaType[] };
