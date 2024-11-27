@@ -1,5 +1,11 @@
 import type { AbortReason, Challenge } from '@prisma/client';
-import type { ChallengeInput, ChallengeStatusInput, UpdateChallengeDTO, getChallengesOptions } from '#types/challenge.types.js';
+import type {
+  ChallengeInput,
+  ChallengeStatusInput,
+  GetMonthlyChallengeOption,
+  UpdateChallengeDTO,
+  getChallengesOptions,
+} from '#types/challenge.types.js';
 
 export interface IChallengeRepository {
   findMany(options: getChallengesOptions): Promise<Challenge[] | null>;
@@ -9,4 +15,5 @@ export interface IChallengeRepository {
   update(id: string, data: UpdateChallengeDTO): Promise<Challenge>;
   updateStatus(data: ChallengeStatusInput): Promise<Challenge>;
   findAbortReason(id: string): Promise<AbortReason | null>;
+  findMonthlyChallenge(option: GetMonthlyChallengeOption, currentYear: number): Promise<Challenge[] | null>;
 }
