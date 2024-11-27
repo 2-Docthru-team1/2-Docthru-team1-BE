@@ -174,4 +174,13 @@ export class ChallengeService implements IChallengeService {
     }
     return abortReason;
   };
+
+  getMonthlyChallenge = async (): Promise<CustomChallenge[] | null> => {
+    const monthlyChallenge = await this.challengeRepository.findMonthlyChallenge();
+    if (!monthlyChallenge) {
+      throw new NotFound(MESSAGES.NOT_FOUND);
+    }
+    const filteredMonthlyChallenge = monthlyChallenge.map(({ isHidden, requestUserId, ...rest }) => rest);
+    return filteredMonthlyChallenge;
+  };
 }

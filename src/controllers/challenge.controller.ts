@@ -142,4 +142,9 @@ export class ChallengeController {
     const abortReason = await this.challengeService.getAbortReason(id);
     res.json(abortReason);
   };
+
+  getMonthlyChallenge = async (req: Request, res: Response) => {
+    const monthlyChallenge = await this.challengeService.getMonthlyChallenge();
+    res.json(monthlyChallenge);
+  };
 }
