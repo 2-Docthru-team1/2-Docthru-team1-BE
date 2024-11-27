@@ -7,4 +7,6 @@ export interface IWorkService {
   createWork(WorkData: CreateWorkDTO): Promise<Omit<ChallengeWork, 'ownerId'>>;
   updateWork(id: string, WorkData: UpdateWorkDTO): Promise<WorkResponse>;
   deleteWork(id: string): Promise<ResultChallengeWork>;
+  likeWork(id: string): Promise<ChallengeWork>;
+  unlikeWork(id: string): Promise<ChallengeWork>;
 }

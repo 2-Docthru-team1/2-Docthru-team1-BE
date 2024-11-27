@@ -69,6 +69,16 @@ export class WorkController {
     const work = await this.WorkService.deleteWork(id);
     res.json(work);
   };
+  likeWork = async (req: Request<{ params: { id: string } }>, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    const work = await this.WorkService.likeWork(id);
+    res.sendStatus(204);
+  };
+  unlikeWork = async (req: Request<{ params: { id: string } }>, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    const work = await this.WorkService.unlikeWork(id);
+    res.sendStatus(204);
+  };
 }
 
 // 챌린지, 작업물 등 관련된 것들
