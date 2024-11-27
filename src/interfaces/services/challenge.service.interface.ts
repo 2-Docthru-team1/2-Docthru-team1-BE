@@ -1,16 +1,15 @@
-import type { AbortReason, Challenge, MediaType, Status } from '@prisma/client';
-import type { ChallengeStatusInput, CreateChallengeDTO, CustomChallenge, UpdateChallengeDTO } from '#types/challenge.types.js';
-import { Order } from '#utils/constants/enum.js';
+import type { AbortReason } from '@prisma/client';
+import type {
+  ChallengeStatusInput,
+  CreateChallengeDTO,
+  CustomChallenge,
+  UpdateChallengeDTO,
+  filteredChallenge,
+  getChallengesOptions,
+} from '#types/challenge.types.js';
 
 export interface IChallengeService {
-  getChallenges(options: {
-    status?: Status;
-    mediaType?: MediaType[];
-    keyword: string;
-    orderBy: Order;
-    page: number;
-    pageSize: number;
-  }): Promise<{ list: Omit<Challenge, 'isHidden' | 'requestUserId'>[]; totalCount: number }>;
+  getChallenges(options: getChallengesOptions): Promise<{ list: filteredChallenge[]; totalCount: number }>;
   getChallengeById(id: string): Promise<CustomChallenge | null>;
   createChallenge(
     challengeData: CreateChallengeDTO,

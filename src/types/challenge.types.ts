@@ -14,13 +14,18 @@ export interface GetChallengesQuery {
 }
 
 export interface getChallengesOptions {
-  status?: Status;
+  status?: Status[];
   mediaType?: MediaType[];
   orderBy: Order;
   keyword: string;
   page: number;
   pageSize: number;
+  admin?: boolean;
+  requestUserId?: string;
+  participantId?: string;
 }
+
+export interface filteredChallenge extends Omit<Challenge, 'isHidden' | 'requestUserId'> {}
 
 export interface CreateChallengeDTO {
   title: string;

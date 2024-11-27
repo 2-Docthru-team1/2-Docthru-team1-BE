@@ -1,4 +1,4 @@
-import type { AbortReason, Challenge } from '@prisma/client';
+import type { AbortReason } from '@prisma/client';
 import type { IChallengeService } from '#interfaces/services/challenge.service.interface.js';
 import { getStorage } from '#middlewares/asyncLocalStorage.js';
 import type { ChallengeRepository } from '#repositories/challenge.repository.js';
@@ -8,12 +8,14 @@ import type {
   CreateChallengeDTO,
   CustomChallenge,
   UpdateChallengeDTO,
+  filteredChallenge,
   getChallengesOptions,
 } from '#types/challenge.types.js';
 import { BadRequest, Forbidden, NotFound } from '#types/http-error.types.js';
 import { generatePresignedDownloadUrl } from '#utils/S3/generate-presigned-download-url.js';
 import { generatePresignedUploadUrl } from '#utils/S3/generate-presigned-upload-url.js';
 import MESSAGES from '#utils/constants/messages.js';
+import filterChallenge from '#utils/filterChallenge.js';
 import { validateUpdateStatus } from '#utils/validateUpdateStatus.js';
 
 export class ChallengeService implements IChallengeService {
@@ -23,20 +25,16 @@ export class ChallengeService implements IChallengeService {
   // 비즈니스 로직, DB에서 가져온 데이터를 가공하는 코드가 주로 작성됩니다.
   // 여기서 가공된 데이터를 controller로 올려줍니다.
 
-  getChallenges = async (
-    options: getChallengesOptions,
-  ): Promise<{ list: Omit<Challenge, 'isHidden' | 'requestUserId'>[]; totalCount: number }> => {
+  getChallenges = async (options: getChallengesOptions): Promise<{ list: filteredChallenge[]; totalCount: number }> => {
     const storage = getStorage();
     const userRole = storage.userRole;
     const isAdmin = userRole === 'admin';
-    const verifyAdminOptions: getChallengesOptions & { admin: boolean } = { ...options, admin: isAdmin };
-    const list = (await this.challengeRepository.findMany(verifyAdminOptions)) || [];
-    const totalCount = (await this.challengeRepository.totalCount(verifyAdminOptions)) || 0;
-    const listWithoutIsHidden = list.map(challenge => {
-      const { isHidden, requestUserId, ...otherField } = challenge;
-      return { ...otherField };
-    });
-    return { list: listWithoutIsHidden, totalCount };
+    options.admin = isAdmin;
+    const challenges = (await this.challengeRepository.findMany(options)) || [];
+    const list = challenges.map(challenge => filterChallenge(challenge));
+    const totalCount = (await this.challengeRepository.totalCount(options)) || 0;
+
+    return { list, totalCount };
   };
 
   getChallengeById = async (id: string): Promise<CustomChallenge | null> => {
