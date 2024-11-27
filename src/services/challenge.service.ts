@@ -181,8 +181,9 @@ export class ChallengeService implements IChallengeService {
     if (!Object.values(MonthlyType).includes(option.monthly)) {
       throw new Error(MESSAGES.BAD_REQUEST);
     }
+    const validMonthly = option.monthly as MonthlyType;
     const currentYear = new Date().getFullYear();
-    const monthlyChallenge = await this.challengeRepository.findMonthlyChallenge(option, currentYear);
+    const monthlyChallenge = await this.challengeRepository.findMonthlyChallenge({ monthly: validMonthly }, currentYear);
     if (!monthlyChallenge || monthlyChallenge.length === 0) {
       throw new NotFound(MESSAGES.NOT_FOUND);
     }
