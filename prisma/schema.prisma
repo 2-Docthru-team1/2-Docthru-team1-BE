@@ -38,6 +38,7 @@ model User {
 
 model Challenge {
   id        String    @id @default(uuid())
+  number    Int       @unique @default(autoincrement())
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
@@ -47,11 +48,11 @@ model Challenge {
   status      Status
   deadline    DateTime
   isHidden    Boolean
-
-  embedUrl  String
-  imageUrl  String
-  imageUrl2 String?
-  mediaType MediaType
+  embedUrl    String
+  imageUrl    String
+  imageUrl2   String?
+  mediaType   MediaType
+  monthly     Boolean?
 
   requestUser   User?           @relation(name: "requests", fields: [requestUserId], references: [id], onDelete: SetNull)
   requestUserId String?
