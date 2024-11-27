@@ -1,4 +1,5 @@
 import type { AbortReason } from '@prisma/client';
+import { MonthlyType } from '@prisma/client';
 import type { IChallengeService } from '#interfaces/services/challenge.service.interface.js';
 import { getStorage } from '#middlewares/asyncLocalStorage.js';
 import type { ChallengeRepository } from '#repositories/challenge.repository.js';
@@ -177,6 +178,9 @@ export class ChallengeService implements IChallengeService {
   };
 
   getMonthlyChallenge = async (option: GetMonthlyChallengeOption): Promise<CustomChallenge[] | null> => {
+    if (!Object.values(MonthlyType).includes(option.monthly)) {
+      throw new Error(MESSAGES.BAD_REQUEST);
+    }
     const currentYear = new Date().getFullYear();
     const monthlyChallenge = await this.challengeRepository.findMonthlyChallenge(option, currentYear);
     if (!monthlyChallenge || monthlyChallenge.length === 0) {
