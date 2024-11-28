@@ -8,4 +8,6 @@ export interface IRecipeRepository {
   create(recipeData: CreateRecipeDTO): Promise<Recipe>;
   update(id: string, recipeData: UpdateRecipeDTO): Promise<Recipe>;
   delete(id: string): Promise<Recipe>;
+  like(recipeId: string, userId: string): Promise<Recipe>;
+  unlike(recipeId: string, userId: string): Promise<Recipe>;
 }

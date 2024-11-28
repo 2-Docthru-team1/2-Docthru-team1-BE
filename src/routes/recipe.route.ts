@@ -12,6 +12,9 @@ recipeRouter
   .patch(tokenVerifier.verifyAccessToken, recipeController.patchRecipe)
   .delete(tokenVerifier.verifyAccessToken, recipeController.deleteRecipe);
 
-recipeRouter.route('/:id/like').post().delete();
+recipeRouter
+  .route('/:id/like')
+  .post(tokenVerifier.verifyAccessToken, recipeController.likeRecipe)
+  .delete(tokenVerifier.verifyAccessToken, recipeController.unlikeRecipe);
 
 export default recipeRouter;
