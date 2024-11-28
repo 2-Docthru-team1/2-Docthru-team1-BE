@@ -34,6 +34,7 @@ model User {
   likeWorks     ChallengeWork[] @relation(name: "likeRelation")
   feedbacks     Feedback[]
   abortReasons  AbortReason[] // 관리자 유저에 한함
+  likeRecipes   Recipe[]        @relation(name: "recipeLikeRelation")
 }
 
 model Challenge {
@@ -130,7 +131,7 @@ model Recipe {
   title       String
   ingredients String[]
   benefits    String[]
-  likeCount   Int
+  likeCount   Int      @default(0)
   category    Category
   direction   String[]
   calories    Int
@@ -141,6 +142,8 @@ model Recipe {
   sodium      Float
   fiber       Float
   images      String[]
+
+  likeUsers User[] @relation(name: "recipeLikeRelation")
 }
 
 enum Role {

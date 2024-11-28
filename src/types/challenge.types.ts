@@ -11,6 +11,7 @@ export interface GetChallengesQuery {
   page?: string;
   pageSize?: string;
   isHidden?: string;
+  filter?: string;
 }
 
 export interface getChallengesOptions {
