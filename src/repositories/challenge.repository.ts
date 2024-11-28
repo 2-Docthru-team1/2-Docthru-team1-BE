@@ -152,7 +152,7 @@ export class ChallengeRepository implements IChallengeRepository {
   findMonthlyChallenge = async (option: GetMonthlyChallengeOption, currentYear: number): Promise<Challenge[] | null> => {
     return await this.challenge.findMany({
       where: {
-        ...(option.monthly ? { monthly: option.monthly } : {}),
+        monthly: option.monthly,
         createdAt: {
           gte: new Date(`${currentYear}-01-01T00:00:00Z`),
           lt: new Date(`${currentYear + 1}-01-01T00:00:00Z`),
