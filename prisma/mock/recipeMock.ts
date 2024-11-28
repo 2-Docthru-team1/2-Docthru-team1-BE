@@ -25,6 +25,7 @@ const RECIPES = [
     sugars: 3.0,
     sodium: 800.0,
     fiber: 2.0,
+    images: ['kimchi-stew.jpg'],
   },
   {
     title: 'Bulgogi',
@@ -45,6 +46,7 @@ const RECIPES = [
     sugars: 8.0,
     sodium: 600.0,
     fiber: 1.0,
+    images: ['kimchi-stew.jpg'],
   },
   {
     title: 'Tteokbokki',
@@ -65,6 +67,7 @@ const RECIPES = [
     sugars: 6.0,
     sodium: 750.0,
     fiber: 2.0,
+    images: ['kimchi-stew.jpg'],
   },
   {
     title: 'Bibim Noodles',
@@ -85,6 +88,7 @@ const RECIPES = [
     sugars: 7.0,
     sodium: 500.0,
     fiber: 1.0,
+    images: ['kimchi-stew.jpg'],
   },
   {
     title: 'Grilled Pork Belly',
@@ -105,6 +109,7 @@ const RECIPES = [
     sugars: 1.0,
     sodium: 400.0,
     fiber: 3.0,
+    images: ['kimchi-stew.jpg'],
   },
   {
     title: 'Hotteok',
@@ -125,6 +130,7 @@ const RECIPES = [
     sugars: 10.0,
     sodium: 150.0,
     fiber: 2.0,
+    images: ['kimchi-stew.jpg'],
   },
   {
     title: 'Rolled Omelette',
@@ -145,6 +151,7 @@ const RECIPES = [
     sugars: 1.0,
     sodium: 200.0,
     fiber: 0.0,
+    images: ['kimchi-stew.jpg'],
   },
   {
     title: 'Red Bean Shaved Ice',
@@ -165,6 +172,7 @@ const RECIPES = [
     sugars: 15.0,
     sodium: 120.0,
     fiber: 3.0,
+    images: ['kimchi-stew.jpg'],
   },
   {
     title: 'Soybean Paste Stew',
@@ -185,6 +193,7 @@ const RECIPES = [
     sugars: 2.8,
     sodium: 920.5,
     fiber: 3.2,
+    images: ['kimchi-stew.jpg'],
   },
   {
     title: 'Spicy Chicken Stir-fry',
@@ -205,6 +214,7 @@ const RECIPES = [
     sugars: 8.9,
     sodium: 780.6,
     fiber: 4.1,
+    images: ['kimchi-stew.jpg'],
   },
   {
     title: 'Cold Noodles',
@@ -225,6 +235,7 @@ const RECIPES = [
     sugars: 3.5,
     sodium: 890.2,
     fiber: 3.8,
+    images: ['kimchi-stew.jpg'],
   },
   {
     title: 'Seafood Pancake',
@@ -245,6 +256,7 @@ const RECIPES = [
     sugars: 2.1,
     sodium: 650.8,
     fiber: 2.4,
+    images: ['kimchi-stew.jpg'],
   },
   {
     title: 'Pork Bone Soup',
@@ -265,6 +277,7 @@ const RECIPES = [
     sugars: 3.4,
     sodium: 880.5,
     fiber: 3.1,
+    images: ['kimchi-stew.jpg'],
   },
   {
     title: 'Kimchi Fried Rice',
@@ -285,6 +298,7 @@ const RECIPES = [
     sugars: 2.7,
     sodium: 890.3,
     fiber: 3.4,
+    images: ['kimchi-stew.jpg'],
   },
   {
     title: 'Braised Short Ribs',
@@ -305,6 +319,7 @@ const RECIPES = [
     sugars: 8.9,
     sodium: 950.7,
     fiber: 4.2,
+    images: ['kimchi-stew.jpg'],
   },
   {
     title: 'Spicy Stir-fried Pork',
@@ -325,6 +340,7 @@ const RECIPES = [
     sugars: 6.8,
     sodium: 880.4,
     fiber: 2.8,
+    images: ['kimchi-stew.jpg'],
   },
   {
     title: 'Bean Sprout Soup with Rice',
@@ -345,6 +361,7 @@ const RECIPES = [
     sugars: 1.8,
     sodium: 680.5,
     fiber: 3.6,
+    images: ['kimchi-stew.jpg'],
   },
   {
     title: 'Spicy Rice Cake Soup',
@@ -365,6 +382,7 @@ const RECIPES = [
     sugars: 3.2,
     sodium: 750.4,
     fiber: 1.8,
+    images: ['kimchi-stew.jpg'],
   },
   {
     title: 'Stir-fried Squid',
@@ -385,6 +403,7 @@ const RECIPES = [
     sugars: 4.7,
     sodium: 890.2,
     fiber: 2.9,
+    images: ['kimchi-stew.jpg'],
   },
   {
     title: 'Seaweed Soup',
@@ -405,6 +424,7 @@ const RECIPES = [
     sugars: 1.2,
     sodium: 520.3,
     fiber: 2.1,
+    images: ['kimchi-stew.jpg'],
   },
   {
     title: 'Blood Sausage Soup',
@@ -425,6 +445,7 @@ const RECIPES = [
     sugars: 2.1,
     sodium: 780.5,
     fiber: 2.8,
+    images: ['kimchi-stew.jpg'],
   },
   {
     title: 'Army Base Stew',
@@ -445,6 +466,7 @@ const RECIPES = [
     sugars: 4.8,
     sodium: 1250.6,
     fiber: 3.2,
+    images: ['kimchi-stew.jpg'],
   },
   {
     title: 'Celebration Noodles',
@@ -465,6 +487,7 @@ const RECIPES = [
     sugars: 2.4,
     sodium: 890.5,
     fiber: 2.7,
+    images: ['kimchi-stew.jpg'],
   },
   {
     title: 'Sweet and Spicy Fried Chicken',
@@ -485,6 +508,7 @@ const RECIPES = [
     sugars: 12.5,
     sodium: 780.3,
     fiber: 1.2,
+    images: ['kimchi-stew.jpg'],
   },
   {
     title: 'Cold Buckwheat Noodles in Broth',
@@ -505,6 +529,7 @@ const RECIPES = [
     sugars: 3.7,
     sodium: 780.5,
     fiber: 2.9,
+    images: ['kimchi-stew.jpg'],
   },
   {
     title: 'Spicy Mixed Buckwheat Noodles',
@@ -525,6 +550,7 @@ const RECIPES = [
     sugars: 5.2,
     sodium: 890.4,
     fiber: 3.1,
+    images: ['kimchi-stew.jpg'],
   },
   {
     title: 'Pork Soup with Rice',
@@ -545,6 +571,7 @@ const RECIPES = [
     sugars: 2.1,
     sodium: 1100.5,
     fiber: 2.4,
+    images: ['kimchi-stew.jpg'],
   },
   {
     title: 'Spicy Beef Soup',
@@ -565,6 +592,7 @@ const RECIPES = [
     sugars: 3.4,
     sodium: 920.7,
     fiber: 3.8,
+    images: ['kimchi-stew.jpg'],
   },
   {
     title: 'Knife-cut Noodle Soup',
@@ -585,6 +613,7 @@ const RECIPES = [
     sugars: 2.9,
     sodium: 850.6,
     fiber: 2.7,
+    images: ['kimchi-stew.jpg'],
   },
   {
     title: 'Braised Mackerel',
@@ -605,6 +634,7 @@ const RECIPES = [
     sugars: 3.2,
     sodium: 650.4,
     fiber: 2.1,
+    images: ['kimchi-stew.jpg'],
   },
   {
     title: 'Stir-fried Glass Noodles',
@@ -625,6 +655,7 @@ const RECIPES = [
     sugars: 4.8,
     sodium: 720.5,
     fiber: 3.6,
+    images: ['kimchi-stew.jpg'],
   },
   {
     title: 'Steamed Eggs',
@@ -645,6 +676,7 @@ const RECIPES = [
     sugars: 1.2,
     sodium: 450.8,
     fiber: 0.5,
+    images: ['kimchi-stew.jpg'],
   },
   {
     title: 'Braised Tofu',
@@ -665,6 +697,7 @@ const RECIPES = [
     sugars: 2.1,
     sodium: 520.6,
     fiber: 1.8,
+    images: ['kimchi-stew.jpg'],
   },
   {
     title: 'Spicy Rice Cakes',
@@ -685,6 +718,7 @@ const RECIPES = [
     sugars: 15.4,
     sodium: 890.7,
     fiber: 2.4,
+    images: ['kimchi-stew.jpg'],
   },
   {
     title: 'Stir-fried Anchovies',
@@ -705,6 +739,7 @@ const RECIPES = [
     sugars: 2.3,
     sodium: 580.4,
     fiber: 0.8,
+    images: ['kimchi-stew.jpg'],
   },
   {
     title: 'Braised Potatoes',
@@ -725,6 +760,7 @@ const RECIPES = [
     sugars: 4.6,
     sodium: 420.7,
     fiber: 2.8,
+    images: ['kimchi-stew.jpg'],
   },
   {
     title: 'Seasoned Bean Sprouts',
@@ -745,6 +781,7 @@ const RECIPES = [
     sugars: 1.2,
     sodium: 320.5,
     fiber: 2.4,
+    images: ['kimchi-stew.jpg'],
   },
   {
     title: 'Braised Fish Cakes',
@@ -765,6 +802,7 @@ const RECIPES = [
     sugars: 6.2,
     sodium: 680.3,
     fiber: 1.2,
+    images: ['kimchi-stew.jpg'],
   },
   {
     title: 'Stir-fried Dried Pollack',
@@ -780,6 +818,7 @@ const RECIPES = [
     sugars: 2.1,
     sodium: 540.6,
     fiber: 1.4,
+    images: ['kimchi-stew.jpg'],
   },
   {
     title: 'Stir-fried Zucchini',
@@ -800,6 +839,7 @@ const RECIPES = [
     sugars: 3.8,
     sodium: 420.5,
     fiber: 2.6,
+    images: ['kimchi-stew.jpg'],
   },
   {
     title: 'Seasoned Spinach',
@@ -815,6 +855,7 @@ const RECIPES = [
     sugars: 1.2,
     sodium: 380.4,
     fiber: 3.2,
+    images: ['kimchi-stew.jpg'],
   },
   {
     title: 'Braised Black Beans',
@@ -835,6 +876,7 @@ const RECIPES = [
     sugars: 5.2,
     sodium: 420.5,
     fiber: 8.4,
+    images: ['kimchi-stew.jpg'],
   },
   {
     title: 'Stir-fried Fish Cake with Vegetables',
@@ -855,6 +897,7 @@ const RECIPES = [
     sugars: 5.2,
     sodium: 580.4,
     fiber: 2.1,
+    images: ['kimchi-stew.jpg'],
   },
   {
     title: 'Seasoned Kelp',
@@ -875,6 +918,7 @@ const RECIPES = [
     sugars: 2.8,
     sodium: 320.5,
     fiber: 2.8,
+    images: ['kimchi-stew.jpg'],
   },
   {
     title: 'Grilled Mackerel Pike',
@@ -895,6 +939,7 @@ const RECIPES = [
     sugars: 0.5,
     sodium: 580.3,
     fiber: 0.4,
+    images: ['kimchi-stew.jpg'],
   },
   {
     title: 'Stir-fried Octopus',
@@ -915,6 +960,7 @@ const RECIPES = [
     sugars: 4.2,
     sodium: 750.6,
     fiber: 2.1,
+    images: ['kimchi-stew.jpg'],
   },
   {
     title: 'Braised Chicken with Ginseng',
@@ -935,6 +981,7 @@ const RECIPES = [
     sugars: 3.2,
     sodium: 480.5,
     fiber: 2.8,
+    images: ['kimchi-stew.jpg'],
   },
   {
     title: 'Grilled Short Ribs',
@@ -955,6 +1002,7 @@ const RECIPES = [
     sugars: 8.4,
     sodium: 820.5,
     fiber: 1.2,
+    images: ['kimchi-stew.jpg'],
   },
   {
     title: 'Spicy Braised Chicken',
@@ -975,6 +1023,7 @@ const RECIPES = [
     sugars: 5.8,
     sodium: 780.4,
     fiber: 3.2,
+    images: ['kimchi-stew.jpg'],
   },
   {
     title: 'Grilled Pork Belly',
@@ -995,6 +1044,7 @@ const RECIPES = [
     sugars: 1.2,
     sodium: 680.5,
     fiber: 0.8,
+    images: ['kimchi-stew.jpg'],
   },
   {
     title: 'Kimchi Stew',
@@ -1015,6 +1065,7 @@ const RECIPES = [
     sugars: 4.2,
     sodium: 920.7,
     fiber: 4.5,
+    images: ['kimchi-stew.jpg'],
   },
   {
     title: 'Steamed Pork Wraps',
@@ -1035,6 +1086,7 @@ const RECIPES = [
     sugars: 2.4,
     sodium: 720.5,
     fiber: 3.8,
+    images: ['kimchi-stew.jpg'],
   },
   {
     title: 'Spicy Chicken Feet',
@@ -1055,6 +1107,7 @@ const RECIPES = [
     sugars: 6.7,
     sodium: 890.4,
     fiber: 1.4,
+    images: ['kimchi-stew.jpg'],
   },
   {
     title: 'Rolled Omelette',
@@ -1075,6 +1128,7 @@ const RECIPES = [
     sugars: 1.8,
     sodium: 420.6,
     fiber: 0.9,
+    images: ['kimchi-stew.jpg'],
   },
 ];
 
