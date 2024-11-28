@@ -1,4 +1,4 @@
-import type { MediaType, MonthlyType, Status } from '@prisma/client';
+import { type MediaType, Status } from '@prisma/client';
 import type { NextFunction, Response } from 'express';
 import type { ChallengeService } from '#services/challenge.service.js';
 import type {
@@ -17,8 +17,8 @@ export class ChallengeController {
   constructor(private challengeService: ChallengeService) {}
 
   getChallenges = async (req: Request<{ query: GetChallengesQuery }>, res: Response, next: NextFunction) => {
-    const { status, mediaType, orderBy = 'latestFirst', keyword = '', page = '1', pageSize = '10' } = req.query;
-    console.log('🚀 ~ ChallengeController ~ getChallenges= ~ status:', status);
+    const { status, mediaType, orderBy = 'latestFirst', keyword = '', page = '1', pageSize = '4' } = req.query;
+    const inactiveStatus: Status[] = [Status.aborted, Status.canceled, Status.denied, Status.pending];
     let mediaTypeEnum;
     if (Array.isArray(mediaType)) {
       mediaTypeEnum = mediaType as MediaType[];
@@ -29,18 +29,17 @@ export class ChallengeController {
     }
 
     let statusEnum;
-    if (status === 'Approved') {
-      statusEnum = ['onGoing', 'finished'] as Status[];
-    } else if (Array.isArray(status)) {
+    if (Array.isArray(status)) {
       statusEnum = status as Status[];
     } else if (status?.length) {
       statusEnum = [status] as Status[];
     } else {
-      statusEnum = undefined;
+      statusEnum = [Status.onGoing, Status.finished] as Status[];
     }
-    // const statusEnum = status ? (status as Status) : undefined;
+    if (statusEnum && statusEnum.some(status => inactiveStatus.includes(status))) {
+      throw new BadRequest(MESSAGES.BAD_REQUEST_STATUS);
+    }
     const orderEnum = orderBy as Order;
-
     const options = {
       status: statusEnum,
       mediaType: mediaTypeEnum,
@@ -52,7 +51,46 @@ export class ChallengeController {
     const { totalCount, list } = await this.challengeService.getChallenges(options);
     res.json({ totalCount, list });
   };
-
+  getRequestChallenges = async (req: Request<{ query: GetChallengesQuery }>, res: Response, next: NextFunction) => {
+    const { filter, keyword = '', page = '1', pageSize = '10' } = req.query;
+    let statusEnum;
+    let orderEnum;
+    switch (filter) {
+      case 'pending':
+        statusEnum = [Status.pending];
+        break;
+      case 'approved':
+        statusEnum = [Status.onGoing, Status.finished];
+        break;
+      case 'denied':
+        statusEnum = [Status.denied];
+        break;
+      case Order.deadlineEarliest:
+        orderEnum = Order.deadlineEarliest;
+        break;
+      case Order.deadlineLatest:
+        orderEnum = Order.deadlineLatest;
+        break;
+      case Order.earliestFirst:
+        orderEnum = Order.earliestFirst;
+        break;
+      case Order.latestFirst:
+        orderEnum = Order.latestFirst;
+        break;
+    }
+    if (orderEnum === undefined) {
+      orderEnum = Order.latestFirst;
+    }
+    const options = {
+      status: statusEnum,
+      orderBy: orderEnum,
+      page: Number(page),
+      pageSize: Number(pageSize),
+      keyword,
+    };
+    const { totalCount, list } = await this.challengeService.getChallenges(options);
+    res.json({ totalCount, list });
+  };
   getMyParticipations = async (req: Request<{ query: GetChallengesQuery }>, res: Response, next: NextFunction) => {
     const { status, orderBy = 'latestFirst', keyword = '', page = '1', pageSize = '10' } = req.query;
     const participantId = req.user?.userId;
@@ -81,7 +119,6 @@ export class ChallengeController {
 
   getMyRequests = async (req: Request<{ query: GetChallengesQuery }>, res: Response, next: NextFunction) => {
     const { status, orderBy = 'latestFirst', keyword = '', page = '1', pageSize = '10' } = req.query;
-    console.log('🚀 ~ ChallengeController ~ getMyRequests= ~ orderBy:', orderBy);
     const requestUserId = req.user?.userId;
 
     let statusEnum;

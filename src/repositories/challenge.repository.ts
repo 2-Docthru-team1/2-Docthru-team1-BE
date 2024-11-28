@@ -47,13 +47,12 @@ export class ChallengeRepository implements IChallengeRepository {
     } = {
       ...(Array.isArray(mediaType) ? { mediaType: { in: mediaType } } : {}),
       ...(Array.isArray(status) ? { status: { in: status } } : {}),
-      // ...(status ? { status } : {}),
       ...(keyword ? { title: { contains: keyword } } : {}),
       ...(admin ? {} : { isHidden: false }),
       ...(requestUserId ? { requestUserId } : {}),
       ...(participantId ? { participants: { some: { id: participantId } } } : {}),
+      ...{ monthly: null },
     };
-
     const challenges = await this.challenge.findMany({
       skip: (page - 1) * pageSize,
       take: pageSize,
@@ -69,13 +68,11 @@ export class ChallengeRepository implements IChallengeRepository {
     const whereCondition: {
       mediaType?: { in: MediaType[] };
       status?: { in: Status[] };
-      // status?: Status;
       title?: { contains: string };
       isHidden?: boolean;
     } = {
       ...(Array.isArray(mediaType) ? { mediaType: { in: mediaType } } : {}),
       ...(Array.isArray(status) ? { status: { in: status } } : {}),
-      // ...(status ? { status } : {}),
       ...(keyword ? { title: { contains: keyword } } : {}),
       ...(admin ? {} : { isHidden: false }),
       ...(requestUserId ? { requestUserId } : {}),

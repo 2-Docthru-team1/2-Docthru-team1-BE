@@ -77,4 +77,18 @@ export class RecipeController {
 
     res.json(recipe);
   };
+
+  likeRecipe = async (req: Request<{ params: { id: string } }>, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    const recipe = await this.recipeService.likeRecipe(id, req.user!.userId);
+
+    res.sendStatus(204);
+  };
+
+  unlikeRecipe = async (req: Request<{ params: { id: string } }>, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    const recipe = await this.recipeService.unlikeRecipe(id, req.user!.userId);
+
+    res.sendStatus(204);
+  };
 }
