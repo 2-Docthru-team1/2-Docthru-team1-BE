@@ -36,6 +36,7 @@ export interface CreateWorkDTOWithId extends CreateWorkDTO {
 }
 export interface CreateWorkDTOWithS3Data extends Omit<CreateWorkDTOWithId, 'imageCount'> {
   imagesData: { uploadUrl: string; s3Key: string }[];
+  userId: string;
 }
 export interface CreateWorkDTOWithUrls extends Omit<CreateWorkDTOWithId, 'imageCount'> {
   uploadUrls: string[];

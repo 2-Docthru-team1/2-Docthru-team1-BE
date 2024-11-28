@@ -33,7 +33,15 @@ export class ChallengeService implements IChallengeService {
     const isAdmin = userRole === 'admin';
     options.admin = isAdmin;
     const challenges = (await this.challengeRepository.findMany(options)) || [];
-    const list = challenges.map(challenge => filterChallenge(challenge));
+    const updatedUrlChallenges = await Promise.all(
+      challenges.map(async challenge => {
+        const expiresIn = 3600;
+        challenge.imageUrl = await generatePresignedDownloadUrl(challenge.imageUrl, expiresIn);
+        challenge.imageUrl2 = challenge.imageUrl2 ? await generatePresignedDownloadUrl(challenge.imageUrl) : null;
+        return challenge;
+      }),
+    );
+    const list = updatedUrlChallenges.map(challenge => filterChallenge(challenge));
     const totalCount = (await this.challengeRepository.totalCount(options)) || 0;
 
     return { list, totalCount };

@@ -1,4 +1,6 @@
 import type { ChallengeWork, WorkImage } from '@prisma/client';
+import { connect } from 'http2';
+import prismaClient from '#connection/postgres.connection.js';
 import type { IWorkRepository } from '#interfaces/repositories/work.repository.interface.js';
 import { getStorage } from '#middlewares/asyncLocalStorage.js';
 import type { ExtendedPrismaClient } from '#types/common.types.js';
@@ -14,10 +16,12 @@ import {
 export class WorkRepository implements IWorkRepository {
   challengeWork: ExtendedPrismaClient['challengeWork'];
   workImage: ExtendedPrismaClient['workImage'];
+  challenge: ExtendedPrismaClient['challenge'];
 
   constructor(client: ExtendedPrismaClient) {
     this.challengeWork = client.challengeWork;
     this.workImage = client.workImage;
+    this.challenge = client.challenge;
   }
   // 이 아래로 직접 DB와 통신하는 코드를 작성합니다.
   // 여기서 DB와 통신해 받아온 데이터를 위로(service로) 올려줍니다.
@@ -52,22 +56,27 @@ export class WorkRepository implements IWorkRepository {
   };
 
   create = async (data: CreateWorkDTOWithS3Data): Promise<ChallengeWork> => {
-    const { challengeId, imagesData, title, content } = data;
-    const storage = getStorage();
-    const userId = storage.userId;
-    const work = await this.challengeWork.create({
-      data: {
-        title,
-        content,
-        challenge: { connect: { id: challengeId } },
-        owner: { connect: { id: userId } },
-        images: {
-          create: imagesData.map(imageData => ({ imageUrl: imageData.s3Key })),
+    const { challengeId, imagesData, title, content, userId } = data;
+    const createdWork = await prismaClient.$transaction(async prisma => {
+      const work = await this.challengeWork.create({
+        data: {
+          title,
+          content,
+          challenge: { connect: { id: challengeId } },
+          owner: { connect: { id: userId } },
+          images: {
+            create: imagesData.map(imageData => ({ imageUrl: imageData.s3Key })),
+          },
         },
-      },
-      include: { images: true, owner: { select: { id: true, name: true, role: true, email: true } } },
+        include: { images: true, owner: { select: { id: true, name: true, role: true, email: true } } },
+      });
+      const challenge = await this.challenge.update({
+        where: { id: challengeId },
+        data: { participants: { connect: { id: userId } } },
+      });
+      return work;
     });
-    return work;
+    return createdWork;
   };
 
   update = async (id: string, data: UpdateWorkDTOWithUrls): Promise<ChallengeWork> => {

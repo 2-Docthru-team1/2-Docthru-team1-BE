@@ -1,6 +1,7 @@
-import type { ChallengeWork, User } from '@prisma/client';
+import type { Challenge, ChallengeWork, User } from '@prisma/client';
 import type { IWorkService } from '#interfaces/services/work.service.interface.js';
 import { getStorage } from '#middlewares/asyncLocalStorage.js';
+import type { ChallengeRepository } from '#repositories/challenge.repository.js';
 import type { FeedbackRepository } from '#repositories/feedback.repository.js';
 import type { WorkRepository } from '#repositories/work.repository.js';
 import { BadRequest, Forbidden, NotFound } from '#types/http-error.types.js';
@@ -21,6 +22,7 @@ export class WorkService implements IWorkService {
   constructor(
     private WorkRepository: WorkRepository,
     private FeedbackRepository: FeedbackRepository,
+    private ChallengeRepository: ChallengeRepository,
   ) {} // 이 부분에 Repository를 연결합니다.
 
   // 이 아래로 데이터를 가공하는 코드를 작성합니다.
@@ -74,10 +76,23 @@ export class WorkService implements IWorkService {
   };
 
   createWork = async (workData: CreateWorkDTOWithId): Promise<Omit<ChallengeWork, 'ownerId'>> => {
+    const storage = getStorage();
+    const userId = storage.userId;
+    const challenge = await this.ChallengeRepository.findById(workData.challengeId);
+    const challengeWithParticipants = challenge as Challenge & { participants: { id: string }[] };
+    if (!challenge) {
+      throw new NotFound(MESSAGES.NOT_FOUND);
+    }
+    const isUserParticipating = challengeWithParticipants.participants.some(participant => participant.id === userId);
+    if (isUserParticipating) {
+      throw new BadRequest(MESSAGES.BAE_REQUEST_PARTICIPATION);
+    }
     const { imageCount, ...restWorkData } = workData;
     const imagesData = await generateS3ImageArray(imageCount);
-    const repositoryWork = { ...restWorkData, imagesData };
+    const repositoryWork = { ...restWorkData, imagesData, userId };
     const work = await this.WorkRepository.create(repositoryWork);
+    //여기서 유저와 챌린지를 연결
+
     const workWithUploadUrls = chageTypeWorkCreate({ ...work, imagesData });
     return workWithUploadUrls;
   };
