@@ -1,4 +1,4 @@
-import { MediaType, Status } from '@prisma/client';
+import { MediaType, MonthlyType, Status } from '@prisma/client';
 import USERS from './userMock.js';
 
 export const CHALLENGES = [
@@ -182,7 +182,6 @@ export const CHALLENGES = [
     monthly: null,
     requestUserId: '590602e9-3796-4287-bca1-de9969139fbc',
   },
-  /** */
   {
     id: 'f7fd3fe0-6dc6-4fdb-bd64-ada1194b4b8c',
     number: 11,
@@ -362,5 +361,59 @@ export const CHALLENGES = [
     mediaType: MediaType.socialMedia,
     monthly: null,
     requestUserId: '590602e9-3796-4287-bca1-de9969139fbc',
+  },
+  {
+    id: '0a9d3b24-1f91-457f-9324-62c1eaec30b0',
+    number: 21,
+    createdAt: new Date('2024-11-17T10:00:00.000Z'),
+    updatedAt: new Date('2024-11-17T10:00:00.000Z'),
+    deletedAt: null,
+    title: 'Monthly Challenge 1',
+    description: 'Description for Monthly Challenge 1',
+    status: Status.onGoing,
+    deadline: new Date('2024-12-01T10:00:00.000Z'),
+    isHidden: false,
+    imageUrl: 'monthlybibibibibi.png',
+    imageUrl2: null,
+    embedUrl: 'https://m.blog.naver.com/es1975/222681705656',
+    mediaType: MediaType.blog,
+    monthly: MonthlyType.November,
+    requestUserId: 'a666a76c-46a1-4aa2-9741-bdbb20785fc4',
+  },
+  {
+    id: '7bd29289-f547-41e5-9f4c-52952f182f62',
+    number: 22,
+    createdAt: new Date('2024-11-18T08:30:00.000Z'),
+    updatedAt: new Date('2024-11-18T08:30:00.000Z'),
+    deletedAt: null,
+    title: 'Monthly Challenge 2',
+    description: 'Description for Monthly Challenge 2',
+    status: Status.onGoing,
+    deadline: new Date('2024-11-25T08:30:00.000Z'),
+    isHidden: true,
+    imageUrl: 'monthlybibibibibi.png',
+    imageUrl2: null,
+    embedUrl: 'https://m.blog.naver.com/es1975/222681705656',
+    mediaType: MediaType.blog,
+    monthly: MonthlyType.November,
+    requestUserId: 'a666a76c-46a1-4aa2-9741-bdbb20785fc4',
+  },
+  {
+    id: '4fae0f0d-998f-469f-8f64-2c204eebc932',
+    number: 23,
+    createdAt: new Date('2024-11-19T09:15:00.000Z'),
+    updatedAt: new Date('2024-11-19T09:15:00.000Z'),
+    deletedAt: null,
+    title: 'Monthly Challenge 3',
+    description: 'Description for Monthly Challenge 3',
+    status: Status.pending,
+    deadline: new Date('2024-12-05T09:15:00.000Z'),
+    isHidden: false,
+    imageUrl: 'monthlybibibibibi.png',
+    imageUrl2: null,
+    embedUrl: 'https://m.blog.naver.com/es1975/222681705656',
+    mediaType: MediaType.blog,
+    monthly: MonthlyType.November,
+    requestUserId: 'a666a76c-46a1-4aa2-9741-bdbb20785fc4',
   },
 ];

@@ -1,4 +1,5 @@
 import type { AbortReason } from '@prisma/client';
+import { MonthlyType } from '@prisma/client';
 import type { IChallengeService } from '#interfaces/services/challenge.service.interface.js';
 import { getStorage } from '#middlewares/asyncLocalStorage.js';
 import type { ChallengeRepository } from '#repositories/challenge.repository.js';
@@ -7,6 +8,7 @@ import type {
   ChallengeStatusInput,
   CreateChallengeDTO,
   CustomChallenge,
+  GetMonthlyChallengeOption,
   UpdateChallengeDTO,
   filteredChallenge,
   getChallengesOptions,
@@ -173,5 +175,19 @@ export class ChallengeService implements IChallengeService {
       throw new NotFound(MESSAGES.NOT_FOUND);
     }
     return abortReason;
+  };
+
+  getMonthlyChallenge = async (option: GetMonthlyChallengeOption): Promise<CustomChallenge[] | null> => {
+    if (!Object.values(MonthlyType).includes(option.monthly)) {
+      throw new Error(MESSAGES.BAD_REQUEST);
+    }
+    const validMonthly = option.monthly as MonthlyType;
+    const currentYear = new Date().getFullYear();
+    const monthlyChallenge = await this.challengeRepository.findMonthlyChallenge({ monthly: validMonthly }, currentYear);
+    if (!monthlyChallenge || monthlyChallenge.length === 0) {
+      throw new NotFound(MESSAGES.NOT_FOUND);
+    }
+    const filteredMonthlyChallenge = monthlyChallenge.map(({ isHidden, requestUserId, ...rest }) => rest);
+    return filteredMonthlyChallenge;
   };
 }

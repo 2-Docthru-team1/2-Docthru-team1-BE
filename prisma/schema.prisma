@@ -53,7 +53,7 @@ model Challenge {
   imageUrl    String
   imageUrl2   String?
   mediaType   MediaType
-  monthly     Boolean?
+  monthly     MonthlyType?
 
   requestUser   User?           @relation(name: "requests", fields: [requestUserId], references: [id], onDelete: SetNull)
   requestUserId String?
@@ -174,4 +174,19 @@ enum Category {
   Noodle
   BanChan
   Dessert
+}
+
+enum MonthlyType {
+  January
+  February
+  March
+  April
+  May
+  June
+  July
+  August
+  September
+  October
+  November
+  December
 }

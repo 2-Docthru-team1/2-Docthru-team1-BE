@@ -1,4 +1,4 @@
-import type { Challenge, MediaType, Role, Status } from '@prisma/client';
+import type { Challenge, MediaType, MonthlyType, Role, Status } from '@prisma/client';
 import { Order } from '#utils/constants/enum.js';
 
 export type CustomChallenge = Omit<Challenge, 'isHidden' | 'requestUserId'>;
@@ -24,6 +24,10 @@ export interface getChallengesOptions {
   admin?: boolean;
   requestUserId?: string;
   participantId?: string;
+}
+
+export interface GetMonthlyChallengeOption {
+  monthly: MonthlyType;
 }
 
 export interface filteredChallenge extends Omit<Challenge, 'isHidden' | 'requestUserId'> {}
