@@ -195,7 +195,19 @@ export class ChallengeService implements IChallengeService {
     if (!monthlyChallenge || monthlyChallenge.length === 0) {
       throw new NotFound(MESSAGES.NOT_FOUND);
     }
-    const filteredMonthlyChallenge = monthlyChallenge.map(({ isHidden, requestUserId, ...rest }) => rest);
+    const returnDownloadUrls = monthlyChallenge.map(async ({ isHidden, requestUserId, imageUrl, imageUrl2, ...rest }) => {
+      const expiresIn = 3600;
+      const downloadImageUrl = await generatePresignedDownloadUrl(imageUrl, expiresIn);
+      const downloadImageUrl2 = imageUrl2 ? await generatePresignedDownloadUrl(imageUrl2, expiresIn) : null;
+
+      return {
+        ...rest,
+        imageUrl: downloadImageUrl,
+        imageUrl2: downloadImageUrl2,
+      };
+    });
+
+    const filteredMonthlyChallenge = await Promise.all(returnDownloadUrls);
     return filteredMonthlyChallenge;
   };
 }
