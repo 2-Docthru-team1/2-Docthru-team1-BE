@@ -2,6 +2,7 @@ import express from 'express';
 import challengeController from '#containers/challenge.container.js';
 import tokenVerifier from '#containers/verify.container.js';
 import workController from '#containers/work.container.js';
+import validateIsAdmin from '#middlewares/isAdmin.validation.js';
 import validatePaginationOptions from '#middlewares/pagination.validation.js';
 import { validateCreateChallenge, validateUpdateChallenge } from '#middlewares/validateChallenge.js';
 
@@ -12,6 +13,9 @@ challengeRouter
   .get(validatePaginationOptions, tokenVerifier.optionalVerifyAccessToken, challengeController.getChallenges)
   .post(tokenVerifier.verifyAccessToken, validateCreateChallenge, challengeController.postChallenge);
 
+challengeRouter
+  .route('/admin-requests')
+  .get(tokenVerifier.verifyAccessToken, validateIsAdmin, challengeController.getRequestChallenges);
 challengeRouter.route('/participation').get(tokenVerifier.verifyAccessToken, challengeController.getMyParticipations);
 challengeRouter.route('/my-requests').get(tokenVerifier.verifyAccessToken, challengeController.getMyRequests);
 
