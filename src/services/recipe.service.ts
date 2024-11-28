@@ -2,6 +2,7 @@ import type { IRecipeService } from '#interfaces/services/recipe.service.interfa
 import type { RecipeRepository } from '#repositories/recipe.repository.js';
 import { BadRequest, NotFound } from '#types/http-error.types.js';
 import type { CreateRecipeDTO, RecipeOptions, UpdateRecipeDTO } from '#types/recipe.types.js';
+import { generatePresignedDownloadUrl } from '#utils/S3/generate-presigned-download-url.js';
 import MESSAGES from '#utils/constants/messages.js';
 
 export class RecipeService implements IRecipeService {
@@ -11,7 +12,22 @@ export class RecipeService implements IRecipeService {
     const recipes = await this.recipeRepository.findMany(options);
     const totalCount = await this.recipeRepository.getCount(options);
 
-    return { list: recipes, totalCount };
+    const newRecipes = await Promise.all(
+      recipes.map(async recipe => {
+        const images: string[] = [];
+        await Promise.all(
+          recipe.images.map(async image => {
+            const url = await generatePresignedDownloadUrl(image);
+            images.push(url);
+          }),
+        );
+
+        recipe.images = images;
+        return recipe;
+      }),
+    );
+
+    return { list: newRecipes, totalCount };
   };
 
   getRecipeById = async (id: string) => {
@@ -19,6 +35,15 @@ export class RecipeService implements IRecipeService {
     if (!recipe || recipe.deletedAt) {
       throw new NotFound(MESSAGES.NOT_FOUND);
     }
+
+    const images: string[] = [];
+    await Promise.all(
+      recipe.images.map(async image => {
+        const url = await generatePresignedDownloadUrl(image);
+        images.push(url);
+      }),
+    );
+    recipe.images = images;
 
     return recipe;
   };
