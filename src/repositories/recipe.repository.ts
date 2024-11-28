@@ -58,4 +58,39 @@ export class RecipeRepository implements IRecipeRepository {
 
     return recipe;
   };
+
+  like = async (recipeId: string, userId: string) => {
+    const recipe = await this.recipe.update({
+      where: { id: recipeId },
+      data: {
+        likeCount: { increment: 1 },
+        likeUsers: { connect: { id: userId } },
+      },
+    });
+
+    return recipe;
+  };
+
+  unlike = async (recipeId: string, userId: string) => {
+    const recipe = await this.recipe.update({
+      where: { id: recipeId },
+      data: {
+        likeCount: { decrement: 1 },
+        likeUsers: { disconnect: { id: userId } },
+      },
+    });
+
+    return recipe;
+  };
+
+  isLiked = async (recipeId: string, userId: string) => {
+    const recipe = await this.recipe.findFirst({
+      where: {
+        id: recipeId,
+        likeUsers: { some: { id: userId } },
+      },
+    });
+
+    return !!recipe;
+  };
 }

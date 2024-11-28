@@ -7,4 +7,6 @@ export interface IRecipeService {
   createRecipe(recipeData: CreateRecipeDTO): Promise<Recipe>;
   updateRecipe(id: string, recipeData: UpdateRecipeDTO): Promise<Recipe>;
   deleteRecipe(id: string): Promise<Recipe>;
+  likeRecipe(recipeId: string, userId: string): Promise<Recipe>;
+  unlikeRecipe(recipeId: string, userId: string): Promise<Recipe>;
 }

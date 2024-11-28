@@ -1,6 +1,6 @@
 import type { IRecipeService } from '#interfaces/services/recipe.service.interface.js';
 import type { RecipeRepository } from '#repositories/recipe.repository.js';
-import { NotFound } from '#types/http-error.types.js';
+import { BadRequest, NotFound } from '#types/http-error.types.js';
 import type { CreateRecipeDTO, RecipeOptions, UpdateRecipeDTO } from '#types/recipe.types.js';
 import MESSAGES from '#utils/constants/messages.js';
 
@@ -47,5 +47,33 @@ export class RecipeService implements IRecipeService {
     }
 
     return recipe;
+  };
+
+  likeRecipe = async (recipeId: string, userId: string) => {
+    const recipe = await this.recipeRepository.findById(recipeId);
+    if (!recipe || recipe.deletedAt) {
+      throw new NotFound(MESSAGES.NOT_FOUND);
+    }
+    const isLiked = await this.recipeRepository.isLiked(recipeId, userId);
+    if (isLiked) {
+      throw new BadRequest(MESSAGES.BAD_REQUEST);
+    }
+    const result = await this.recipeRepository.like(recipeId, userId);
+
+    return result;
+  };
+
+  unlikeRecipe = async (recipeId: string, userId: string) => {
+    const recipe = await this.recipeRepository.findById(recipeId);
+    if (!recipe || recipe.deletedAt) {
+      throw new NotFound(MESSAGES.NOT_FOUND);
+    }
+    const isLiked = await this.recipeRepository.isLiked(recipeId, userId);
+    if (!isLiked) {
+      throw new BadRequest(MESSAGES.BAD_REQUEST);
+    }
+    const result = await this.recipeRepository.unlike(recipeId, userId);
+
+    return result;
   };
 }
