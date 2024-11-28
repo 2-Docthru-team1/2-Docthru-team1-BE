@@ -1,4 +1,4 @@
-import { type AbortReason, type Challenge, type MediaType, type Status } from '@prisma/client';
+import { type AbortReason, type Challenge, type MediaType, MonthlyType, type Status } from '@prisma/client';
 import baseClient from '#connection/postgres.connection.js';
 import type { IChallengeRepository } from '#interfaces/repositories/challenge.repository.interface.js';
 import type {
@@ -44,6 +44,7 @@ export class ChallengeRepository implements IChallengeRepository {
       status?: { in: Status[] };
       title?: { contains: string };
       isHidden?: boolean;
+      monthly: MonthlyType | null;
     } = {
       ...(Array.isArray(mediaType) ? { mediaType: { in: mediaType } } : {}),
       ...(Array.isArray(status) ? { status: { in: status } } : {}),
@@ -51,7 +52,7 @@ export class ChallengeRepository implements IChallengeRepository {
       ...(admin ? {} : { isHidden: false }),
       ...(requestUserId ? { requestUserId } : {}),
       ...(participantId ? { participants: { some: { id: participantId } } } : {}),
-      ...{ monthly: null },
+      monthly: null,
     };
     const challenges = await this.challenge.findMany({
       skip: (page - 1) * pageSize,
@@ -70,6 +71,7 @@ export class ChallengeRepository implements IChallengeRepository {
       status?: { in: Status[] };
       title?: { contains: string };
       isHidden?: boolean;
+      monthly: MonthlyType | null;
     } = {
       ...(Array.isArray(mediaType) ? { mediaType: { in: mediaType } } : {}),
       ...(Array.isArray(status) ? { status: { in: status } } : {}),
@@ -77,6 +79,7 @@ export class ChallengeRepository implements IChallengeRepository {
       ...(admin ? {} : { isHidden: false }),
       ...(requestUserId ? { requestUserId } : {}),
       ...(participantId ? { participants: { some: { id: participantId } } } : {}),
+      monthly: null,
     };
     const totalCount = await this.challenge.count({ where: whereCondition });
     return totalCount;
