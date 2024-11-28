@@ -50,28 +50,30 @@ export class RecipeService implements IRecipeService {
   };
 
   likeRecipe = async (recipeId: string, userId: string) => {
+    const recipe = await this.recipeRepository.findById(recipeId);
+    if (!recipe || recipe.deletedAt) {
+      throw new NotFound(MESSAGES.NOT_FOUND);
+    }
     const isLiked = await this.recipeRepository.isLiked(recipeId, userId);
     if (isLiked) {
       throw new BadRequest(MESSAGES.BAD_REQUEST);
     }
-    const recipe = await this.recipeRepository.like(recipeId, userId);
-    if (!recipe || recipe.deletedAt) {
-      throw new NotFound(MESSAGES.NOT_FOUND);
-    }
+    const result = await this.recipeRepository.like(recipeId, userId);
 
-    return recipe;
+    return result;
   };
 
   unlikeRecipe = async (recipeId: string, userId: string) => {
+    const recipe = await this.recipeRepository.findById(recipeId);
+    if (!recipe || recipe.deletedAt) {
+      throw new NotFound(MESSAGES.NOT_FOUND);
+    }
     const isLiked = await this.recipeRepository.isLiked(recipeId, userId);
     if (!isLiked) {
       throw new BadRequest(MESSAGES.BAD_REQUEST);
     }
-    const recipe = await this.recipeRepository.unlike(recipeId, userId);
-    if (!recipe || recipe.deletedAt) {
-      throw new NotFound(MESSAGES.NOT_FOUND);
-    }
+    const result = await this.recipeRepository.unlike(recipeId, userId);
 
-    return recipe;
+    return result;
   };
 }

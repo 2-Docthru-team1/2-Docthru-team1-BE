@@ -10,4 +10,5 @@ export interface IRecipeRepository {
   delete(id: string): Promise<Recipe>;
   like(recipeId: string, userId: string): Promise<Recipe>;
   unlike(recipeId: string, userId: string): Promise<Recipe>;
+  isLiked(recipeId: string, userId: string): Promise<boolean>;
 }
