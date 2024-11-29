@@ -26,7 +26,7 @@ export class FeedbackRepository implements IFeedbackRepository {
       orderBy: { createdAt: Prisma.SortOrder.desc },
       skip: (page - 1) * pageSize,
       take: pageSize,
-      include: { owner: { select: { name: true } } },
+      include: { owner: { select: { name: true, role: true } } },
     });
 
     return feedbacks;
@@ -35,7 +35,7 @@ export class FeedbackRepository implements IFeedbackRepository {
   findById = async (id: string): Promise<Feedback | null> => {
     const feedback = await this.feedback.findUnique({
       where: { id },
-      include: { owner: { select: { name: true } } },
+      include: { owner: { select: { name: true, role: true } } },
     });
 
     return feedback;
