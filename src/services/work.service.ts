@@ -1,4 +1,5 @@
 import type { Challenge, ChallengeWork } from '@prisma/client';
+import { Role } from '@prisma/client';
 import type { IWorkService } from '#interfaces/services/work.service.interface.js';
 import { getStorage } from '#middlewares/asyncLocalStorage.js';
 import type { ChallengeRepository } from '#repositories/challenge.repository.js';
@@ -124,15 +125,15 @@ export class WorkService implements IWorkService {
   deleteWork = async (id: string): Promise<ResultChallengeWork> => {
     const storage = getStorage();
     const userId = storage.userId;
+    const userRole = storage.userRole;
     const foundWork = await this.WorkRepository.findById(id);
     if (!foundWork || foundWork.deletedAt) {
       throw new NotFound(MESSAGES.NOT_FOUND);
     }
-    if (userId !== foundWork.ownerId) {
+    if (userId !== foundWork.ownerId && userRole !== Role.admin) {
       throw new Forbidden(MESSAGES.FORBIDDEN);
     }
 
-    //본인 인증 하고
     const deletedWork = await this.WorkRepository.delete(id);
     const { ownerId, ...otherWorkField } = deletedWork || {};
     const changedWork = { ...otherWorkField } as ResultChallengeWork;
