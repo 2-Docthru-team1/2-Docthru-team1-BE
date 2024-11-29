@@ -22,6 +22,7 @@ export class ChallengeRepository implements IChallengeRepository {
 
   findMany = async (options: getChallengesOptions): Promise<Challenge[] | null> => {
     const { status, mediaType, orderBy, keyword, page, pageSize, admin, requestUserId, participantId } = options;
+
     const applyOrderBy: {
       deadline?: 'asc' | 'desc';
       createdAt?: 'asc' | 'desc';
@@ -39,6 +40,7 @@ export class ChallengeRepository implements IChallengeRepository {
       default:
         applyOrderBy.createdAt = 'desc';
     }
+
     const whereCondition: {
       mediaType?: { in: MediaType[] };
       status?: { in: Status[] };
@@ -54,6 +56,7 @@ export class ChallengeRepository implements IChallengeRepository {
       ...(participantId ? { participants: { some: { id: participantId } } } : {}),
       monthly: null,
     };
+
     const challenges = await this.challenge.findMany({
       skip: (page - 1) * pageSize,
       take: pageSize,
@@ -61,11 +64,13 @@ export class ChallengeRepository implements IChallengeRepository {
       orderBy: applyOrderBy,
       include: { requestUser: { select: { id: true, name: true } } },
     });
+
     return challenges;
   };
 
   totalCount = async (options: getChallengesOptions): Promise<number | null> => {
     const { status, mediaType, keyword, admin, requestUserId, participantId } = options;
+
     const whereCondition: {
       mediaType?: { in: MediaType[] };
       status?: { in: Status[] };
@@ -81,22 +86,26 @@ export class ChallengeRepository implements IChallengeRepository {
       ...(participantId ? { participants: { some: { id: participantId } } } : {}),
       monthly: null,
     };
+
     const totalCount = await this.challenge.count({ where: whereCondition });
+
     return totalCount;
   };
 
   findById = async (id: string): Promise<Challenge | null> => {
-    return await baseClient.challenge.findUnique({
+    const challenge = await baseClient.challenge.findUnique({
       where: { id },
       include: {
         participants: { select: { id: true } },
         requestUser: { select: { id: true, name: true } },
       },
     });
+
+    return challenge;
   };
 
   create = async (data: ChallengeInput): Promise<Challenge> => {
-    return await this.challenge.create({
+    const challenge = await this.challenge.create({
       data: {
         ...data,
       },
@@ -104,6 +113,8 @@ export class ChallengeRepository implements IChallengeRepository {
         requestUser: { select: { id: true, name: true } },
       },
     });
+
+    return challenge;
   };
 
   update = async (id: string, data: UpdateChallengeDTO): Promise<Challenge> => {
@@ -114,12 +125,14 @@ export class ChallengeRepository implements IChallengeRepository {
         requestUser: { select: { id: true, name: true } },
       },
     });
+
     return challenge;
   };
 
   updateStatus = async (data: ChallengeStatusInput): Promise<Challenge> => {
     const { challengeId, status, abortReason, userId } = data;
     const newStatus = { status };
+
     if (abortReason && ['denied', 'aborted'].includes(status)) {
       await this.abortReason.upsert({
         where: { challengeId },
@@ -134,23 +147,28 @@ export class ChallengeRepository implements IChallengeRepository {
         },
       });
     }
-    return await this.challenge.update({
+
+    const challenge = await this.challenge.update({
       where: { id: challengeId },
       data: newStatus,
       include: {
         requestUser: { select: { id: true, name: true } },
       },
     });
+
+    return challenge;
   };
 
   findAbortReason = async (id: string): Promise<AbortReason | null> => {
-    return await this.abortReason.findUnique({
+    const abortReason = await this.abortReason.findUnique({
       where: { challengeId: id },
     });
+
+    return abortReason;
   };
 
   findMonthlyChallenge = async (option: GetMonthlyChallengeOption, currentYear: number): Promise<Challenge[] | null> => {
-    return await this.challenge.findMany({
+    const challenge = await this.challenge.findMany({
       where: {
         monthly: option.monthly,
         createdAt: {
@@ -160,5 +178,7 @@ export class ChallengeRepository implements IChallengeRepository {
       },
       include: { requestUser: { select: { id: true, name: true } } },
     });
+
+    return challenge;
   };
 }

@@ -30,8 +30,6 @@ export interface GetMonthlyChallengeOption {
   monthly: MonthlyType;
 }
 
-export interface filteredChallenge extends Omit<Challenge, 'isHidden' | 'requestUserId'> {}
-
 export interface CreateChallengeDTO {
   title: string;
   description: string;

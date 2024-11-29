@@ -20,12 +20,9 @@ export interface BasicOptions {
   page: number;
   pageSize: number;
 }
-export interface BasicStringOptions {
-  page: string;
-  pageSize: string;
-}
+
 export interface BasicQueries {
-  orderBy: string;
-  page: string;
-  pageSize: string;
+  orderBy?: string;
+  page?: string;
+  pageSize?: string;
 }

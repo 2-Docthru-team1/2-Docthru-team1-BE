@@ -1,9 +1,8 @@
-import type { ChallengeWork, WorkImage } from '@prisma/client';
-import type { CreateWorkDTOWithS3Data } from '#types/work.types.js';
+import type { ChallengeWork } from '@prisma/client';
 
-export function chageTypeWorkCreate(data: ChallengeWork & { imagesData: { s3Key: string; uploadUrl: string }[] }) {
-  const { imagesData, ownerId, ...ohter } = data;
+export function changeTypeWorkCreate(data: ChallengeWork & { imagesData: { s3Key: string; uploadUrl: string }[] }) {
+  const { imagesData, ownerId, ...other } = data;
   const images = imagesData.map(data => ({ uploadUrl: data.uploadUrl }));
-  const returnData = { ...ohter, images };
+  const returnData = { ...other, images };
   return returnData;
 }

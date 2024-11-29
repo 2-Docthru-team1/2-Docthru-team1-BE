@@ -5,12 +5,11 @@ import type {
   CustomChallenge,
   GetMonthlyChallengeOption,
   UpdateChallengeDTO,
-  filteredChallenge,
   getChallengesOptions,
 } from '#types/challenge.types.js';
 
 export interface IChallengeService {
-  getChallenges(options: getChallengesOptions): Promise<{ list: filteredChallenge[]; totalCount: number }>;
+  getChallenges(options: getChallengesOptions): Promise<{ list: CustomChallenge[]; totalCount: number }>;
   getChallengeById(id: string): Promise<CustomChallenge | null>;
   createChallenge(
     challengeData: CreateChallengeDTO,
