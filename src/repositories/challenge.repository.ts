@@ -108,7 +108,10 @@ export class ChallengeRepository implements IChallengeRepository {
   findByNumber = async (number: number): Promise<Challenge | null> => {
     const challenge = await this.challenge.findUnique({
       where: { number },
-      include: { requestUser: { select: { id: true, name: true } } },
+      include: {
+        participants: { select: { id: true } },
+        requestUser: { select: { id: true, name: true } },
+      },
     });
 
     return challenge;
