@@ -34,13 +34,16 @@ export class RecipeRepository implements IRecipeRepository {
       where: { category, title: { contains: keyword } },
       skip: (page - 1) * pageSize,
       take: pageSize,
+      include: {
+        likeUsers: { select: { id: true } },
+      },
     });
 
     return recipes;
   };
 
   findById = async (id: string) => {
-    const recipe = await this.recipe.findUnique({ where: { id } });
+    const recipe = await this.recipe.findUnique({ where: { id }, include: { likeUsers: { select: { id: true } } } });
 
     return recipe;
   };
