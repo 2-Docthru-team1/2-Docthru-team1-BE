@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import FEEDBACKS from '@/prisma/mock/feedbackMock.js';
 import RECIPES from '@/prisma/mock/recipeMock.js';
+import { ABORT_REASONS } from './mock/abortReasonMock.js';
 import { CHALLENGES } from './mock/challengeMock.js';
 import { CHALLENGE_WORKS, WORK_IMAGES } from './mock/challengeWorkMock.js';
 import USERS from './mock/userMock.js';
@@ -8,6 +9,7 @@ import USERS from './mock/userMock.js';
 const prisma = new PrismaClient();
 
 async function main() {
+  await prisma.abortReason.deleteMany();
   await prisma.recipe.deleteMany();
   await prisma.feedback.deleteMany();
   await prisma.workImage.deleteMany();
@@ -54,6 +56,10 @@ async function main() {
 
   await prisma.recipe.createMany({
     data: RECIPES,
+    skipDuplicates: true,
+  });
+  await prisma.abortReason.createMany({
+    data: ABORT_REASONS,
     skipDuplicates: true,
   });
 }
