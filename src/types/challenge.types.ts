@@ -17,13 +17,14 @@ export interface GetChallengesQuery {
 export interface getChallengesOptions {
   status?: Status[];
   mediaType?: MediaType[];
-  orderBy: Order;
-  keyword: string;
-  page: number;
-  pageSize: number;
+  orderBy?: Order;
+  keyword?: string;
+  page?: number;
+  pageSize?: number;
   admin?: boolean;
   requestUserId?: string;
   participantId?: string;
+  allRecords?: boolean;
 }
 
 export interface GetMonthlyChallengeOption {

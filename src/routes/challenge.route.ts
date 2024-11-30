@@ -25,6 +25,9 @@ challengeRouter
   .get(challengeController.getChallengeById)
   .patch(tokenVerifier.verifyAccessToken, challengeController.patchChallenge);
 
+challengeRouter.route('/:id/next').get(challengeController.getNextChallenge);
+challengeRouter.route('/:id/prev').get(challengeController.getPrevChallenge);
+
 challengeRouter.patch('/:id/status', tokenVerifier.verifyAccessToken, challengeController.patchChallengeStatus);
 challengeRouter.get('/:id/reason', challengeController.getChallengeAbortReason);
 
