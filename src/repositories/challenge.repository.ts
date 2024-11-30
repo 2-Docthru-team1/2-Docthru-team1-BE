@@ -21,7 +21,7 @@ export class ChallengeRepository implements IChallengeRepository {
   }
 
   findMany = async (options: getChallengesOptions): Promise<Challenge[] | null> => {
-    const { status, mediaType, orderBy, keyword, page, pageSize, admin, requestUserId, participantId } = options;
+    const { status, mediaType, orderBy, keyword, page = 1, pageSize = 4, admin, requestUserId, participantId } = options;
 
     const applyOrderBy: {
       deadline?: 'asc' | 'desc';
@@ -69,7 +69,7 @@ export class ChallengeRepository implements IChallengeRepository {
   };
 
   totalCount = async (options: getChallengesOptions): Promise<number | null> => {
-    const { status, mediaType, keyword, admin, requestUserId, participantId } = options;
+    const { status, mediaType, keyword, admin, requestUserId, participantId, allRecords } = options;
 
     const whereCondition: {
       mediaType?: { in: MediaType[] };
@@ -87,7 +87,8 @@ export class ChallengeRepository implements IChallengeRepository {
       monthly: null,
     };
 
-    const totalCount = await this.challenge.count({ where: whereCondition });
+    // NOTE allRecords일 경우 모든 레코드를 카운트
+    const totalCount = await this.challenge.count({ where: allRecords ? { deletedAt: undefined } : whereCondition });
 
     return totalCount;
   };
@@ -99,6 +100,14 @@ export class ChallengeRepository implements IChallengeRepository {
         participants: { select: { id: true } },
         requestUser: { select: { id: true, name: true } },
       },
+    });
+
+    return challenge;
+  };
+
+  findByNumber = async (number: number): Promise<Challenge | null> => {
+    const challenge = await this.challenge.findUnique({
+      where: { number },
     });
 
     return challenge;

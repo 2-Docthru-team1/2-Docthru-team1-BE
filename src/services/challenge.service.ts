@@ -60,6 +60,47 @@ export class ChallengeService implements IChallengeService {
     };
   };
 
+  getNextChallenge = async (id: string): Promise<CustomChallenge | null> => {
+    const totalCount = (await this.challengeRepository.totalCount({ allRecords: true })) || 0;
+    const challenge = await this.challengeRepository.findById(id);
+    if (!challenge || challenge.deletedAt) {
+      throw new NotFound(MESSAGES.NOT_FOUND);
+    }
+
+    let nextChallenge;
+    let i = 1;
+    do {
+      if (i > totalCount) {
+        throw new NotFound(MESSAGES.NOT_FOUND);
+      }
+      nextChallenge = await this.challengeRepository.findByNumber(challenge.number + i);
+      i += 1;
+    } while (!nextChallenge || nextChallenge.deletedAt || nextChallenge.monthly);
+
+    const CustomChallenge = filterChallenge(nextChallenge);
+    return CustomChallenge;
+  };
+
+  getPreviousChallenge = async (id: string): Promise<CustomChallenge | null> => {
+    const challenge = await this.challengeRepository.findById(id);
+    if (!challenge || challenge.deletedAt) {
+      throw new NotFound(MESSAGES.NOT_FOUND);
+    }
+
+    let previousChallenge;
+    let i = 1;
+    do {
+      if (challenge.number - i < 1) {
+        throw new NotFound(MESSAGES.NOT_FOUND);
+      }
+      previousChallenge = await this.challengeRepository.findByNumber(challenge.number - i);
+      i += 1;
+    } while (!previousChallenge || previousChallenge.deletedAt || previousChallenge.monthly);
+
+    const CustomChallenge = filterChallenge(previousChallenge);
+    return CustomChallenge;
+  };
+
   createChallenge = async (
     challengeData: CreateChallengeDTO,
   ): Promise<{ challenge: CustomChallenge; uploadUrls: { uploadUrl: string }[] }> => {

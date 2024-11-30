@@ -160,6 +160,18 @@ export class ChallengeController {
     res.json(challenge);
   };
 
+  getNextChallenge = async (req: Request<{ params: { id: string } }>, res: Response) => {
+    const { id } = req.params;
+    const nextChallenge = await this.challengeService.getNextChallenge(id);
+    res.json(nextChallenge);
+  };
+
+  getPrevChallenge = async (req: Request<{ params: { id: string } }>, res: Response) => {
+    const { id } = req.params;
+    const prevChallenge = await this.challengeService.getPreviousChallenge(id);
+    res.json(prevChallenge);
+  };
+
   postChallenge = async (req: Request<{ body: CreateChallengeDTO }>, res: Response) => {
     assert(req.body, CreateChallenge, MESSAGES.WRONG_FORMAT);
     const challengeData = req.body;
