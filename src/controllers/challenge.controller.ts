@@ -100,8 +100,17 @@ export class ChallengeController {
   };
 
   getMyParticipations = async (req: Request<{ query: GetChallengesQuery }>, res: Response, next: NextFunction) => {
-    const { status, orderBy = 'latestFirst', keyword = '', page = '1', pageSize = '10' } = req.query;
+    const { status, mediaType, orderBy = 'latestFirst', keyword = '', page = '1', pageSize = '10' } = req.query;
     const participantId = req.user?.userId;
+
+    let mediaTypeEnum;
+    if (Array.isArray(mediaType)) {
+      mediaTypeEnum = mediaType as MediaType[];
+    } else if (mediaType?.length) {
+      mediaTypeEnum = [mediaType] as MediaType[];
+    } else {
+      mediaTypeEnum = undefined;
+    }
 
     let statusEnum;
     if (status === 'onGoing' || status === 'finished') {
@@ -116,6 +125,7 @@ export class ChallengeController {
       orderBy: orderEnum,
       page: Number(page),
       pageSize: Number(pageSize),
+      mediaType: mediaTypeEnum,
       keyword,
       participantId,
     };
@@ -126,26 +136,64 @@ export class ChallengeController {
   };
 
   getMyRequests = async (req: Request<{ query: GetChallengesQuery }>, res: Response, next: NextFunction) => {
-    const { status, orderBy = 'latestFirst', keyword = '', page = '1', pageSize = '10' } = req.query;
+    const { mediaType, filter, keyword = '', page = '1', pageSize = '10' } = req.query;
     const requestUserId = req.user?.userId;
 
     let statusEnum;
-    if (status === 'Approved') {
-      statusEnum = ['onGoing', 'finished'] as Status[];
-    } else if (Array.isArray(status)) {
-      statusEnum = status as Status[];
-    } else if (status?.length) {
-      statusEnum = [status] as Status[];
+    let mediaTypeEnum;
+    let orderEnum;
+
+    if (Array.isArray(mediaType)) {
+      mediaTypeEnum = mediaType as MediaType[];
+    } else if (mediaType?.length) {
+      mediaTypeEnum = [mediaType] as MediaType[];
     } else {
-      statusEnum = undefined;
+      mediaTypeEnum = undefined;
     }
-    const orderEnum = orderBy as Order;
+
+    switch (filter) {
+      case 'approved':
+        statusEnum = [Status.onGoing, Status.finished];
+        break;
+      case 'pending':
+        statusEnum = [Status.pending];
+        break;
+      case 'onGoing':
+        statusEnum = [Status.onGoing];
+        break;
+      case 'finished':
+        statusEnum = [Status.finished];
+        break;
+      case 'denied':
+        statusEnum = [Status.denied];
+        break;
+      case 'aborted':
+        statusEnum = [Status.aborted];
+        break;
+      case 'canceled':
+        statusEnum = [Status.canceled];
+        break;
+      case Order.deadlineEarliest:
+        orderEnum = Order.deadlineEarliest;
+        break;
+      case Order.deadlineLatest:
+        orderEnum = Order.deadlineLatest;
+        break;
+      case Order.earliestFirst:
+        orderEnum = Order.earliestFirst;
+        break;
+      case Order.latestFirst:
+      default:
+        orderEnum = Order.latestFirst;
+        break;
+    }
 
     const options = {
       status: statusEnum,
       orderBy: orderEnum,
       page: Number(page),
       pageSize: Number(pageSize),
+      mediaType: mediaTypeEnum,
       keyword,
       requestUserId,
     };
