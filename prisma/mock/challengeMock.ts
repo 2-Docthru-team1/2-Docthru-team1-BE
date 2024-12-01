@@ -416,7 +416,7 @@ export const CHALLENGES = [
     requestUserId: 'a666a76c-46a1-4aa2-9741-bdbb20785fc4',
   },
   {
-    id: '0a9d3b24-1f91-457f-9324-62c1eaec30b0',
+    id: 'a00ac4c1-a22d-4f15-a9ce-a50adc9537ce',
     number: 24,
     createdAt: new Date('2024-11-17T10:00:00.000Z'),
     updatedAt: new Date('2024-11-17T10:00:00.000Z'),
@@ -434,7 +434,7 @@ export const CHALLENGES = [
     requestUserId: 'a666a76c-46a1-4aa2-9741-bdbb20785fc4',
   },
   {
-    id: '7bd29289-f547-41e5-9f4c-52952f182f62',
+    id: 'bb98bc35-2c63-48e3-b24d-a97f1cfc392c',
     number: 25,
     createdAt: new Date('2024-11-18T08:30:00.000Z'),
     updatedAt: new Date('2024-11-18T08:30:00.000Z'),
@@ -452,7 +452,7 @@ export const CHALLENGES = [
     requestUserId: 'a666a76c-46a1-4aa2-9741-bdbb20785fc4',
   },
   {
-    id: '4fae0f0d-998f-469f-8f64-2c204eebc932',
+    id: '1dbc4d70-2694-4fc7-bebe-2e340532fb57',
     number: 26,
     createdAt: new Date('2024-11-19T09:15:00.000Z'),
     updatedAt: new Date('2024-11-19T09:15:00.000Z'),
