@@ -10,7 +10,6 @@ import type {
   CustomChallenge,
   GetMonthlyChallengeOption,
   UpdateChallengeDTO,
-  filteredChallenge,
   getChallengesOptions,
 } from '#types/challenge.types.js';
 import { BadRequest, Forbidden, NotFound } from '#types/http-error.types.js';
@@ -23,36 +22,83 @@ import { validateUpdateStatus } from '#utils/validateUpdateStatus.js';
 export class ChallengeService implements IChallengeService {
   constructor(private challengeRepository: ChallengeRepository) {}
 
-  // 이 아래로 데이터를 가공하는 코드를 작성합니다.
-  // 비즈니스 로직, DB에서 가져온 데이터를 가공하는 코드가 주로 작성됩니다.
-  // 여기서 가공된 데이터를 controller로 올려줍니다.
-
-  getChallenges = async (options: getChallengesOptions): Promise<{ list: filteredChallenge[]; totalCount: number }> => {
+  getChallenges = async (options: getChallengesOptions): Promise<{ list: CustomChallenge[]; totalCount: number }> => {
     const storage = getStorage();
     const userRole = storage.userRole;
     const isAdmin = userRole === 'admin';
     options.admin = isAdmin;
+
     const challenges = (await this.challengeRepository.findMany(options)) || [];
-    const list = challenges.map(challenge => filterChallenge(challenge));
+    const updatedUrlChallenges = await Promise.all(
+      challenges.map(async challenge => {
+        const expiresIn = 3600;
+        challenge.imageUrl = await generatePresignedDownloadUrl(challenge.imageUrl, expiresIn);
+        challenge.imageUrl2 = challenge.imageUrl2 ? await generatePresignedDownloadUrl(challenge.imageUrl) : null;
+        return challenge;
+      }),
+    );
+
+    const list = updatedUrlChallenges.map(challenge => filterChallenge(challenge));
     const totalCount = (await this.challengeRepository.totalCount(options)) || 0;
 
-    return { list, totalCount };
+    return { totalCount, list };
   };
 
   getChallengeById = async (id: string): Promise<CustomChallenge | null> => {
-    const expiresIn = 3600;
     const challenge = await this.challengeRepository.findById(id);
     if (!challenge || challenge.deletedAt) {
       throw new NotFound(MESSAGES.NOT_FOUND);
     }
-    const { isHidden, requestUserId, ...rest } = challenge;
-    const imageUrl = await generatePresignedDownloadUrl(challenge.imageUrl, expiresIn);
-    const imageUrl2 = challenge.imageUrl2 ? await generatePresignedDownloadUrl(challenge.imageUrl2, expiresIn) : null;
+
+    const CustomChallenge = filterChallenge(challenge);
+    const imageUrl = await generatePresignedDownloadUrl(challenge.imageUrl);
+    const imageUrl2 = challenge.imageUrl2 ? await generatePresignedDownloadUrl(challenge.imageUrl2) : null;
     return {
-      ...rest,
+      ...CustomChallenge,
       imageUrl,
       imageUrl2,
     };
+  };
+
+  getNextChallenge = async (id: string): Promise<CustomChallenge | null> => {
+    const totalCount = (await this.challengeRepository.totalCount({ allRecords: true })) || 0;
+    const challenge = await this.challengeRepository.findById(id);
+    if (!challenge || challenge.deletedAt) {
+      throw new NotFound(MESSAGES.NOT_FOUND);
+    }
+
+    let nextChallenge;
+    let i = 1;
+    do {
+      if (i > totalCount) {
+        throw new NotFound(MESSAGES.NOT_FOUND);
+      }
+      nextChallenge = await this.challengeRepository.findByNumber(challenge.number + i);
+      i += 1;
+    } while (!nextChallenge || nextChallenge.deletedAt || nextChallenge.monthly);
+
+    const CustomChallenge = filterChallenge(nextChallenge);
+    return CustomChallenge;
+  };
+
+  getPreviousChallenge = async (id: string): Promise<CustomChallenge | null> => {
+    const challenge = await this.challengeRepository.findById(id);
+    if (!challenge || challenge.deletedAt) {
+      throw new NotFound(MESSAGES.NOT_FOUND);
+    }
+
+    let previousChallenge;
+    let i = 1;
+    do {
+      if (challenge.number - i < 1) {
+        throw new NotFound(MESSAGES.NOT_FOUND);
+      }
+      previousChallenge = await this.challengeRepository.findByNumber(challenge.number - i);
+      i += 1;
+    } while (!previousChallenge || previousChallenge.deletedAt || previousChallenge.monthly);
+
+    const CustomChallenge = filterChallenge(previousChallenge);
+    return CustomChallenge;
   };
 
   createChallenge = async (
@@ -63,6 +109,7 @@ export class ChallengeService implements IChallengeService {
     if (!userId) {
       throw new BadRequest(MESSAGES.UNAUTHORIZED);
     }
+
     const { imageCount, ...restChallengeData } = challengeData;
     const uploadUrls: { uploadUrl: string }[] = [];
     let imageUrl: string = '';
@@ -89,8 +136,8 @@ export class ChallengeService implements IChallengeService {
     };
 
     const challenge = await this.challengeRepository.create(ChallengeInput);
-    const { isHidden, requestUserId, ...rest } = challenge;
-    return { challenge: { ...rest }, uploadUrls };
+    const CustomChallenge = filterChallenge(challenge);
+    return { challenge: { ...CustomChallenge }, uploadUrls };
   };
 
   updateChallenge = async (
@@ -139,8 +186,8 @@ export class ChallengeService implements IChallengeService {
     };
 
     const updatedChallenge = await this.challengeRepository.update(id, updatedChallengeInput);
-    const { isHidden, requestUserId, ...rest } = updatedChallenge;
-    return { challenge: { ...rest }, uploadUrls };
+    const CustomChallenge = filterChallenge(updatedChallenge);
+    return { challenge: { ...CustomChallenge }, uploadUrls };
   };
 
   updateStatus = async (data: ChallengeStatusInput): Promise<CustomChallenge | null> => {
@@ -165,8 +212,8 @@ export class ChallengeService implements IChallengeService {
       userId,
     });
 
-    const { isHidden, requestUserId, ...rest } = updateChallenge;
-    return { ...rest };
+    const CustomChallenge = filterChallenge(updateChallenge);
+    return CustomChallenge;
   };
 
   getAbortReason = async (id: string): Promise<AbortReason | null> => {
@@ -181,12 +228,14 @@ export class ChallengeService implements IChallengeService {
     if (!Object.values(MonthlyType).includes(option.monthly)) {
       throw new Error(MESSAGES.BAD_REQUEST);
     }
+
     const validMonthly = option.monthly as MonthlyType;
     const currentYear = new Date().getFullYear();
     const monthlyChallenge = await this.challengeRepository.findMonthlyChallenge({ monthly: validMonthly }, currentYear);
     if (!monthlyChallenge || monthlyChallenge.length === 0) {
       throw new NotFound(MESSAGES.NOT_FOUND);
     }
+
     const returnDownloadUrls = monthlyChallenge.map(async ({ isHidden, requestUserId, imageUrl, imageUrl2, ...rest }) => {
       const expiresIn = 3600;
       const downloadImageUrl = await generatePresignedDownloadUrl(imageUrl, expiresIn);

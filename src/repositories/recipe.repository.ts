@@ -3,7 +3,11 @@ import type { ExtendedPrismaClient } from '#types/common.types.js';
 import type { CreateRecipeDTO, RecipeOptions, UpdateRecipeDTO } from '#types/recipe.types.js';
 
 export class RecipeRepository implements IRecipeRepository {
-  constructor(private recipe: ExtendedPrismaClient['recipe']) {}
+  private recipe: ExtendedPrismaClient['recipe'];
+
+  constructor(prismaClient: ExtendedPrismaClient) {
+    this.recipe = prismaClient.recipe;
+  }
 
   getCount = async (options: RecipeOptions) => {
     const { category, keyword } = options;
@@ -30,13 +34,16 @@ export class RecipeRepository implements IRecipeRepository {
       where: { category, title: { contains: keyword } },
       skip: (page - 1) * pageSize,
       take: pageSize,
+      include: {
+        likeUsers: { select: { id: true } },
+      },
     });
 
     return recipes;
   };
 
   findById = async (id: string) => {
-    const recipe = await this.recipe.findUnique({ where: { id } });
+    const recipe = await this.recipe.findUnique({ where: { id }, include: { likeUsers: { select: { id: true } } } });
 
     return recipe;
   };

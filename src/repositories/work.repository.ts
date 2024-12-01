@@ -1,26 +1,20 @@
-import type { ChallengeWork, WorkImage } from '@prisma/client';
+import type { ChallengeWork } from '@prisma/client';
+import prismaClient from '#connection/postgres.connection.js';
 import type { IWorkRepository } from '#interfaces/repositories/work.repository.interface.js';
-import { getStorage } from '#middlewares/asyncLocalStorage.js';
 import type { ExtendedPrismaClient } from '#types/common.types.js';
-import {
-  type CreateWorkDTO,
-  type CreateWorkDTOWithS3Data,
-  type GetWorksOptions,
-  type RepositoryCreateWorkDTO,
-  type UpdateWorkDTO,
-  type UpdateWorkDTOWithUrls,
-} from '#types/work.types.js';
+import { type CreateWorkDTOWithS3Data, type GetWorksOptions, type UpdateWorkDTOWithUrls } from '#types/work.types.js';
 
 export class WorkRepository implements IWorkRepository {
   challengeWork: ExtendedPrismaClient['challengeWork'];
   workImage: ExtendedPrismaClient['workImage'];
+  challenge: ExtendedPrismaClient['challenge'];
 
   constructor(client: ExtendedPrismaClient) {
     this.challengeWork = client.challengeWork;
     this.workImage = client.workImage;
+    this.challenge = client.challenge;
   }
-  // 이 아래로 직접 DB와 통신하는 코드를 작성합니다.
-  // 여기서 DB와 통신해 받아온 데이터를 위로(service로) 올려줍니다.
+
   findMany = async (options: GetWorksOptions): Promise<ChallengeWork[] | null> => {
     const { challengeId, page, pageSize } = options;
     const works = await this.challengeWork.findMany({
@@ -35,10 +29,12 @@ export class WorkRepository implements IWorkRepository {
     });
     return works;
   };
+
   totalCount = async (challengeId: string): Promise<number | null> => {
     const totalCount = await this.challengeWork.count({ where: { challengeId } });
     return totalCount;
   };
+
   findById = async (id: string): Promise<(ChallengeWork & { likeUsers: { id: string }[] }) | null> => {
     const work = await this.challengeWork.findUnique({
       where: { id },
@@ -52,22 +48,31 @@ export class WorkRepository implements IWorkRepository {
   };
 
   create = async (data: CreateWorkDTOWithS3Data): Promise<ChallengeWork> => {
-    const { challengeId, imagesData, title, content } = data;
-    const storage = getStorage();
-    const userId = storage.userId;
-    const work = await this.challengeWork.create({
-      data: {
-        title,
-        content,
-        challenge: { connect: { id: challengeId } },
-        owner: { connect: { id: userId } },
-        images: {
-          create: imagesData.map(imageData => ({ imageUrl: imageData.s3Key })),
+    const { challengeId, imagesData, title, content, userId } = data;
+
+    const createdWork = await prismaClient.$transaction(async prisma => {
+      const work = await this.challengeWork.create({
+        data: {
+          title,
+          content,
+          challenge: { connect: { id: challengeId } },
+          owner: { connect: { id: userId } },
+          images: {
+            create: imagesData.map(imageData => ({ imageUrl: imageData.s3Key })),
+          },
         },
-      },
-      include: { images: true, owner: { select: { id: true, name: true, role: true, email: true } } },
+        include: { images: true, owner: { select: { id: true, name: true, role: true, email: true } } },
+      });
+
+      const challenge = await this.challenge.update({
+        where: { id: challengeId },
+        data: { participants: { connect: { id: userId } } },
+      });
+
+      return work;
     });
-    return work;
+
+    return createdWork;
   };
 
   update = async (id: string, data: UpdateWorkDTOWithUrls): Promise<ChallengeWork> => {
@@ -79,6 +84,7 @@ export class WorkRepository implements IWorkRepository {
       },
       include: { owner: { select: { id: true, name: true, role: true, email: true } }, images: true },
     });
+
     if (imagesData?.length) {
       const existngWorkImages = work.images;
       await this.workImage.deleteMany({ where: { workId: id } });
@@ -94,10 +100,16 @@ export class WorkRepository implements IWorkRepository {
     const work = await this.challengeWork.update({
       where: { id },
       data: { deletedAt: new Date() },
-      include: { owner: { select: { id: true, name: true, email: true, role: true } }, images: { select: { imageUrl: true } } },
+      include: {
+        owner: {
+          select: { id: true, name: true, email: true, role: true },
+        },
+        images: { select: { imageUrl: true } },
+      },
     });
     return work;
   };
+
   addLike = async (id: string, userId: string): Promise<ChallengeWork> => {
     const work = await this.challengeWork.update({
       where: { id },
@@ -105,6 +117,7 @@ export class WorkRepository implements IWorkRepository {
     });
     return work;
   };
+
   removeLike = async (id: string, userId: string): Promise<ChallengeWork> => {
     const work = await this.challengeWork.update({
       where: { id },

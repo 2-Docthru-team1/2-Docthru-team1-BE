@@ -4,7 +4,11 @@ import type { BasicOptions, ExtendedPrismaClient } from '#types/common.types.js'
 import type { CreateFeedbackDTO, UpdateFeedbackDTO } from '#types/feedback.types.js';
 
 export class FeedbackRepository implements IFeedbackRepository {
-  constructor(private feedback: ExtendedPrismaClient['feedback']) {}
+  private feedback: ExtendedPrismaClient['feedback'];
+
+  constructor(prismaClient: ExtendedPrismaClient) {
+    this.feedback = prismaClient.feedback;
+  }
 
   getCount = async (workId: string): Promise<number> => {
     const count = await this.feedback.count({
@@ -13,20 +17,16 @@ export class FeedbackRepository implements IFeedbackRepository {
 
     return count;
   };
-  
-  getCountByWorkId = async (workId: string): Promise<number> => {
-    const count = await this.feedback.count({ where: { workId: workId } });
-    return count;
-  };
 
   findMany = async (options: BasicOptions, workId: string): Promise<Feedback[] | null> => {
     const { page, pageSize } = options;
+
     const feedbacks = await this.feedback.findMany({
       where: { workId },
       orderBy: { createdAt: Prisma.SortOrder.desc },
       skip: (page - 1) * pageSize,
       take: pageSize,
-      include: { owner: { select: { name: true } } },
+      include: { owner: { select: { name: true, role: true } } },
     });
 
     return feedbacks;
@@ -35,7 +35,7 @@ export class FeedbackRepository implements IFeedbackRepository {
   findById = async (id: string): Promise<Feedback | null> => {
     const feedback = await this.feedback.findUnique({
       where: { id },
-      include: { owner: { select: { name: true } } },
+      include: { owner: { select: { name: true, role: true } } },
     });
 
     return feedback;

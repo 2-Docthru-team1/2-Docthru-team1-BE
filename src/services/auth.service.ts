@@ -1,5 +1,4 @@
 import type { IAuthService } from '#interfaces/services/auth.service.interface.js';
-import { getStorage } from '#middlewares/asyncLocalStorage.js';
 import type { UserRepository } from '#repositories/user.repository.js';
 import type { CreateUserDTO, SigninResponse, UserToken } from '#types/auth.types.js';
 import { BadRequest, NotFound, Unauthorized } from '#types/http-error.types.js';
@@ -73,9 +72,6 @@ export class AuthService implements IAuthService {
 
     const accessToken = createToken(user, 'access');
     user.accessToken = accessToken;
-
-    const storage = getStorage();
-    console.log('🚀 ~ AuthService ~ getNewToken= ~ storage:', storage);
 
     return filterSensitiveData(user);
   };

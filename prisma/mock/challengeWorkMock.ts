@@ -76,6 +76,41 @@ export const WORK_IMAGES = [
     imageUrl: 'bibimbab.png',
     workId: 'd7f5fb39-652b-4da4-9f26-19d2bf9722dd', // 열 번째 챌린지 워크의 ID
   },
+  {
+    createdAt: '2024-11-20T10:00:00Z',
+    updatedAt: '2024-11-20T10:00:00Z',
+    deletedAt: null,
+    imageUrl: 'bibimbab.png',
+    workId: '2a338524-a152-44c2-8c67-471f0c6e4a6d', // 열한 번째 챌린지 워크의 ID
+  },
+  {
+    createdAt: '2024-11-20T10:00:00Z',
+    updatedAt: '2024-11-20T10:00:00Z',
+    deletedAt: null,
+    imageUrl: 'bibimbab.png',
+    workId: '976fcfa2-594a-4c37-b31c-bed96444451e', // 열두 번째 챌린지 워크의 ID
+  },
+  {
+    createdAt: '2024-11-20T10:00:00Z',
+    updatedAt: '2024-11-20T10:00:00Z',
+    deletedAt: null,
+    imageUrl: 'bibimbab.png',
+    workId: '90ef4610-2e1c-4417-81f0-20823757f15c', // 열세 번째 챌린지 워크의 ID
+  },
+  {
+    createdAt: '2024-11-20T10:00:00Z',
+    updatedAt: '2024-11-20T10:00:00Z',
+    deletedAt: null,
+    imageUrl: 'bibimbab.png',
+    workId: 'e45bc54f-90b4-4218-817d-8c4c5c0dcda9', // 열네 번째 챌린지 워크의 ID
+  },
+  {
+    createdAt: '2024-11-20T10:00:00Z',
+    updatedAt: '2024-11-20T10:00:00Z',
+    deletedAt: null,
+    imageUrl: 'bibimbab.png',
+    workId: 'ba649b42-6efe-430c-be23-0b1cb963e6ad', // 열다섯 번째 챌린지 워크의 ID
+  },
 ];
 
 export const CHALLENGE_WORKS = [
@@ -178,5 +213,55 @@ export const CHALLENGE_WORKS = [
     likeCount: 11,
     ownerId: '78dd77e8-36e4-4cbd-bd7b-27e7fcaae6f9',
     challengeId: '62eda79b-066f-4a97-8296-e34ae656086b',
+  },
+  {
+    id: '2a338524-a152-44c2-8c67-471f0c6e4a6d',
+    createdAt: '2024-11-15T10:00:00Z',
+    updatedAt: '2024-11-15T10:00:00Z',
+    title: '열한번 째 챌린지',
+    content: '열한번 째 챌린지 워크의 내용입니다.',
+    likeCount: 0,
+    ownerId: 'e8394ccc-7359-4c16-ab37-4ed9671146a4',
+    challengeId: 'f7fd3fe0-6dc6-4fdb-bd64-ada1194b4b8c',
+  },
+  {
+    id: '976fcfa2-594a-4c37-b31c-bed96444451e',
+    createdAt: '2024-11-15T10:00:00Z',
+    updatedAt: '2024-11-15T10:00:00Z',
+    title: '열두번 째 챌린지',
+    content: '열두번 째 챌린지 워크의 내용입니다.',
+    likeCount: 0,
+    ownerId: 'c19d6446-2c05-48d7-99d2-9c12d2baa868',
+    challengeId: '16786232-7ccf-44b0-8e50-51e6c148a590',
+  },
+  {
+    id: '90ef4610-2e1c-4417-81f0-20823757f15c',
+    createdAt: '2024-11-15T10:00:00Z',
+    updatedAt: '2024-11-15T10:00:00Z',
+    title: '열세번 째 챌린지',
+    content: '열세번 째 챌린지 워크의 내용입니다.',
+    likeCount: 0,
+    ownerId: '0081e090-abfa-4e86-a13d-3cba9539a06c',
+    challengeId: '16786232-7ccf-44b0-8e50-51e6c148a590',
+  },
+  {
+    id: 'e45bc54f-90b4-4218-817d-8c4c5c0dcda9',
+    createdAt: '2024-11-15T10:00:00Z',
+    updatedAt: '2024-11-15T10:00:00Z',
+    title: '열네번 째 챌린지',
+    content: '열네번 째 챌린지 워크의 내용입니다.',
+    likeCount: 24,
+    ownerId: '5f72c907-e528-4e38-8b4e-c602417ae8af',
+    challengeId: 'f7fd3fe0-6dc6-4fdb-bd64-ada1194b4b8c',
+  },
+  {
+    id: 'ba649b42-6efe-430c-be23-0b1cb963e6ad',
+    createdAt: '2024-11-15T10:00:00Z',
+    updatedAt: '2024-11-15T10:00:00Z',
+    title: '열다섯번 째 챌린지',
+    content: '열다섯번 째 챌린지 워크의 내용입니다.',
+    likeCount: 55,
+    ownerId: '143c6a80-3522-41e9-a2ed-c57cbdb18f75',
+    challengeId: 'f7fd3fe0-6dc6-4fdb-bd64-ada1194b4b8c',
   },
 ];

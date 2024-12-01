@@ -1,4 +1,4 @@
-import { type AbortReason, type Challenge, type MediaType, type Status } from '@prisma/client';
+import { type AbortReason, type Challenge, type MediaType, MonthlyType, type Status } from '@prisma/client';
 import baseClient from '#connection/postgres.connection.js';
 import type { IChallengeRepository } from '#interfaces/repositories/challenge.repository.interface.js';
 import type {
@@ -21,7 +21,8 @@ export class ChallengeRepository implements IChallengeRepository {
   }
 
   findMany = async (options: getChallengesOptions): Promise<Challenge[] | null> => {
-    const { status, mediaType, orderBy, keyword, page, pageSize, admin, requestUserId, participantId } = options;
+    const { status, mediaType, orderBy, keyword, page = 1, pageSize = 4, admin, requestUserId, participantId } = options;
+
     const applyOrderBy: {
       deadline?: 'asc' | 'desc';
       createdAt?: 'asc' | 'desc';
@@ -39,11 +40,13 @@ export class ChallengeRepository implements IChallengeRepository {
       default:
         applyOrderBy.createdAt = 'desc';
     }
+
     const whereCondition: {
       mediaType?: { in: MediaType[] };
       status?: { in: Status[] };
       title?: { contains: string };
       isHidden?: boolean;
+      monthly: MonthlyType | null;
     } = {
       ...(Array.isArray(mediaType) ? { mediaType: { in: mediaType } } : {}),
       ...(Array.isArray(status) ? { status: { in: status } } : {}),
@@ -51,8 +54,9 @@ export class ChallengeRepository implements IChallengeRepository {
       ...(admin ? {} : { isHidden: false }),
       ...(requestUserId ? { requestUserId } : {}),
       ...(participantId ? { participants: { some: { id: participantId } } } : {}),
-      ...{ monthly: null },
+      monthly: null,
     };
+
     const challenges = await this.challenge.findMany({
       skip: (page - 1) * pageSize,
       take: pageSize,
@@ -60,16 +64,19 @@ export class ChallengeRepository implements IChallengeRepository {
       orderBy: applyOrderBy,
       include: { requestUser: { select: { id: true, name: true } } },
     });
+
     return challenges;
   };
 
   totalCount = async (options: getChallengesOptions): Promise<number | null> => {
-    const { status, mediaType, keyword, admin, requestUserId, participantId } = options;
+    const { status, mediaType, keyword, admin, requestUserId, participantId, allRecords } = options;
+
     const whereCondition: {
       mediaType?: { in: MediaType[] };
       status?: { in: Status[] };
       title?: { contains: string };
       isHidden?: boolean;
+      monthly: MonthlyType | null;
     } = {
       ...(Array.isArray(mediaType) ? { mediaType: { in: mediaType } } : {}),
       ...(Array.isArray(status) ? { status: { in: status } } : {}),
@@ -77,23 +84,41 @@ export class ChallengeRepository implements IChallengeRepository {
       ...(admin ? {} : { isHidden: false }),
       ...(requestUserId ? { requestUserId } : {}),
       ...(participantId ? { participants: { some: { id: participantId } } } : {}),
+      monthly: null,
     };
-    const totalCount = await this.challenge.count({ where: whereCondition });
+
+    // NOTE allRecords일 경우 모든 레코드를 카운트
+    const totalCount = await this.challenge.count({ where: allRecords ? { deletedAt: undefined } : whereCondition });
+
     return totalCount;
   };
 
   findById = async (id: string): Promise<Challenge | null> => {
-    return await baseClient.challenge.findUnique({
+    const challenge = await baseClient.challenge.findUnique({
       where: { id },
       include: {
         participants: { select: { id: true } },
         requestUser: { select: { id: true, name: true } },
       },
     });
+
+    return challenge;
+  };
+
+  findByNumber = async (number: number): Promise<Challenge | null> => {
+    const challenge = await this.challenge.findUnique({
+      where: { number },
+      include: {
+        participants: { select: { id: true } },
+        requestUser: { select: { id: true, name: true } },
+      },
+    });
+
+    return challenge;
   };
 
   create = async (data: ChallengeInput): Promise<Challenge> => {
-    return await this.challenge.create({
+    const challenge = await this.challenge.create({
       data: {
         ...data,
       },
@@ -101,6 +126,8 @@ export class ChallengeRepository implements IChallengeRepository {
         requestUser: { select: { id: true, name: true } },
       },
     });
+
+    return challenge;
   };
 
   update = async (id: string, data: UpdateChallengeDTO): Promise<Challenge> => {
@@ -111,12 +138,14 @@ export class ChallengeRepository implements IChallengeRepository {
         requestUser: { select: { id: true, name: true } },
       },
     });
+
     return challenge;
   };
 
   updateStatus = async (data: ChallengeStatusInput): Promise<Challenge> => {
     const { challengeId, status, abortReason, userId } = data;
     const newStatus = { status };
+
     if (abortReason && ['denied', 'aborted'].includes(status)) {
       await this.abortReason.upsert({
         where: { challengeId },
@@ -131,23 +160,28 @@ export class ChallengeRepository implements IChallengeRepository {
         },
       });
     }
-    return await this.challenge.update({
+
+    const challenge = await this.challenge.update({
       where: { id: challengeId },
       data: newStatus,
       include: {
         requestUser: { select: { id: true, name: true } },
       },
     });
+
+    return challenge;
   };
 
   findAbortReason = async (id: string): Promise<AbortReason | null> => {
-    return await this.abortReason.findUnique({
+    const abortReason = await this.abortReason.findUnique({
       where: { challengeId: id },
     });
+
+    return abortReason;
   };
 
   findMonthlyChallenge = async (option: GetMonthlyChallengeOption, currentYear: number): Promise<Challenge[] | null> => {
-    return await this.challenge.findMany({
+    const challenge = await this.challenge.findMany({
       where: {
         monthly: option.monthly,
         createdAt: {
@@ -157,5 +191,7 @@ export class ChallengeRepository implements IChallengeRepository {
       },
       include: { requestUser: { select: { id: true, name: true } } },
     });
+
+    return challenge;
   };
 }

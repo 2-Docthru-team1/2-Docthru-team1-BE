@@ -1,5 +1,6 @@
 import { type MediaType, Status } from '@prisma/client';
 import type { NextFunction, Response } from 'express';
+import { assert } from 'superstruct';
 import type { ChallengeService } from '#services/challenge.service.js';
 import type {
   CreateChallengeDTO,
@@ -12,6 +13,7 @@ import type { Request } from '#types/common.types.js';
 import { BadRequest } from '#types/http-error.types.js';
 import { Order } from '#utils/constants/enum.js';
 import MESSAGES from '#utils/constants/messages.js';
+import { CreateChallenge, PatchChallenge } from '#utils/struct.js';
 
 export class ChallengeController {
   constructor(private challengeService: ChallengeService) {}
@@ -39,6 +41,7 @@ export class ChallengeController {
     if (statusEnum && statusEnum.some(status => inactiveStatus.includes(status))) {
       throw new BadRequest(MESSAGES.BAD_REQUEST_STATUS);
     }
+
     const orderEnum = orderBy as Order;
     const options = {
       status: statusEnum,
@@ -49,8 +52,10 @@ export class ChallengeController {
       keyword,
     };
     const { totalCount, list } = await this.challengeService.getChallenges(options);
+
     res.json({ totalCount, list });
   };
+
   getRequestChallenges = async (req: Request<{ query: GetChallengesQuery }>, res: Response, next: NextFunction) => {
     const { filter, keyword = '', page = '1', pageSize = '10' } = req.query;
     let statusEnum;
@@ -81,6 +86,7 @@ export class ChallengeController {
     if (orderEnum === undefined) {
       orderEnum = Order.latestFirst;
     }
+
     const options = {
       status: statusEnum,
       orderBy: orderEnum,
@@ -89,8 +95,10 @@ export class ChallengeController {
       keyword,
     };
     const { totalCount, list } = await this.challengeService.getChallenges(options);
+
     res.json({ totalCount, list });
   };
+
   getMyParticipations = async (req: Request<{ query: GetChallengesQuery }>, res: Response, next: NextFunction) => {
     const { status, orderBy = 'latestFirst', keyword = '', page = '1', pageSize = '10' } = req.query;
     const participantId = req.user?.userId;
@@ -131,7 +139,6 @@ export class ChallengeController {
     } else {
       statusEnum = undefined;
     }
-    // const statusEnum = status ? (status as Status) : undefined;
     const orderEnum = orderBy as Order;
 
     const options = {
@@ -143,6 +150,7 @@ export class ChallengeController {
       requestUserId,
     };
     const { list, totalCount } = await this.challengeService.getChallenges(options);
+
     res.json({ totalCount, list });
   };
 
@@ -152,13 +160,27 @@ export class ChallengeController {
     res.json(challenge);
   };
 
+  getNextChallenge = async (req: Request<{ params: { id: string } }>, res: Response) => {
+    const { id } = req.params;
+    const nextChallenge = await this.challengeService.getNextChallenge(id);
+    res.json(nextChallenge);
+  };
+
+  getPrevChallenge = async (req: Request<{ params: { id: string } }>, res: Response) => {
+    const { id } = req.params;
+    const prevChallenge = await this.challengeService.getPreviousChallenge(id);
+    res.json(prevChallenge);
+  };
+
   postChallenge = async (req: Request<{ body: CreateChallengeDTO }>, res: Response) => {
+    assert(req.body, CreateChallenge, MESSAGES.WRONG_FORMAT);
     const challengeData = req.body;
     const newChallenge = await this.challengeService.createChallenge(challengeData);
     res.status(201).json(newChallenge);
   };
 
   patchChallenge = async (req: Request<{ params: { id: string }; body: UpdateChallengeDTO }>, res: Response) => {
+    assert(req.body, PatchChallenge, MESSAGES.WRONG_FORMAT);
     const { id } = req.params;
     const updateChallenge = await this.challengeService.updateChallenge(id, req.body);
     res.json(updateChallenge);

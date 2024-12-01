@@ -55,9 +55,11 @@ export class FeedbackService implements IFeedbackService {
     if (!targetFeedback || targetFeedback.deletedAt) {
       throw new NotFound(MESSAGES.NOT_FOUND);
     }
+
     const storage = getStorage();
     const userId = storage.userId;
-    if (userId !== targetFeedback.ownerId) {
+    const userRole = storage.userRole;
+    if (userId !== targetFeedback.ownerId && userRole !== 'admin') {
       throw new Forbidden(MESSAGES.FORBIDDEN);
     }
 

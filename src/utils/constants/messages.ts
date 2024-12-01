@@ -1,5 +1,7 @@
 const MESSAGES = Object.freeze({
   BAD_REQUEST: '요청이 잘못되었습니다.',
+  BAD_REQUEST_STATUS: '사용할 수 없는 status 값입니다.',
+  BAE_REQUEST_PARTICIPATION: '동일한 챌린지에 여러번 참가할 수 없습니다.',
   UNAUTHORIZED: '로그인이 필요합니다.',
   FORBIDDEN: '접근 권한이 없습니다.',
   NOT_FOUND: '찾을 수 없는 리소스입니다.',
@@ -18,7 +20,6 @@ const MESSAGES = Object.freeze({
   NO_ENV_VARIABLE: '필요한 환경변수가 지정되지 않았습니다.',
   ALREADY_LIKED_MESSAGE: '이미 좋아요를 눌렀습니다.',
   UNLIKE_NOT_CURRENTLY_LIKED: '좋아요를 취소할 수 없습니다. 현재 좋아요 상태가 아닙니다.',
-  BAD_REQUEST_STATUS: '사용할 수 없는 status 값입니다.',
 });
 
 export default MESSAGES;

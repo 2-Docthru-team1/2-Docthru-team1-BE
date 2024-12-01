@@ -4,7 +4,11 @@ import type { ExtendedPrismaClient } from '#types/common.types.js';
 import type { User } from '#types/user.types.js';
 
 export class UserRepository implements IUserRepository {
-  constructor(private user: ExtendedPrismaClient['user']) {}
+  private user: ExtendedPrismaClient['user'];
+
+  constructor(prismaClient: ExtendedPrismaClient) {
+    this.user = prismaClient.user;
+  }
 
   findById = async (id: string): Promise<User | null> => {
     const user = await this.user.findUnique({ where: { id } });
