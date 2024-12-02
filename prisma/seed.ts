@@ -39,6 +39,19 @@ async function main() {
       });
     }
   }
+
+  for (const work of CHALLENGE_WORKS) {
+    await prisma.$transaction(async () => {
+      await prisma.challengeWork.create({
+        data: work,
+      });
+      await prisma.challenge.update({
+        where: { id: work.challengeId },
+        data: { participants: { connect: { id: work.ownerId } } },
+      });
+    });
+  }
+
   await prisma.challengeWork.createMany({
     data: CHALLENGE_WORKS,
     skipDuplicates: true,
