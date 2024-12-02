@@ -97,17 +97,25 @@ export class WorkRepository implements IWorkRepository {
   };
 
   delete = async (id: string): Promise<ChallengeWork> => {
-    const work = await this.challengeWork.update({
-      where: { id },
-      data: { deletedAt: new Date() },
-      include: {
-        owner: {
-          select: { id: true, name: true, email: true, role: true },
+    const deletedWork = await prismaClient.$transaction(async prisma => {
+      const work = await this.challengeWork.update({
+        where: { id },
+        data: { deletedAt: new Date() },
+        include: {
+          owner: {
+            select: { id: true, name: true, email: true, role: true },
+          },
+          images: { select: { imageUrl: true } },
         },
-        images: { select: { imageUrl: true } },
-      },
+      });
+      const challengeAfterDisconnect = await this.challenge.update({
+        where: { id: work.challengeId },
+        data: { participants: { disconnect: { id: work.ownerId! } } },
+      });
+      return work;
     });
-    return work;
+
+    return deletedWork;
   };
 
   addLike = async (id: string, userId: string): Promise<ChallengeWork> => {
