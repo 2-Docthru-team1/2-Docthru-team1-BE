@@ -11,6 +11,7 @@ export const authRouter = express.Router();
 authRouter.post('/signIn', authController.signIn);
 authRouter.get('/me', tokenVerifier.verifyAccessToken, authController.getMe);
 authRouter.post('/signUp', hashPassword, authController.signUp);
+authRouter.post('/:id/verify', authController.verifyUser);
 authRouter.post('/refresh', tokenVerifier.verifyRefreshToken, authController.refreshToken);
 
 /*********************************************************************************** test **********************************************************************************************/
