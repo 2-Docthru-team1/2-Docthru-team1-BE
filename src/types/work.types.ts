@@ -1,6 +1,5 @@
 import type { ChallengeWork, WorkImage } from '@prisma/client';
 
-// export type RequestCreateWorkDTO = Omit<CreateWorkDTO, 'challengeId' | 'ownerId'> & { imageCount: number };
 export interface RequestCreateWorkDTO extends CreateWorkDTO {
   imageCount: number;
 }
@@ -23,17 +22,6 @@ export interface ChallengeWorkWithImages extends ChallengeWork {
 
 export type ResultChallengeWork = Omit<ChallengeWorkWithImages, 'ownerId'>;
 
-export interface RequestCreateController {
-  title: string;
-  content: string;
-  imageCount: number;
-}
-
-export interface RequestCreateService extends RequestCreateController {
-  ownerId: string;
-  challengeId: string;
-}
-
 /********************************************* */
 export interface CreateWorkDTO {
   title: string;
@@ -50,10 +38,6 @@ export interface CreateWorkDTOWithS3Data extends Omit<CreateWorkDTOWithId, 'imag
   userId: string;
 }
 
-export interface CreateWorkDTOWithUrls extends Omit<CreateWorkDTOWithId, 'imageCount'> {
-  uploadUrls: string[];
-}
-
 export interface UpdateWorkDTO {
   title?: string;
   content?: string;
@@ -64,8 +48,7 @@ export interface UpdateWorkDTOWithUrls extends Omit<UpdateWorkDTO, 'imageCount'>
   imagesData?: { s3Key: string; uploadUrl: string }[];
 }
 
-export interface WorkResponse extends Omit<ChallengeWork, 'ownerId' | 'images'> {
-  images: { uploadUrl: string }[];
+export interface WorkResponseWithUploadUrls {
+  work: Omit<ChallengeWork, 'ownerId'>;
+  uploadUrls: { uploadUrl: string }[];
 }
-
-export interface UpdateWorkDTOWithOutOwnerId extends Omit<UpdateWorkDTO, 'ownerId'> {}

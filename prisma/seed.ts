@@ -52,11 +52,6 @@ async function main() {
     });
   }
 
-  await prisma.challengeWork.createMany({
-    data: CHALLENGE_WORKS,
-    skipDuplicates: true,
-  });
-
   await prisma.workImage.createMany({
     data: WORK_IMAGES,
     skipDuplicates: true,
@@ -71,6 +66,7 @@ async function main() {
     data: RECIPES,
     skipDuplicates: true,
   });
+
   await prisma.abortReason.createMany({
     data: ABORT_REASONS,
     skipDuplicates: true,

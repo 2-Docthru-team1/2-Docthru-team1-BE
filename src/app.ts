@@ -7,8 +7,8 @@ import { Server } from 'socket.io';
 import { port } from '#configs/common.config.js';
 import errorHandler from '#middlewares/error-handler.js';
 import { startJob } from '#utils/jobs/index.js';
-import setupMiddlewares from '@/src/app.middlewares.js';
-import setupRoutes from '@/src/app.routes.js';
+import setupMiddlewares from './app.middlewares.js';
+import setupRoutes from './app.routes.js';
 
 export const app = express();
 const server = createServer(app);
