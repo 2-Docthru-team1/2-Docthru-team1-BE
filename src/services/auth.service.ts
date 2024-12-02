@@ -52,6 +52,17 @@ export class AuthService implements IAuthService {
     return filterSensitiveData(user);
   };
 
+  verifyUser = async (id: string) => {
+    const target = await this.userRepository.findById(id);
+    if (!target || target.deletedAt) {
+      throw new NotFound(MESSAGES.NOT_FOUND);
+    }
+
+    const user = await this.userRepository.update(id, { isVerified: true });
+
+    return filterSensitiveData(user);
+  };
+
   getNewToken = async (userToken: UserToken, refreshToken: string): Promise<SafeUser> => {
     const user = await this.userRepository.findById(userToken.userId);
     if (!user || user.deletedAt) {

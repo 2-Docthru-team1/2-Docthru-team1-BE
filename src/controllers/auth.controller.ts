@@ -5,7 +5,8 @@ import type { CreateUserDTO, SignInDTO } from '#types/auth.types.js';
 import type { Request } from '#types/common.types.js';
 import { BadRequest, NotFound, Unauthorized } from '#types/http-error.types.js';
 import MESSAGES from '#utils/constants/messages.js';
-import { CreateUser, SignIn } from '#utils/struct.js';
+import sendVerificationMail from '#utils/nodemailer/verification-message.js';
+import { CreateUser, SignIn, Uuid } from '#utils/struct.js';
 
 export class AuthController {
   constructor(private authService: AuthService) {}
@@ -28,6 +29,17 @@ export class AuthController {
   signUp = async (req: Request<{ body: CreateUserDTO }>, res: Response, next: NextFunction) => {
     assert(req.body, CreateUser, MESSAGES.WRONG_FORMAT);
     const user = await this.authService.createUser(req.body);
+
+    // sendVerificationMail(user.id);
+    sendVerificationMail(user.id, user.email);
+    res.json({ message: `입력한 주소의 인증 메일을 확인해주세요.` });
+  };
+
+  verifyUser = async (req: Request<{ params: { id: string } }>, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    assert(id, Uuid, MESSAGES.WRONG_ID_FORMAT);
+
+    const user = await this.authService.verifyUser(id);
 
     res.json(user);
   };
