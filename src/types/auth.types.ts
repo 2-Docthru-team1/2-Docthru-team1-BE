@@ -25,3 +25,12 @@ export interface SignInDTO {
   password: string;
   salt: string;
 }
+
+export interface UpdateUserDTO {
+  name?: string;
+  password?: string;
+  salt?: string;
+  role?: Role;
+  refreshToken?: string | '';
+  isVerified?: boolean;
+}

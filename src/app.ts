@@ -2,6 +2,8 @@ import express from 'express';
 import 'express-async-errors';
 import fs from 'fs';
 import https from 'https';
+import { createServer } from 'node:http';
+import { Server } from 'socket.io';
 import { port } from '#configs/common.config.js';
 import errorHandler from '#middlewares/error-handler.js';
 import { startJob } from '#utils/jobs/index.js';
@@ -9,8 +11,10 @@ import setupMiddlewares from './app.middlewares.js';
 import setupRoutes from './app.routes.js';
 
 export const app = express();
+const server = createServer(app);
+const io = new Server(server);
 
-startJob();
+startJob(io);
 setupMiddlewares(app);
 setupRoutes(app);
 app.use(errorHandler);

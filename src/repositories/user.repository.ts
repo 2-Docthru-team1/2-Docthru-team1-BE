@@ -1,5 +1,5 @@
 import type { IUserRepository } from '#interfaces/repositories/user.repository.interface.js';
-import type { CreateUserDTO } from '#types/auth.types.js';
+import type { CreateUserDTO, UpdateUserDTO } from '#types/auth.types.js';
 import type { ExtendedPrismaClient } from '#types/common.types.js';
 import type { User } from '#types/user.types.js';
 
@@ -28,7 +28,7 @@ export class UserRepository implements IUserRepository {
     return user;
   };
 
-  update = async (id: string, data: User): Promise<User> => {
+  update = async (id: string, data: UpdateUserDTO): Promise<User> => {
     const user = await this.user.update({ where: { id }, data });
 
     return user;
