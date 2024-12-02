@@ -10,8 +10,8 @@ import type {
   CreateWorkDTOWithId,
   GetWorksOptions,
   ResultChallengeWork,
-  UpdateWorkDTO, //UpdateWorkDTOWithId,
-  WorkResponse,
+  UpdateWorkDTO,
+  WorkResponseWithUploadUrls,
 } from '#types/work.types.js';
 import { generatePresignedDownloadUrl } from '#utils/S3/generate-presigned-download-url.js';
 import { generateS3ImageArray } from '#utils/S3/generateS3ImageArray.js';
@@ -76,7 +76,7 @@ export class WorkService implements IWorkService {
     return { ...changedWork, images: updatedImages };
   };
 
-  createWork = async (workData: CreateWorkDTOWithId): Promise<Omit<ChallengeWork, 'ownerId'>> => {
+  createWork = async (workData: CreateWorkDTOWithId): Promise<WorkResponseWithUploadUrls> => {
     const storage = getStorage();
     const userId = storage.userId;
 
@@ -101,7 +101,7 @@ export class WorkService implements IWorkService {
     return workWithUploadUrls;
   };
 
-  updateWork = async (id: string, workData: UpdateWorkDTO): Promise<WorkResponse> => {
+  updateWork = async (id: string, workData: UpdateWorkDTO): Promise<WorkResponseWithUploadUrls> => {
     const storage = getStorage();
     const userId = storage.userId;
 
