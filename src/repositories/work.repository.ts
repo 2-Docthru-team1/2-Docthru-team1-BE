@@ -61,7 +61,7 @@ export class WorkRepository implements IWorkRepository {
             create: imagesData.map(imageData => ({ imageUrl: imageData.s3Key })),
           },
         },
-        include: { images: true, owner: { select: { id: true, name: true, role: true, email: true } } },
+        include: { images: { select: { imageUrl: true } }, owner: { select: { id: true, name: true, role: true, email: true } } },
       });
 
       const challenge = await this.challenge.update({
