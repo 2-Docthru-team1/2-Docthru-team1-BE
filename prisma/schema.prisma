@@ -148,6 +148,17 @@ model Recipe {
   likeUsers User[] @relation(name: "recipeLikeRelation")
 }
 
+model Notification {
+  id          String    @id @default(uuid())
+  message     String
+  createdAt   DateTime  @default(now())
+  isRead      Boolean   @default(false)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String
+  challenge   Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  challengeId String
+}
+
 enum Role {
   normal
   admin
@@ -191,15 +202,4 @@ enum MonthlyType {
   October
   November
   December
-}
-
-model Notification {
-  id          String    @id @default(uuid())
-  message     String
-  createdAt   DateTime  @default(now())
-  isRead      Boolean   @default(false)
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId      String
-  challenge   Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
-  challengeId String
 }
