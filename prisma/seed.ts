@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import prismaClient from '#connection/postgres.connection.js';
 import FEEDBACKS from '@/prisma/mock/feedbackMock.js';
 import RECIPES from '@/prisma/mock/recipeMock.js';
 import { ABORT_REASONS } from './mock/abortReasonMock.js';
@@ -22,23 +23,10 @@ async function main() {
     skipDuplicates: true,
   });
 
-  for (const challenge of CHALLENGES) {
-    if (!['canceled', 'aborted', 'denied', 'pending'].includes(challenge.status)) {
-      await prisma.challenge.create({
-        data: {
-          ...challenge,
-          participants: { connect: { id: challenge.requestUserId } },
-        },
-      });
-    } else {
-      await prisma.challenge.create({
-        data: {
-          ...challenge,
-          participants: { connect: [] }, // 또는 participants: undefined
-        },
-      });
-    }
-  }
+  await prismaClient.challenge.createMany({
+    data: CHALLENGES,
+    skipDuplicates: true,
+  });
 
   for (const work of CHALLENGE_WORKS) {
     await prisma.$transaction(async () => {
@@ -51,11 +39,6 @@ async function main() {
       });
     });
   }
-
-  await prisma.challengeWork.createMany({
-    data: CHALLENGE_WORKS,
-    skipDuplicates: true,
-  });
 
   await prisma.workImage.createMany({
     data: WORK_IMAGES,
@@ -71,6 +54,7 @@ async function main() {
     data: RECIPES,
     skipDuplicates: true,
   });
+
   await prisma.abortReason.createMany({
     data: ABORT_REASONS,
     skipDuplicates: true,
