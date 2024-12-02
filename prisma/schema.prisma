@@ -35,7 +35,7 @@ model User {
   feedbacks     Feedback[]
   abortReasons  AbortReason[] // 관리자 유저에 한함
   likeRecipes   Recipe[]        @relation(name: "recipeLikeRelation")
-  Notification  Notification[]
+  notifications Notification[]
 }
 
 model Challenge {
@@ -61,7 +61,7 @@ model Challenge {
   participants  User[]          @relation(name: "participation")
   works         ChallengeWork[]
   abortReason   AbortReason?
-  Notification  Notification[]
+  notifications Notification[]
 }
 
 model ChallengeWork {
