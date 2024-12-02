@@ -1,5 +1,4 @@
 import { PrismaClient } from '@prisma/client';
-import prismaClient from '#connection/postgres.connection.js';
 import FEEDBACKS from '@/prisma/mock/feedbackMock.js';
 import RECIPES from '@/prisma/mock/recipeMock.js';
 import { ABORT_REASONS } from './mock/abortReasonMock.js';
@@ -23,10 +22,23 @@ async function main() {
     skipDuplicates: true,
   });
 
-  await prismaClient.challenge.createMany({
-    data: CHALLENGES,
-    skipDuplicates: true,
-  });
+  for (const challenge of CHALLENGES) {
+    if (!['canceled', 'aborted', 'denied', 'pending'].includes(challenge.status)) {
+      await prisma.challenge.create({
+        data: {
+          ...challenge,
+          participants: { connect: { id: challenge.requestUserId } },
+        },
+      });
+    } else {
+      await prisma.challenge.create({
+        data: {
+          ...challenge,
+          participants: { connect: [] }, // 또는 participants: undefined
+        },
+      });
+    }
+  }
 
   for (const work of CHALLENGE_WORKS) {
     await prisma.$transaction(async () => {
