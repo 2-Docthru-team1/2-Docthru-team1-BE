@@ -6,6 +6,7 @@ import { createServer } from 'node:http';
 import { Server } from 'socket.io';
 import { port } from '#configs/common.config.js';
 import errorHandler from '#middlewares/error-handler.js';
+import loggerMiddleware from '#middlewares/loggerMiddleware.js';
 import { startJob } from '#utils/jobs/index.js';
 import setupMiddlewares from './app.middlewares.js';
 import setupRoutes from './app.routes.js';
@@ -14,6 +15,7 @@ export const app = express();
 const server = createServer(app);
 const io = new Server(server);
 
+app.use(loggerMiddleware);
 startJob(io);
 setupMiddlewares(app);
 setupRoutes(app);
