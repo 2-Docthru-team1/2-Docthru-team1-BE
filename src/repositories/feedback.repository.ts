@@ -58,10 +58,4 @@ export class FeedbackRepository implements IFeedbackRepository {
 
     return feedback;
   };
-
-  isDeleted = async (id: string): Promise<boolean> => {
-    const feedback = await this.feedback.findUnique({ where: { id } });
-
-    return !!feedback?.deletedAt;
-  };
 }
