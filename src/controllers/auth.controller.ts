@@ -17,15 +17,15 @@ export class AuthController {
 
     const { refreshToken, ...user } = await this.authService.signIn(email, password);
 
-    res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      sameSite: 'lax',
-    });
     // res.cookie('refreshToken', refreshToken, {
     //   httpOnly: true,
-    //   sameSite: 'none',
-    //   secure: true, // NOTE https가 아니면 false로
+    //   sameSite: 'lax',
     // });
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      sameSite: 'none',
+      secure: true,
+    });
 
     res.json(user);
   };
