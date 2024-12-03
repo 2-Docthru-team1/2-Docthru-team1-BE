@@ -19,9 +19,13 @@ export class AuthController {
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
-      sameSite: 'none',
-      secure: true, // NOTE https가 아니면 false로
+      sameSite: 'lax',
     });
+    // res.cookie('refreshToken', refreshToken, {
+    //   httpOnly: true,
+    //   sameSite: 'none',
+    //   secure: true, // NOTE https가 아니면 false로
+    // });
 
     res.json(user);
   };
