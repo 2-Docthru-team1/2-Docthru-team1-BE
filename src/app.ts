@@ -15,7 +15,6 @@ export const app = express();
 const server = createServer(app);
 const io = new Server(server);
 
-app.use(loggerMiddleware);
 startJob(io);
 setupMiddlewares(app);
 setupRoutes(app);

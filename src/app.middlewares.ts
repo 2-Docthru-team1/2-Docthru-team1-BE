@@ -2,6 +2,7 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express from 'express';
 import { runAsyncLocalStorage } from '#middlewares/asyncLocalStorage.js';
+import loggerMiddleware from '#middlewares/loggerMiddleware.js';
 import validatePaginationOptions from '#middlewares/pagination.validation.js';
 
 export default function setupMiddlewares(app: express.Application) {
@@ -10,6 +11,7 @@ export default function setupMiddlewares(app: express.Application) {
   app.use(cookieParser());
   app.use(validatePaginationOptions);
   app.use(runAsyncLocalStorage);
+  app.use(loggerMiddleware);
 
   app.use((req, res, next) => {
     console.log(`Request Path: ${req.path}`);
