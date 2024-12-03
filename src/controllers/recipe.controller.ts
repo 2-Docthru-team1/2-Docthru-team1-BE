@@ -1,8 +1,11 @@
 import { Category } from '@prisma/client';
 import type { NextFunction, Response } from 'express';
+import { assert } from 'superstruct';
 import type { RecipeService } from '#services/recipe.service.js';
 import type { Request } from '#types/common.types.js';
 import type { CreateRecipeDTO, RecipeOptions, RecipeQueries, UpdateRecipeDTO } from '#types/recipe.types.js';
+import MESSAGES from '#utils/constants/messages.js';
+import { Uuid } from '#utils/struct.js';
 
 export class RecipeController {
   constructor(private recipeService: RecipeService) {}
@@ -52,6 +55,7 @@ export class RecipeController {
 
   getRecipeById = async (req: Request<{ params: { id: string } }>, res: Response) => {
     const { id } = req.params;
+    assert(id, Uuid, MESSAGES.WRONG_ID_FORMAT);
 
     const recipe = await this.recipeService.getRecipeById(id);
 
@@ -66,6 +70,8 @@ export class RecipeController {
 
   patchRecipe = async (req: Request<{ params: { id: string }; body: UpdateRecipeDTO }>, res: Response, next: NextFunction) => {
     const { id } = req.params;
+    assert(id, Uuid, MESSAGES.WRONG_ID_FORMAT);
+
     const recipe = await this.recipeService.updateRecipe(id, req.body);
 
     res.json(recipe);
@@ -73,6 +79,8 @@ export class RecipeController {
 
   deleteRecipe = async (req: Request<{ params: { id: string } }>, res: Response, next: NextFunction) => {
     const { id } = req.params;
+    assert(id, Uuid, MESSAGES.WRONG_ID_FORMAT);
+
     const recipe = await this.recipeService.deleteRecipe(id);
 
     res.json(recipe);
@@ -80,6 +88,8 @@ export class RecipeController {
 
   likeRecipe = async (req: Request<{ params: { id: string } }>, res: Response, next: NextFunction) => {
     const { id } = req.params;
+    assert(id, Uuid, MESSAGES.WRONG_ID_FORMAT);
+
     const recipe = await this.recipeService.likeRecipe(id, req.user!.userId);
 
     res.sendStatus(204);
@@ -87,6 +97,8 @@ export class RecipeController {
 
   unlikeRecipe = async (req: Request<{ params: { id: string } }>, res: Response, next: NextFunction) => {
     const { id } = req.params;
+    assert(id, Uuid, MESSAGES.WRONG_ID_FORMAT);
+
     const recipe = await this.recipeService.unlikeRecipe(id, req.user!.userId);
 
     res.sendStatus(204);
