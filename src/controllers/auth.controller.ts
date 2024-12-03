@@ -24,8 +24,8 @@ export class AuthController {
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       sameSite: 'none',
-      secure: false,
-      path: '/auth/refresh',
+      secure: true,
+      path: '/auth',
     });
 
     res.json(user);
