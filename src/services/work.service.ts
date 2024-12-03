@@ -20,20 +20,25 @@ import MESSAGES from '#utils/constants/messages.js';
 
 export class WorkService implements IWorkService {
   constructor(
-    private WorkRepository: WorkRepository,
-    private FeedbackRepository: FeedbackRepository,
-    private ChallengeRepository: ChallengeRepository,
+    private workRepository: WorkRepository,
+    private feedbackRepository: FeedbackRepository,
+    private challengeRepository: ChallengeRepository,
   ) {}
 
   getWorks = async (options: GetWorksOptions): Promise<{ list: ResultChallengeWork[]; totalCount: number } | null> => {
+    const targetChallenge = await this.challengeRepository.findById(options.challengeId);
+    if (!targetChallenge || targetChallenge.deletedAt) {
+      throw new NotFound(MESSAGES.CHALLENGE_NOT_FOUND);
+    }
+
     const [list, totalCount] = await Promise.all([
-      this.WorkRepository.findMany(options),
-      this.WorkRepository.totalCount(options.challengeId),
+      this.workRepository.findMany(options),
+      this.workRepository.totalCount(options.challengeId),
     ]);
 
     const changedList = await Promise.all(
       list?.map(async work => {
-        const feedbackCount = await this.FeedbackRepository.getCount(work.id);
+        const feedbackCount = await this.feedbackRepository.getCount(work.id);
         const { ownerId, ...other } = work;
         return { feedbackCount, ...other };
       }) || [],
@@ -57,7 +62,7 @@ export class WorkService implements IWorkService {
   };
 
   getWorkById = async (id: string): Promise<ResultChallengeWork | null> => {
-    const work = await this.WorkRepository.findById(id);
+    const work = await this.workRepository.findById(id);
     if (!work || work.deletedAt) {
       throw new NotFound(MESSAGES.NOT_FOUND);
     }
@@ -80,7 +85,7 @@ export class WorkService implements IWorkService {
     const storage = getStorage();
     const userId = storage.userId;
 
-    const challenge = await this.ChallengeRepository.findById(workData.challengeId);
+    const challenge = await this.challengeRepository.findById(workData.challengeId);
     const challengeWithParticipants = challenge as Challenge & { participants: { id: string }[] };
     if (!challenge) {
       throw new NotFound(MESSAGES.NOT_FOUND);
@@ -94,7 +99,7 @@ export class WorkService implements IWorkService {
     const { imageCount, ...restWorkData } = workData;
     const imagesData = await generateS3ImageArray(imageCount);
     const repositoryWork = { ...restWorkData, imagesData, userId };
-    const work = await this.WorkRepository.create(repositoryWork);
+    const work = await this.workRepository.create(repositoryWork);
     //여기서 유저와 챌린지를 연결
 
     const workWithUploadUrls = changeTypeWorkCreate({ ...work, imagesData });
@@ -106,7 +111,7 @@ export class WorkService implements IWorkService {
     const userId = storage.userId;
 
     const { imageCount, ...other } = workData;
-    const FoundWork = await this.WorkRepository.findById(id);
+    const FoundWork = await this.workRepository.findById(id);
     if (!FoundWork || FoundWork.deletedAt) {
       throw new NotFound(MESSAGES.NOT_FOUND);
     }
@@ -116,7 +121,7 @@ export class WorkService implements IWorkService {
 
     const imagesData = await generateS3ImageArray(imageCount!);
     const repositoryWork = { imagesData, ...other };
-    const work = await this.WorkRepository.update(id, repositoryWork);
+    const work = await this.workRepository.update(id, repositoryWork);
     const workWithUploadUrls = changeTypeWorkCreate({ ...work, imagesData });
 
     return workWithUploadUrls;
@@ -126,7 +131,7 @@ export class WorkService implements IWorkService {
     const storage = getStorage();
     const userId = storage.userId;
     const userRole = storage.userRole;
-    const foundWork = await this.WorkRepository.findById(id);
+    const foundWork = await this.workRepository.findById(id);
     if (!foundWork || foundWork.deletedAt) {
       throw new NotFound(MESSAGES.NOT_FOUND);
     }
@@ -134,7 +139,7 @@ export class WorkService implements IWorkService {
       throw new Forbidden(MESSAGES.FORBIDDEN);
     }
 
-    const deletedWork = await this.WorkRepository.delete(id);
+    const deletedWork = await this.workRepository.delete(id);
     const { ownerId, ...otherWorkField } = deletedWork || {};
     const changedWork = { ...otherWorkField } as ResultChallengeWork;
     const updatedImages = await Promise.all(
@@ -153,7 +158,7 @@ export class WorkService implements IWorkService {
     const storage = getStorage();
     const userId = storage.userId;
 
-    const foundWork = await this.WorkRepository.findById(id); // 여기서 가져와서 체크
+    const foundWork = await this.workRepository.findById(id); // 여기서 가져와서 체크
     if (!foundWork || foundWork?.deletedAt) {
       throw new NotFound(MESSAGES.NOT_FOUND);
     }
@@ -163,7 +168,7 @@ export class WorkService implements IWorkService {
       throw new BadRequest(MESSAGES.ALREADY_LIKED_MESSAGE);
     }
 
-    const updatedWork = await this.WorkRepository.addLike(id, userId);
+    const updatedWork = await this.workRepository.addLike(id, userId);
     return updatedWork;
   };
 
@@ -171,7 +176,7 @@ export class WorkService implements IWorkService {
     const storage = getStorage();
     const userId = storage.userId;
 
-    const foundWork = await this.WorkRepository.findById(id);
+    const foundWork = await this.workRepository.findById(id);
     if (!foundWork || foundWork?.deletedAt) {
       throw new NotFound(MESSAGES.NOT_FOUND);
     }
@@ -181,7 +186,7 @@ export class WorkService implements IWorkService {
       throw new BadRequest(MESSAGES.UNLIKE_NOT_CURRENTLY_LIKED);
     }
 
-    const updatedWork = await this.WorkRepository.removeLike(id, userId);
+    const updatedWork = await this.workRepository.removeLike(id, userId);
     return updatedWork;
   };
 }
