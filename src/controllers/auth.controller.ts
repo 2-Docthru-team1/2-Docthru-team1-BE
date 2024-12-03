@@ -23,8 +23,8 @@ export class AuthController {
     // });
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
-      sameSite: 'none',
-      secure: true,
+      sameSite: 'lax',
+      secure: false,
     });
 
     res.json(user);
