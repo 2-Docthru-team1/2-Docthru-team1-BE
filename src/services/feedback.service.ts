@@ -2,6 +2,7 @@ import type { Feedback } from '@prisma/client';
 import type { IFeedbackService } from '#interfaces/services/feedback.service.interface.js';
 import { getStorage } from '#middlewares/asyncLocalStorage.js';
 import type { FeedbackRepository } from '#repositories/feedback.repository.js';
+import type { WorkRepository } from '#repositories/work.repository.js';
 import type { BasicOptions } from '#types/common.types.js';
 import type { CreateFeedbackDTO, UpdateFeedbackDTO } from '#types/feedback.types.js';
 import { Forbidden } from '#types/http-error.types.js';
@@ -9,9 +10,15 @@ import assertExist from '#utils/assertExist.js';
 import MESSAGES from '#utils/constants/messages.js';
 
 export class FeedbackService implements IFeedbackService {
-  constructor(private feedbackRepository: FeedbackRepository) {}
+  constructor(
+    private feedbackRepository: FeedbackRepository,
+    private workRepository: WorkRepository,
+  ) {}
 
   getFeedbacks = async (options: BasicOptions, workId: string): Promise<{ totalCount: number; list: Feedback[] | null }> => {
+    const targetWork = await this.workRepository.findById(workId);
+    assertExist(targetWork);
+
     const totalCount = await this.feedbackRepository.getCount(workId);
     const feedbacks = await this.feedbackRepository.findMany(options, workId);
 

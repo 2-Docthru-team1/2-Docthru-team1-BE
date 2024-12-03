@@ -27,6 +27,9 @@ export class WorkService implements IWorkService {
   ) {}
 
   getWorks = async (options: GetWorksOptions): Promise<{ list: ResultChallengeWork[]; totalCount: number } | null> => {
+    const targetChallenge = await this.challengeRepository.findById(options.challengeId);
+    assertExist(targetChallenge);
+
     const [list, totalCount] = await Promise.all([
       this.workRepository.findMany(options),
       this.workRepository.totalCount(options.challengeId),
