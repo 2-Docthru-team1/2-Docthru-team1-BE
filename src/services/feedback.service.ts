@@ -4,26 +4,23 @@ import { getStorage } from '#middlewares/asyncLocalStorage.js';
 import type { FeedbackRepository } from '#repositories/feedback.repository.js';
 import type { BasicOptions } from '#types/common.types.js';
 import type { CreateFeedbackDTO, UpdateFeedbackDTO } from '#types/feedback.types.js';
-import { Forbidden, NotFound } from '#types/http-error.types.js';
+import { Forbidden } from '#types/http-error.types.js';
+import assertExist from '#utils/assertExist.js';
 import MESSAGES from '#utils/constants/messages.js';
 
 export class FeedbackService implements IFeedbackService {
   constructor(private feedbackRepository: FeedbackRepository) {}
 
   getFeedbacks = async (options: BasicOptions, workId: string): Promise<{ totalCount: number; list: Feedback[] | null }> => {
-    let totalCount: number;
-    let feedbacks: Feedback[] | null;
-    totalCount = await this.feedbackRepository.getCount(workId);
-    feedbacks = await this.feedbackRepository.findMany(options, workId);
+    const totalCount = await this.feedbackRepository.getCount(workId);
+    const feedbacks = await this.feedbackRepository.findMany(options, workId);
 
     return { totalCount, list: feedbacks };
   };
 
   getFeedbackById = async (id: string): Promise<Feedback | null> => {
     const feedback = await this.feedbackRepository.findById(id);
-    if (!feedback || feedback.deletedAt) {
-      throw new NotFound(MESSAGES.NOT_FOUND);
-    }
+    assertExist(feedback);
 
     return feedback;
   };
@@ -36,9 +33,8 @@ export class FeedbackService implements IFeedbackService {
 
   updateFeedback = async (id: string, feedbackData: UpdateFeedbackDTO): Promise<Feedback> => {
     const targetFeedback = await this.feedbackRepository.findById(id);
-    if (!targetFeedback || targetFeedback.deletedAt) {
-      throw new NotFound(MESSAGES.NOT_FOUND);
-    }
+    assertExist(targetFeedback);
+
     const storage = getStorage();
     const userId = storage.userId;
     if (userId !== targetFeedback.ownerId) {
@@ -52,9 +48,7 @@ export class FeedbackService implements IFeedbackService {
 
   deleteFeedback = async (id: string): Promise<Feedback> => {
     const targetFeedback = await this.feedbackRepository.findById(id);
-    if (!targetFeedback || targetFeedback.deletedAt) {
-      throw new NotFound(MESSAGES.NOT_FOUND);
-    }
+    assertExist(targetFeedback);
 
     const storage = getStorage();
     const userId = storage.userId;
