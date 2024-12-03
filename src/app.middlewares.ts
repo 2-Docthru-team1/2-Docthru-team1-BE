@@ -6,7 +6,7 @@ import validatePaginationOptions from '#middlewares/pagination.validation.js';
 
 export default function setupMiddlewares(app: express.Application) {
   app.use(express.json());
-  app.use(cors({ credentials: true, origin: '*' }));
+  app.use(cors({ credentials: true, origin: true }));
   app.use(cookieParser());
   app.use(validatePaginationOptions);
   app.use(runAsyncLocalStorage);
