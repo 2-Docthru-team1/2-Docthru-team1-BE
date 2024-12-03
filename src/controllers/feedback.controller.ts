@@ -12,6 +12,7 @@ export class FeedbackController {
   getFeedbacks = async (req: Request<{ params: { id: string }; query: BasicQueries }>, res: Response, next: NextFunction) => {
     const { orderBy = 'latest', page = '1', pageSize = '10' } = req.query;
     const { id } = req.params;
+    assert(id, Uuid, MESSAGES.WRONG_ID_FORMAT);
 
     const options: BasicOptions = {
       orderBy,
@@ -35,6 +36,8 @@ export class FeedbackController {
   postFeedback = async (req: Request<{ params: { id: string } }>, res: Response, next: NextFunction) => {
     assert(req.body, CreateFeedback, MESSAGES.WRONG_FORMAT);
     const { id } = req.params;
+    assert(id, Uuid, MESSAGES.WRONG_ID_FORMAT);
+
     const userId = req.user!.userId;
 
     const user = await this.feedbackService.createFeedback({ ...req.body, ownerId: userId, workId: id });
@@ -48,6 +51,7 @@ export class FeedbackController {
     next: NextFunction,
   ) => {
     const { id } = req.params;
+    assert(id, Uuid, MESSAGES.WRONG_ID_FORMAT);
     assert(req.body, PatchFeedback, MESSAGES.WRONG_FORMAT);
 
     const user = await this.feedbackService.updateFeedback(id, req.body);
@@ -57,6 +61,7 @@ export class FeedbackController {
 
   deleteFeedback = async (req: Request<{ params: { id: string } }>, res: Response, next: NextFunction) => {
     const { id } = req.params;
+    assert(id, Uuid, MESSAGES.WRONG_ID_FORMAT);
 
     const user = await this.feedbackService.deleteFeedback(id);
 

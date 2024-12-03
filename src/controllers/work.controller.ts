@@ -11,6 +11,8 @@ export class WorkController {
 
   getWorks = async (req: Request<{ params: { id: string }; query: BasicQueries }>, res: Response, next: NextFunction) => {
     const { id } = req.params;
+    assert(id, Uuid, MESSAGES.WRONG_ID_FORMAT);
+
     const { page = '1', pageSize = '4' } = req.query;
     const options: { challengeId: string; page: number; pageSize: number } = {
       challengeId: id,

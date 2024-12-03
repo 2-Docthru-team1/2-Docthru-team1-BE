@@ -13,7 +13,7 @@ import type { Request } from '#types/common.types.js';
 import { BadRequest } from '#types/http-error.types.js';
 import { Order } from '#utils/constants/enum.js';
 import MESSAGES from '#utils/constants/messages.js';
-import { CreateChallenge, PatchChallenge } from '#utils/struct.js';
+import { CreateChallenge, PatchChallenge, Uuid } from '#utils/struct.js';
 
 export class ChallengeController {
   constructor(private challengeService: ChallengeService) {}
@@ -204,18 +204,24 @@ export class ChallengeController {
 
   getChallengeById = async (req: Request<{ params: { id: string } }>, res: Response) => {
     const { id } = req.params;
+    assert(id, Uuid, MESSAGES.WRONG_ID_FORMAT);
+
     const challenge = await this.challengeService.getChallengeById(id);
     res.json(challenge);
   };
 
   getNextChallenge = async (req: Request<{ params: { id: string } }>, res: Response) => {
     const { id } = req.params;
+    assert(id, Uuid, MESSAGES.WRONG_ID_FORMAT);
+
     const nextChallenge = await this.challengeService.getNextChallenge(id);
     res.json(nextChallenge);
   };
 
   getPrevChallenge = async (req: Request<{ params: { id: string } }>, res: Response) => {
     const { id } = req.params;
+    assert(id, Uuid, MESSAGES.WRONG_ID_FORMAT);
+
     const prevChallenge = await this.challengeService.getPreviousChallenge(id);
     res.json(prevChallenge);
   };
@@ -230,12 +236,16 @@ export class ChallengeController {
   patchChallenge = async (req: Request<{ params: { id: string }; body: UpdateChallengeDTO }>, res: Response) => {
     assert(req.body, PatchChallenge, MESSAGES.WRONG_FORMAT);
     const { id } = req.params;
+    assert(id, Uuid, MESSAGES.WRONG_ID_FORMAT);
+
     const updateChallenge = await this.challengeService.updateChallenge(id, req.body);
     res.json(updateChallenge);
   };
 
   patchChallengeStatus = async (req: Request<{ params: { id: string }; body: UpdateChallengeStatusDTO }>, res: Response) => {
     const { id: challengeId } = req.params;
+    assert(challengeId, Uuid, MESSAGES.WRONG_ID_FORMAT);
+
     const { status, abortReason } = req.body;
     const updatedChallenge = await this.challengeService.updateStatus({
       challengeId,
@@ -247,6 +257,8 @@ export class ChallengeController {
 
   getChallengeAbortReason = async (req: Request<{ params: { id: string } }>, res: Response) => {
     const { id } = req.params;
+    assert(id, Uuid, MESSAGES.WRONG_ID_FORMAT);
+
     const abortReason = await this.challengeService.getAbortReason(id);
     res.json(abortReason);
   };

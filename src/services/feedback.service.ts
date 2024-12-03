@@ -2,19 +2,26 @@ import type { Feedback } from '@prisma/client';
 import type { IFeedbackService } from '#interfaces/services/feedback.service.interface.js';
 import { getStorage } from '#middlewares/asyncLocalStorage.js';
 import type { FeedbackRepository } from '#repositories/feedback.repository.js';
+import type { WorkRepository } from '#repositories/work.repository.js';
 import type { BasicOptions } from '#types/common.types.js';
 import type { CreateFeedbackDTO, UpdateFeedbackDTO } from '#types/feedback.types.js';
 import { Forbidden, NotFound } from '#types/http-error.types.js';
 import MESSAGES from '#utils/constants/messages.js';
 
 export class FeedbackService implements IFeedbackService {
-  constructor(private feedbackRepository: FeedbackRepository) {}
+  constructor(
+    private feedbackRepository: FeedbackRepository,
+    private workRepository: WorkRepository,
+  ) {}
 
   getFeedbacks = async (options: BasicOptions, workId: string): Promise<{ totalCount: number; list: Feedback[] | null }> => {
-    let totalCount: number;
-    let feedbacks: Feedback[] | null;
-    totalCount = await this.feedbackRepository.getCount(workId);
-    feedbacks = await this.feedbackRepository.findMany(options, workId);
+    const targetWork = await this.workRepository.findById(workId);
+    if (!targetWork || targetWork.deletedAt) {
+      throw new NotFound(MESSAGES.WORK_NOT_FOUND);
+    }
+
+    const totalCount = await this.feedbackRepository.getCount(workId);
+    const feedbacks = await this.feedbackRepository.findMany(options, workId);
 
     return { totalCount, list: feedbacks };
   };
@@ -39,6 +46,7 @@ export class FeedbackService implements IFeedbackService {
     if (!targetFeedback || targetFeedback.deletedAt) {
       throw new NotFound(MESSAGES.NOT_FOUND);
     }
+
     const storage = getStorage();
     const userId = storage.userId;
     if (userId !== targetFeedback.ownerId) {
