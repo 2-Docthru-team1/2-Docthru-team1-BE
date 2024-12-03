@@ -25,6 +25,7 @@ export class AuthController {
       httpOnly: true,
       sameSite: 'none',
       secure: false,
+      path: '/auth/refresh',
     });
 
     res.json(user);
