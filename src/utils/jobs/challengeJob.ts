@@ -14,14 +14,13 @@ export const scheduleChallengeStatus = (io: Server) => {
 
     const challengeIds = challengesToFinish.map(challenge => challenge.id);
     await challengeService.updateChallengesToFinished(challengeIds);
-    console.log('실행되었다네');
 
     for (const challenge of challengesToFinish) {
       const roomName = `challenge-${challenge.id}`;
       const participantIds = challenge.participants.map(participant => participant.id);
 
       for (const participantId of participantIds) {
-        const notificationMessage = `챌린지 "${challenge.title}" 는 종료되었습니다.`;
+        const notificationMessage = `The challenge "${challenge.title}" has been completed.`;
         await notificationService.createNotification(participantId, challenge.id, notificationMessage);
 
         const participantSocketId = userSocketMap.get(participantId);
