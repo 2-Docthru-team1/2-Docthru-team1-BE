@@ -14,6 +14,7 @@ export const scheduleChallengeStatus = (io: Server) => {
 
     const challengeIds = challengesToFinish.map(challenge => challenge.id);
     await challengeService.updateChallengesToFinished(challengeIds);
+    console.log('실행되었다네');
 
     for (const challenge of challengesToFinish) {
       const roomName = `challenge-${challenge.id}`;

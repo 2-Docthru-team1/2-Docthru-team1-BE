@@ -19,5 +19,5 @@ export interface IChallengeRepository {
   findAbortReason(id: string): Promise<AbortReason | null>;
   findMonthlyChallenge(option: GetMonthlyChallengeOption, currentYear: number): Promise<Challenge[] | null>;
   findChallengesToFinish(): Promise<ChallengeWithParticipants[]>;
-  updateChallengesToFinished(challengeIds: string[]): Promise<any>;
+  updateChallengesToFinished(challengeIds: string[]): Promise<Challenge[]>;
 }

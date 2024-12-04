@@ -22,5 +22,5 @@ export interface IChallengeService {
   getAbortReason(id: string): Promise<AbortReason | null>;
   getMonthlyChallenge(option: GetMonthlyChallengeOption): Promise<CustomChallenge[] | null>;
   getChallengesToFinish(): Promise<Challenge[]>;
-  updateChallengesToFinished(challengeIds: string[]): Promise<any>;
+  updateChallengesToFinished(challengeIds: string[]): Promise<Challenge[]>;
 }

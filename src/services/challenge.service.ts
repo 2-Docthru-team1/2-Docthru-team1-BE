@@ -251,7 +251,7 @@ export class ChallengeService implements IChallengeService {
     return challenges;
   };
 
-  updateChallengesToFinished = async (challengeIds: string[]) => {
+  updateChallengesToFinished = async (challengeIds: string[]): Promise<Challenge[]> => {
     const challenges = await this.challengeRepository.updateChallengesToFinished(challengeIds);
     return challenges;
   };
