@@ -1,5 +1,3 @@
-import type { NextFunction, Response } from 'express';
-import { assert } from 'superstruct';
 import type { AuthService } from '#services/auth.service.js';
 import type { CreateUserDTO, SignInDTO } from '#types/auth.types.js';
 import type { Request } from '#types/common.types.js';
@@ -7,6 +5,8 @@ import { BadRequest, NotFound, Unauthorized } from '#types/http-error.types.js';
 import MESSAGES from '#utils/constants/messages.js';
 import sendVerificationMail from '#utils/nodemailer/verification-message.js';
 import { CreateUser, SignIn, Uuid } from '#utils/struct.js';
+import type { NextFunction, Response } from 'express';
+import { assert } from 'superstruct';
 
 export class AuthController {
   constructor(private authService: AuthService) {}
@@ -44,8 +44,10 @@ export class AuthController {
     res.json(user);
   };
 
-  refreshToken = async (req: Request, res: Response, next: NextFunction) => {
-    const { refreshToken } = req.cookies;
+  refreshToken = async (req: Request<{body: {refreshToken: string}}>, res: Response, next: NextFunction) => {
+    // const { refreshToken } = req.cookies;
+    const { refreshToken } = req.body;
+
     if (refreshToken === undefined) {
       throw new BadRequest(MESSAGES.NO_REFRESH_TOKEN);
     }
