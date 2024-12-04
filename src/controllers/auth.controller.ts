@@ -15,18 +15,7 @@ export class AuthController {
     assert(req.body, SignIn, MESSAGES.WRONG_FORMAT);
     const { email, password } = req.body;
 
-    const { refreshToken, ...user } = await this.authService.signIn(email, password);
-
-    // res.cookie('refreshToken', refreshToken, {
-    //   httpOnly: true,
-    //   sameSite: 'lax',
-    // });
-    res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      sameSite: 'none',
-      secure: true,
-      path: '/auth',
-    });
+    const user = await this.authService.signIn(email, password);
 
     res.json(user);
   };
