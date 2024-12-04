@@ -15,6 +15,7 @@ export const app = express();
 
 setupMiddlewares(app);
 setupRoutes(app);
+app.use(errorHandler);
 
 let server;
 if (port === '443') {
@@ -61,7 +62,9 @@ if (port === '443') {
 }
 
 const io = new Server(server);
-startSocket(io);
-startJob(io);
+app.use((req, res, next) => {
+  startSocket(io);
+  startJob(io);
+});
 
 app.use(errorHandler);
