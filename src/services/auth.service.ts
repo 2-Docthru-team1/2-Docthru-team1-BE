@@ -84,26 +84,4 @@ export class AuthService implements IAuthService {
 
     return filterSensitiveData(user);
   };
-  // getNewToken = async (userToken: UserToken, refreshToken: string): Promise<SafeUser> => {
-  //   const user = await this.userRepository.findById(userToken.userId);
-  //   assertExist(user);
-
-  //   if (user.refreshToken !== refreshToken) {
-  //     throw new Unauthorized(MESSAGES.INVALID_REFRESH_TOKEN);
-  //   }
-
-  //   // NOTE 리프레시 토큰의 남은 시간이 2시간 이내일경우
-  //   const timeRemaining = remainingTime(userToken.exp);
-  //   if (timeRemaining < 3600 * 2) {
-  //     // NOTE 새 리프레시 토큰을 발급하고 이를 업데이트
-  //     const refreshToken = createToken(user, 'refresh');
-  //     user.refreshToken = refreshToken;
-  //     await this.userRepository.update(user.id, user);
-  //   }
-
-  //   const accessToken = createToken(user, 'access');
-  //   user.accessToken = accessToken;
-
-  //   return filterSensitiveData(user);
-  // };
 }

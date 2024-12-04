@@ -48,21 +48,4 @@ export class AuthController {
 
     res.json(user);
   };
-  // refreshToken = async (req: Request, res: Response, next: NextFunction) => {
-  //   const { refreshToken } = req.cookies;
-
-  //   if (refreshToken === undefined) {
-  //     throw new BadRequest(MESSAGES.NO_REFRESH_TOKEN);
-  //   }
-  //   if (!req.user || !req.user.userId) {
-  //     throw new Unauthorized(MESSAGES.UNAUTHORIZED);
-  //   }
-
-  //   const user = await this.authService.getNewToken(req.user, refreshToken);
-  //   if (!user) {
-  //     throw new NotFound(MESSAGES.NOT_FOUND);
-  //   }
-
-  //   res.json(user);
-  // };
 }
