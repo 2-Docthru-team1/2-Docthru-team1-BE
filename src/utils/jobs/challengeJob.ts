@@ -5,7 +5,7 @@ import { notificationService } from '#containers/notification.container.js';
 import { userSocketMap } from '#utils/socket/socket.utils.js';
 
 export const scheduleChallengeStatus = (io: Server) => {
-  cron.schedule('* * * * *', async () => {
+  cron.schedule('0 0 * * *', async () => {
     const challengesToFinish = await challengeService.getChallengesToFinish();
 
     if (!challengesToFinish) {
