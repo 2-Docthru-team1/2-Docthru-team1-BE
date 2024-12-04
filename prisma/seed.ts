@@ -24,10 +24,23 @@ async function main() {
     skipDuplicates: true,
   });
 
-  await prisma.challenge.createMany({
-    data: CHALLENGES,
-    skipDuplicates: true,
-  });
+  for (const challenge of CHALLENGES) {
+    if (!['canceled', 'aborted', 'denied'].includes(challenge.status)) {
+      await prisma.challenge.create({
+        data: {
+          ...challenge,
+          participants: { connect: { id: challenge.requestUserId } },
+        },
+      });
+    } else {
+      await prisma.challenge.create({
+        data: {
+          ...challenge,
+          participants: { connect: [] }, // 또는 participants: undefined
+        },
+      });
+    }
+  }
 
   for (const work of CHALLENGE_WORKS) {
     await prisma.$transaction(async () => {
