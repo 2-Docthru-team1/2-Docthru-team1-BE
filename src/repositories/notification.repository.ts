@@ -22,6 +22,7 @@ export class NotificationRepository implements INotificationRepository {
         challengeId,
         message,
         createdAt: new Date(),
+        isRead: false,
       },
     });
   };
