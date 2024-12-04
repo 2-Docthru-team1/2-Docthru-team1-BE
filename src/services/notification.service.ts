@@ -7,7 +7,7 @@ export class NotificationService {
     return await this.notificationRepository.findUnreadNotifications(userId);
   };
 
-  updateNotificationAsReadd = async (notificationId: string) => {
+  updateNotificationAsRead = async (notificationId: string) => {
     return await this.notificationRepository.updateNotificationAsRead(notificationId);
   };
 

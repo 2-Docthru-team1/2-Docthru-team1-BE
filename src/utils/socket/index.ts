@@ -15,7 +15,7 @@ export const startSocket = (io: Server) => {
 
       userSocketMap.set(userId, socket.id);
 
-      await finishedNotification(io, socket, userId, userSocketMap);
+      await finishedNotification(io, socket, userId);
 
       socket.on('disconnect', () => {
         userSocketMap.delete(userId);
