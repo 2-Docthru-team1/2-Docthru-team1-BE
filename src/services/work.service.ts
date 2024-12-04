@@ -5,7 +5,7 @@ import { getStorage } from '#middlewares/asyncLocalStorage.js';
 import type { ChallengeRepository } from '#repositories/challenge.repository.js';
 import type { FeedbackRepository } from '#repositories/feedback.repository.js';
 import type { WorkRepository } from '#repositories/work.repository.js';
-import { BadRequest, Forbidden, NotFound } from '#types/http-error.types.js';
+import { BadRequest, Forbidden } from '#types/http-error.types.js';
 import type {
   CreateWorkDTOWithId,
   GetWorksOptions,
@@ -15,6 +15,7 @@ import type {
 } from '#types/work.types.js';
 import { generatePresignedDownloadUrl } from '#utils/S3/generate-presigned-download-url.js';
 import { generateS3ImageArray } from '#utils/S3/generateS3ImageArray.js';
+import assertExist from '#utils/assertExist.js';
 import { changeTypeWorkCreate } from '#utils/changeTypeWork.js';
 import MESSAGES from '#utils/constants/messages.js';
 
@@ -27,9 +28,7 @@ export class WorkService implements IWorkService {
 
   getWorks = async (options: GetWorksOptions): Promise<{ list: ResultChallengeWork[]; totalCount: number } | null> => {
     const targetChallenge = await this.challengeRepository.findById(options.challengeId);
-    if (!targetChallenge || targetChallenge.deletedAt) {
-      throw new NotFound(MESSAGES.CHALLENGE_NOT_FOUND);
-    }
+    assertExist(targetChallenge);
 
     const [list, totalCount] = await Promise.all([
       this.workRepository.findMany(options),
@@ -63,9 +62,7 @@ export class WorkService implements IWorkService {
 
   getWorkById = async (id: string): Promise<ResultChallengeWork | null> => {
     const work = await this.workRepository.findById(id);
-    if (!work || work.deletedAt) {
-      throw new NotFound(MESSAGES.NOT_FOUND);
-    }
+    assertExist(work);
 
     const { ownerId, ...otherWorkField } = work || {};
     const changedWork = { ...otherWorkField } as ResultChallengeWork & { likeUsers: { id: string }[] };
@@ -86,10 +83,8 @@ export class WorkService implements IWorkService {
     const userId = storage.userId;
 
     const challenge = await this.challengeRepository.findById(workData.challengeId);
+    assertExist(challenge);
     const challengeWithParticipants = challenge as Challenge & { participants: { id: string }[] };
-    if (!challenge) {
-      throw new NotFound(MESSAGES.NOT_FOUND);
-    }
 
     const isUserParticipating = challengeWithParticipants.participants.some(participant => participant.id === userId);
     if (isUserParticipating) {
@@ -111,11 +106,9 @@ export class WorkService implements IWorkService {
     const userId = storage.userId;
 
     const { imageCount, ...other } = workData;
-    const FoundWork = await this.workRepository.findById(id);
-    if (!FoundWork || FoundWork.deletedAt) {
-      throw new NotFound(MESSAGES.NOT_FOUND);
-    }
-    if (userId !== FoundWork.ownerId) {
+    const foundWork = await this.workRepository.findById(id);
+    assertExist(foundWork);
+    if (userId !== foundWork.ownerId) {
       throw new Forbidden(MESSAGES.FORBIDDEN);
     }
 
@@ -132,9 +125,7 @@ export class WorkService implements IWorkService {
     const userId = storage.userId;
     const userRole = storage.userRole;
     const foundWork = await this.workRepository.findById(id);
-    if (!foundWork || foundWork.deletedAt) {
-      throw new NotFound(MESSAGES.NOT_FOUND);
-    }
+    assertExist(foundWork);
     if (userId !== foundWork.ownerId && userRole !== Role.admin) {
       throw new Forbidden(MESSAGES.FORBIDDEN);
     }
@@ -159,9 +150,7 @@ export class WorkService implements IWorkService {
     const userId = storage.userId;
 
     const foundWork = await this.workRepository.findById(id); // 여기서 가져와서 체크
-    if (!foundWork || foundWork?.deletedAt) {
-      throw new NotFound(MESSAGES.NOT_FOUND);
-    }
+    assertExist(foundWork);
 
     const isLike = foundWork!.likeUsers.some(user => user.id === userId);
     if (isLike) {
@@ -177,9 +166,7 @@ export class WorkService implements IWorkService {
     const userId = storage.userId;
 
     const foundWork = await this.workRepository.findById(id);
-    if (!foundWork || foundWork?.deletedAt) {
-      throw new NotFound(MESSAGES.NOT_FOUND);
-    }
+    assertExist(foundWork);
 
     const isLike = foundWork!.likeUsers.some(user => user.id === userId);
     if (!isLike) {
