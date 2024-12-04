@@ -15,6 +15,7 @@ import type {
 import { BadRequest, Forbidden, NotFound } from '#types/http-error.types.js';
 import { generatePresignedDownloadUrl } from '#utils/S3/generate-presigned-download-url.js';
 import { generatePresignedUploadUrl } from '#utils/S3/generate-presigned-upload-url.js';
+import assertExist from '#utils/assertExist.js';
 import MESSAGES from '#utils/constants/messages.js';
 import filterChallenge from '#utils/filterChallenge.js';
 import { validateUpdateStatus } from '#utils/validateUpdateStatus.js';
@@ -46,9 +47,7 @@ export class ChallengeService implements IChallengeService {
 
   getChallengeById = async (id: string): Promise<CustomChallenge | null> => {
     const challenge = await this.challengeRepository.findById(id);
-    if (!challenge || challenge.deletedAt) {
-      throw new NotFound(MESSAGES.NOT_FOUND);
-    }
+    assertExist(challenge);
 
     const CustomChallenge = filterChallenge(challenge);
     const imageUrl = await generatePresignedDownloadUrl(challenge.imageUrl);
@@ -63,9 +62,7 @@ export class ChallengeService implements IChallengeService {
   getNextChallenge = async (id: string): Promise<CustomChallenge | null> => {
     const totalCount = (await this.challengeRepository.totalCount({ allRecords: true })) || 0;
     const challenge = await this.challengeRepository.findById(id);
-    if (!challenge || challenge.deletedAt) {
-      throw new NotFound(MESSAGES.NOT_FOUND);
-    }
+    assertExist(challenge);
 
     let nextChallenge;
     let i = 1;
@@ -83,9 +80,7 @@ export class ChallengeService implements IChallengeService {
 
   getPreviousChallenge = async (id: string): Promise<CustomChallenge | null> => {
     const challenge = await this.challengeRepository.findById(id);
-    if (!challenge || challenge.deletedAt) {
-      throw new NotFound(MESSAGES.NOT_FOUND);
-    }
+    assertExist(challenge);
 
     let previousChallenge;
     let i = 1;
@@ -149,11 +144,9 @@ export class ChallengeService implements IChallengeService {
     const userId = storage.userId;
     const challenge = await this.challengeRepository.findById(id);
 
+    assertExist(challenge);
     if (!userId) {
       throw new BadRequest(MESSAGES.UNAUTHORIZED);
-    }
-    if (!challenge || challenge.deletedAt) {
-      throw new NotFound(MESSAGES.NOT_FOUND);
     }
     if (challenge.requestUserId !== userId) {
       throw new Forbidden(MESSAGES.FORBIDDEN);
@@ -218,9 +211,8 @@ export class ChallengeService implements IChallengeService {
 
   getAbortReason = async (id: string): Promise<AbortReason | null> => {
     const abortReason = await this.challengeRepository.findAbortReason(id);
-    if (!abortReason) {
-      throw new NotFound(MESSAGES.NOT_FOUND);
-    }
+    assertExist(abortReason);
+
     return abortReason;
   };
 
@@ -250,5 +242,14 @@ export class ChallengeService implements IChallengeService {
 
     const filteredMonthlyChallenge = await Promise.all(returnDownloadUrls);
     return filteredMonthlyChallenge;
+  };
+
+  // socket
+  getChallengesToFinish = async () => {
+    return await this.challengeRepository.findChallengesToFinish();
+  };
+
+  updateChallengesToFinished = async (challengeIds: string[]) => {
+    return await this.challengeRepository.updateChallengesToFinished(challengeIds);
   };
 }

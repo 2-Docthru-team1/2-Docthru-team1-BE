@@ -1,8 +1,9 @@
 import type { IRecipeService } from '#interfaces/services/recipe.service.interface.js';
 import type { RecipeRepository } from '#repositories/recipe.repository.js';
-import { BadRequest, NotFound } from '#types/http-error.types.js';
+import { BadRequest } from '#types/http-error.types.js';
 import type { CreateRecipeDTO, RecipeOptions, UpdateRecipeDTO } from '#types/recipe.types.js';
 import { generatePresignedDownloadUrl } from '#utils/S3/generate-presigned-download-url.js';
+import assertExist from '#utils/assertExist.js';
 import MESSAGES from '#utils/constants/messages.js';
 
 export class RecipeService implements IRecipeService {
@@ -32,9 +33,7 @@ export class RecipeService implements IRecipeService {
 
   getRecipeById = async (id: string) => {
     const recipe = await this.recipeRepository.findById(id);
-    if (!recipe || recipe.deletedAt) {
-      throw new NotFound(MESSAGES.NOT_FOUND);
-    }
+    assertExist(recipe);
 
     const images: string[] = [];
     await Promise.all(
@@ -56,9 +55,7 @@ export class RecipeService implements IRecipeService {
 
   updateRecipe = async (id: string, data: UpdateRecipeDTO) => {
     const recipe = await this.recipeRepository.findById(id);
-    if (!recipe || recipe.deletedAt) {
-      throw new NotFound(MESSAGES.NOT_FOUND);
-    }
+    assertExist(recipe);
 
     const newRecipe = await this.recipeRepository.update(id, data);
 
@@ -67,18 +64,15 @@ export class RecipeService implements IRecipeService {
 
   deleteRecipe = async (id: string) => {
     const recipe = await this.recipeRepository.delete(id);
-    if (!recipe || recipe.deletedAt) {
-      throw new NotFound(MESSAGES.NOT_FOUND);
-    }
+    assertExist(recipe);
 
     return recipe;
   };
 
   likeRecipe = async (recipeId: string, userId: string) => {
     const recipe = await this.recipeRepository.findById(recipeId);
-    if (!recipe || recipe.deletedAt) {
-      throw new NotFound(MESSAGES.NOT_FOUND);
-    }
+    assertExist(recipe);
+
     const isLiked = await this.recipeRepository.isLiked(recipeId, userId);
     if (isLiked) {
       throw new BadRequest(MESSAGES.BAD_REQUEST);
@@ -90,9 +84,8 @@ export class RecipeService implements IRecipeService {
 
   unlikeRecipe = async (recipeId: string, userId: string) => {
     const recipe = await this.recipeRepository.findById(recipeId);
-    if (!recipe || recipe.deletedAt) {
-      throw new NotFound(MESSAGES.NOT_FOUND);
-    }
+    assertExist(recipe);
+
     const isLiked = await this.recipeRepository.isLiked(recipeId, userId);
     if (!isLiked) {
       throw new BadRequest(MESSAGES.BAD_REQUEST);

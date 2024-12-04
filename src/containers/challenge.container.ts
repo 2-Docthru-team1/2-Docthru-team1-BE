@@ -7,4 +7,5 @@ const challengeRepository = new ChallengeRepository(prismaClient);
 const challengeService = new ChallengeService(challengeRepository);
 const challengeController = new ChallengeController(challengeService);
 
+export { challengeService };
 export default challengeController;

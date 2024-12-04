@@ -1,79 +1,29 @@
-import jwt from 'jsonwebtoken';
 import cron from 'node-cron';
 import { Server } from 'socket.io';
-import { jwtSecret } from '#configs/auth.config.js';
-import prismaClient from '#connection/postgres.connection.js';
+import { challengeService } from '#containers/challenge.container.js';
+import { notificationService } from '#containers/notification.container.js';
+import { userSocketMap } from '#utils/socket/socket.utils.js';
 
 export const scheduleChallengeStatus = (io: Server) => {
-  const userSocketMap = new Map();
+  cron.schedule('0 0 * * *', async () => {
+    const challengesToFinish = await challengeService.getChallengesToFinish();
 
-  io.on('connection', async socket => {
-    const token = socket.handshake.auth.token;
-    const secretKey = jwtSecret;
-
-    try {
-      const decoded = jwt.verify(token, secretKey) as { userId: string };
-      userSocketMap.set(decoded.userId, socket.id);
-
-      const notifications = await prismaClient.notification.findMany({
-        where: {
-          userId: decoded.userId,
-          isRead: false,
-        },
-      });
-
-      notifications.forEach(async notification => {
-        socket.emit('challengeStatusChangedFinished', {
-          message: notification.message,
-          challengeId: notification.challengeId,
-          createdAt: notification.createdAt,
-        });
-
-        await prismaClient.notification.update({
-          where: { id: notification.id },
-          data: { isRead: true },
-        });
-      });
-
-      socket.on('disconnect', () => {
-        userSocketMap.delete(decoded.userId);
-      });
-    } catch (e) {
-      socket.disconnect();
-    }
-  });
-
-  cron.schedule('* * * * *', async () => {
-    const now = new Date();
-
-    const challengesToFinish = await prismaClient.challenge.findMany({
-      where: {
-        deadline: { lte: now },
-        status: { in: ['pending', 'onGoing'] },
-      },
-      include: {
-        participants: {
-          select: { id: true },
-        },
-      },
-    });
-
-    if (challengesToFinish.length === 0) {
+    if (!challengesToFinish) {
       return;
     }
 
     const challengeIds = challengesToFinish.map(challenge => challenge.id);
-    await prismaClient.challenge.updateMany({
-      where: { id: { in: challengeIds } },
-      data: { status: 'finished' },
-    });
+    await challengeService.updateChallengesToFinished(challengeIds);
 
-    challengesToFinish.forEach(challenge => {
+    for (const challenge of challengesToFinish) {
       const roomName = `challenge-${challenge.id}`;
       const participantIds = challenge.participants.map(participant => participant.id);
 
-      participantIds.forEach(async participantId => {
+      for (const participantId of participantIds) {
         const participantSocketId = userSocketMap.get(participantId);
+        if (!participantSocketId) {
+          return;
+        }
         const participantSocket = io.sockets.sockets.get(participantSocketId);
 
         if (participantSocket) {
@@ -84,17 +34,13 @@ export const scheduleChallengeStatus = (io: Server) => {
             createdAt: new Date(),
           });
         } else {
-          await prismaClient.notification.create({
-            data: {
-              userId: participantId,
-              challengeId: challenge.id,
-              message: `챌린지 "${challenge.title}" 는 종료되었습니다.`,
-              isRead: false,
-              createdAt: new Date(),
-            },
-          });
+          await notificationService.createNotification(
+            participantId,
+            challenge.id,
+            `챌린지 "${challenge.title}" 는 종료되었습니다.`,
+          );
         }
-      });
-    });
+      }
+    }
   });
 };

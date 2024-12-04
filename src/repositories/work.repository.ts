@@ -1,4 +1,4 @@
-import type { ChallengeWork } from '@prisma/client';
+import type { ChallengeWork, WorkLike } from '@prisma/client';
 import prismaClient from '#connection/postgres.connection.js';
 import type { IWorkRepository } from '#interfaces/repositories/work.repository.interface.js';
 import type { ExtendedPrismaClient } from '#types/common.types.js';
@@ -35,13 +35,13 @@ export class WorkRepository implements IWorkRepository {
     return totalCount;
   };
 
-  findById = async (id: string): Promise<(ChallengeWork & { likeUsers: { id: string }[] }) | null> => {
+  findById = async (id: string): Promise<ChallengeWork | null> => {
     const work = await this.challengeWork.findUnique({
       where: { id },
       include: {
         owner: { select: { id: true, name: true, email: true, role: true } },
         images: { select: { imageUrl: true } },
-        likeUsers: { select: { id: true } },
+        workLikes: { select: { userId: true } },
       },
     });
     return work;
@@ -121,7 +121,14 @@ export class WorkRepository implements IWorkRepository {
   addLike = async (id: string, userId: string): Promise<ChallengeWork> => {
     const work = await this.challengeWork.update({
       where: { id },
-      data: { likeCount: { increment: 1 }, likeUsers: { connect: { id: userId } } },
+      data: {
+        likeCount: { increment: 1 },
+        workLikes: {
+          create: {
+            userId,
+          },
+        },
+      },
     });
     return work;
   };
@@ -129,7 +136,15 @@ export class WorkRepository implements IWorkRepository {
   removeLike = async (id: string, userId: string): Promise<ChallengeWork> => {
     const work = await this.challengeWork.update({
       where: { id },
-      data: { likeCount: { decrement: 1 }, likeUsers: { disconnect: { id: userId } } },
+      data: {
+        likeCount: { decrement: 1 },
+        workLikes: {
+          deleteMany: {
+            challengeWorkId: id,
+            userId: userId,
+          },
+        },
+      },
     });
     return work;
   };

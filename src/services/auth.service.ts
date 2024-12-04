@@ -1,8 +1,10 @@
 import type { IAuthService } from '#interfaces/services/auth.service.interface.js';
+import { getStorage } from '#middlewares/asyncLocalStorage.js';
 import type { UserRepository } from '#repositories/user.repository.js';
-import type { CreateUserDTO, SigninResponse, UserToken } from '#types/auth.types.js';
+import type { CreateUserDTO, SigninResponse } from '#types/auth.types.js';
 import { BadRequest, NotFound, Unauthorized } from '#types/http-error.types.js';
 import type { SafeUser } from '#types/user.types.js';
+import assertExist from '#utils/assertExist.js';
 import MESSAGES from '#utils/constants/messages.js';
 import createToken from '#utils/createToken.js';
 import filterSensitiveData from '#utils/filterSensitiveData.js';
@@ -14,9 +16,7 @@ export class AuthService implements IAuthService {
 
   signIn = async (email: string, password: string): Promise<SigninResponse> => {
     const user = await this.userRepository.findByEmail(email);
-    if (!user || user.deletedAt) {
-      throw new NotFound(MESSAGES.INVALID_CREDENTIALS);
-    }
+    assertExist(user);
 
     const hashedInputPassword = hashingPassword(password, user.salt);
     if (hashedInputPassword !== user.password) {
@@ -34,9 +34,7 @@ export class AuthService implements IAuthService {
 
   getUser = async (userId: string): Promise<SafeUser> => {
     const user = await this.userRepository.findById(userId);
-    if (!user || user.deletedAt) {
-      throw new NotFound(MESSAGES.NOT_FOUND);
-    }
+    assertExist(user);
 
     return filterSensitiveData(user);
   };
@@ -54,26 +52,26 @@ export class AuthService implements IAuthService {
 
   verifyUser = async (id: string) => {
     const target = await this.userRepository.findById(id);
-    if (!target || target.deletedAt) {
-      throw new NotFound(MESSAGES.NOT_FOUND);
-    }
+    assertExist(target);
 
     const user = await this.userRepository.update(id, { isVerified: true });
 
     return filterSensitiveData(user);
   };
 
-  getNewToken = async (userToken: UserToken, refreshToken: string): Promise<SafeUser> => {
-    const user = await this.userRepository.findById(userToken.userId);
-    if (!user || user.deletedAt) {
-      throw new BadRequest(MESSAGES.INVALID_ACCESS_TOKEN);
-    }
-    if (user.refreshToken !== refreshToken) {
+  getNewToken = async (): Promise<SafeUser> => {
+    const storage = getStorage();
+    console.log('🚀 ~ AuthService ~ getNewToken= ~ storage:', storage);
+
+    const user = await this.userRepository.findById(storage.userId);
+    assertExist(user);
+
+    if (user.refreshToken !== storage.refreshToken) {
       throw new Unauthorized(MESSAGES.INVALID_REFRESH_TOKEN);
     }
 
     // NOTE 리프레시 토큰의 남은 시간이 2시간 이내일경우
-    const timeRemaining = remainingTime(userToken.exp);
+    const timeRemaining = remainingTime(storage.tokenEXP);
     if (timeRemaining < 3600 * 2) {
       // NOTE 새 리프레시 토큰을 발급하고 이를 업데이트
       const refreshToken = createToken(user, 'refresh');
