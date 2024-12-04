@@ -5,7 +5,7 @@ import { notificationService } from '#containers/notification.container.js';
 import { userSocketMap } from '#utils/socket/socket.utils.js';
 
 export const scheduleChallengeStatus = (io: Server) => {
-  cron.schedule('0 0 * * *', async () => {
+  cron.schedule('* * * * *', async () => {
     const challengesToFinish = await challengeService.getChallengesToFinish();
 
     if (!challengesToFinish) {
@@ -20,25 +20,21 @@ export const scheduleChallengeStatus = (io: Server) => {
       const participantIds = challenge.participants.map(participant => participant.id);
 
       for (const participantId of participantIds) {
-        const participantSocketId = userSocketMap.get(participantId);
-        if (!participantSocketId) {
-          return;
-        }
-        const participantSocket = io.sockets.sockets.get(participantSocketId);
+        const notificationMessage = `챌린지 "${challenge.title}" 는 종료되었습니다.`;
+        await notificationService.createNotification(participantId, challenge.id, notificationMessage);
 
-        if (participantSocket) {
-          participantSocket.join(roomName);
-          io.to(roomName).emit('challengeStatusChangedFinished', {
-            message: `챌린지 "${challenge.title}" 는 종료되었습니다.`,
-            challengeId: challenge.id,
-            createdAt: new Date(),
-          });
-        } else {
-          await notificationService.createNotification(
-            participantId,
-            challenge.id,
-            `챌린지 "${challenge.title}" 는 종료되었습니다.`,
-          );
+        const participantSocketId = userSocketMap.get(participantId);
+        if (participantSocketId) {
+          const participantSocket = io.sockets.sockets.get(participantSocketId);
+
+          if (participantSocket) {
+            participantSocket.join(roomName);
+            io.to(roomName).emit('challengeStatusChangedFinished', {
+              message: notificationMessage,
+              challengeId: challenge.id,
+              createdAt: new Date(),
+            });
+          }
         }
       }
     }

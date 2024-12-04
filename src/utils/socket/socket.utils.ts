@@ -5,7 +5,7 @@ import MESSAGES from '#utils/constants/messages.js';
 
 export const userSocketMap = new Map<string, string>();
 
-export const matchUserIdSocketId = async (socket: Socket): Promise<string> => {
+export const matchUserIdSocketId = async (socket: Socket) => {
   const token = socket.handshake.auth.token;
 
   if (!token) {
@@ -21,6 +21,4 @@ export const matchUserIdSocketId = async (socket: Socket): Promise<string> => {
   socket.on('disconnect', () => {
     userSocketMap.delete(userId);
   });
-
-  return userId;
 };

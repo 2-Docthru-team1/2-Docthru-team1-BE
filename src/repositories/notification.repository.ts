@@ -7,16 +7,9 @@ export class NotificationRepository {
     this.notification = client.notification;
   }
 
-  findUnreadNotifications = async (userId: string) => {
+  getNotifications = async (userId: string) => {
     return await this.notification.findMany({
-      where: { userId, isRead: false },
-    });
-  };
-
-  updateNotificationAsRead = async (notificationId: string) => {
-    return await this.notification.update({
-      where: { id: notificationId },
-      data: { isRead: true },
+      where: { userId },
     });
   };
 
@@ -26,7 +19,6 @@ export class NotificationRepository {
         userId,
         challengeId,
         message,
-        isRead: false,
         createdAt: new Date(),
       },
     });
