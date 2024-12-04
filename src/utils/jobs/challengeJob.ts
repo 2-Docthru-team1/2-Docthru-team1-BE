@@ -7,7 +7,9 @@ export const scheduleChallengeStatus = (io: Server, userSocketMap: Map<string, s
   cron.schedule('* * * * *', async () => {
     const challengesToFinish = await challengeService.getChallengesToFinish();
 
-    if (!challengesToFinish) return;
+    if (!challengesToFinish) {
+      return;
+    }
 
     const challengeIds = challengesToFinish.map(challenge => challenge.id);
     await challengeService.updateChallengesToFinished(challengeIds);

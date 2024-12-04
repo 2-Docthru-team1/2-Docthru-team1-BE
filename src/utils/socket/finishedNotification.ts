@@ -2,19 +2,18 @@ import { Server, Socket } from 'socket.io';
 import { notificationService } from '#containers/notification.container.js';
 
 export const finishedNotification = async (io: Server, socket: Socket, userId: string) => {
-  try {
-    const unreadNotifications = await notificationService.getUnreadNotifications(userId);
+  const unreadNotifications = await notificationService.getUnreadNotifications(userId);
+  if (!unreadNotifications) {
+    return;
+  }
 
-    for (const notification of unreadNotifications) {
-      socket.emit('storedNotifications', {
-        message: notification.message,
-        challengeId: notification.challengeId,
-        createdAt: notification.createdAt,
-      });
+  for (const notification of unreadNotifications) {
+    socket.emit('storedNotifications', {
+      message: notification.message,
+      challengeId: notification.challengeId,
+      createdAt: notification.createdAt,
+    });
 
-      await notificationService.updateNotificationAsRead(notification.id);
-    }
-  } catch (error) {
-    console.error('Failed to send unread notifications:', error);
+    await notificationService.updateNotificationAsRead(notification.id);
   }
 };

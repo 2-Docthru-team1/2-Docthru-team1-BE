@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { Server } from 'socket.io';
 import { jwtSecret } from '#configs/auth.config.js';
+import MESSAGES from '#utils/constants/messages.js';
 import { finishedNotification } from './finishedNotification.js';
 
 export const startSocket = (io: Server) => {
@@ -8,6 +9,10 @@ export const startSocket = (io: Server) => {
 
   io.on('connection', async socket => {
     const token = socket.handshake.auth.token;
+    if (!token) {
+      socket.disconnect();
+      throw new Error(MESSAGES.INVALID_ACCESS_TOKEN);
+    }
 
     try {
       const decoded = jwt.verify(token, jwtSecret) as { userId: string };
