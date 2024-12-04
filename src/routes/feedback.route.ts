@@ -6,6 +6,7 @@ export const feedbackRouter = Router();
 
 feedbackRouter
   .route('/:id')
+  .get(feedbackController.getFeedbackById)
   .patch(tokenVerifier.verifyAccessToken, feedbackController.patchFeedback)
   .delete(tokenVerifier.verifyAccessToken, feedbackController.deleteFeedback);
 
