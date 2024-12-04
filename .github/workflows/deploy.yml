@@ -35,10 +35,9 @@ jobs:
             source /etc/profile.d/HanCook-env.sh
 
             npm install
-            # export DATABASE_URL="$DATABASE_URL" && npx prisma migrate deploy && npx prisma db seed
-            # export DATABASE_URL="$DATABASE_URL" && npx prisma migrate dev
             export DATABASE_URL="$DATABASE_URL"
-            npx prisma migrate deploy
+            # npx prisma migrate deploy
+            npx prisma migrate dev
             npx prisma db seed
             npx tsc
 
