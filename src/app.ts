@@ -62,9 +62,15 @@ if (port === '443') {
 }
 
 const io = new Server(server);
-app.use((req, res, next) => {
-  startSocket(io);
-  startJob(io);
-});
 
-app.use(errorHandler);
+try {
+  startSocket(io);
+} catch (error) {
+  console.error('Error in startSocket:', error);
+}
+
+try {
+  startJob(io);
+} catch (error) {
+  console.error('Error in startJob:', error);
+}
