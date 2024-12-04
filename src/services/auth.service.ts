@@ -1,6 +1,7 @@
 import type { IAuthService } from '#interfaces/services/auth.service.interface.js';
+import { getStorage } from '#middlewares/asyncLocalStorage.js';
 import type { UserRepository } from '#repositories/user.repository.js';
-import type { CreateUserDTO, SigninResponse, UserToken } from '#types/auth.types.js';
+import type { CreateUserDTO, SigninResponse } from '#types/auth.types.js';
 import { BadRequest, NotFound, Unauthorized } from '#types/http-error.types.js';
 import type { SafeUser } from '#types/user.types.js';
 import assertExist from '#utils/assertExist.js';
@@ -58,16 +59,19 @@ export class AuthService implements IAuthService {
     return filterSensitiveData(user);
   };
 
-  getNewToken = async (userToken: UserToken, refreshToken: string): Promise<SafeUser> => {
-    const user = await this.userRepository.findById(userToken.userId);
+  getNewToken = async (): Promise<SafeUser> => {
+    const storage = getStorage();
+    console.log('🚀 ~ AuthService ~ getNewToken= ~ storage:', storage);
+
+    const user = await this.userRepository.findById(storage.userId);
     assertExist(user);
 
-    if (user.refreshToken !== refreshToken) {
+    if (user.refreshToken !== storage.refreshToken) {
       throw new Unauthorized(MESSAGES.INVALID_REFRESH_TOKEN);
     }
 
     // NOTE 리프레시 토큰의 남은 시간이 2시간 이내일경우
-    const timeRemaining = remainingTime(userToken.exp);
+    const timeRemaining = remainingTime(storage.tokenEXP);
     if (timeRemaining < 3600 * 2) {
       // NOTE 새 리프레시 토큰을 발급하고 이를 업데이트
       const refreshToken = createToken(user, 'refresh');
