@@ -7,6 +7,7 @@ import { Server } from 'socket.io';
 import { port } from '#configs/common.config.js';
 import errorHandler from '#middlewares/error-handler.js';
 import { startJob } from '#utils/jobs/index.js';
+import { startSocket } from '#utils/socket/index.js';
 import setupMiddlewares from './app.middlewares.js';
 import setupRoutes from './app.routes.js';
 
@@ -14,7 +15,6 @@ export const app = express();
 
 setupMiddlewares(app);
 setupRoutes(app);
-app.use(errorHandler);
 
 let server;
 if (port === '443') {
@@ -61,4 +61,7 @@ if (port === '443') {
 }
 
 const io = new Server(server);
+startSocket(io);
 startJob(io);
+
+app.use(errorHandler);

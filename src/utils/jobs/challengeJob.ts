@@ -2,8 +2,9 @@ import cron from 'node-cron';
 import { Server } from 'socket.io';
 import { challengeService } from '#containers/challenge.container.js';
 import { notificationService } from '#containers/notification.container.js';
+import { userSocketMap } from '#utils/socket/socket.utils.js';
 
-export const scheduleChallengeStatus = (io: Server, userSocketMap: Map<string, string>) => {
+export const scheduleChallengeStatus = (io: Server) => {
   cron.schedule('* * * * *', async () => {
     const challengesToFinish = await challengeService.getChallengesToFinish();
 
