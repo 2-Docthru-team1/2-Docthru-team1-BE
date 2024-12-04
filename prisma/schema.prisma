@@ -31,7 +31,7 @@ model User {
   requests      Challenge[]     @relation(name: "requests")
   participation Challenge[]     @relation(name: "participation")
   ownWorks      ChallengeWork[] @relation(name: "ownership")
-  likeWorks     ChallengeWork[] @relation(name: "likeRelation")
+  workLikes     WorkLike[]
   feedbacks     Feedback[]
   abortReasons  AbortReason[] // 관리자 유저에 한함
   likeRecipes   Recipe[]        @relation(name: "recipeLikeRelation")
@@ -75,7 +75,7 @@ model ChallengeWork {
   likeCount Int    @default(0)
 
   images    WorkImage[]
-  likeUsers User[]      @relation(name: "likeRelation")
+  workLikes WorkLike[]
   feedbacks Feedback[]
 
   owner       User?     @relation(name: "ownership", fields: [ownerId], references: [id], onDelete: SetNull)
@@ -94,6 +94,18 @@ model WorkImage {
 
   work   ChallengeWork @relation(fields: [workId], references: [id], onDelete: Cascade)
   workId String
+}
+
+model WorkLike {
+  id        String    @id @default(uuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  user            User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userId          String?
+  challengeWork   ChallengeWork @relation(fields: [challengeWorkId], references: [id], onDelete: Cascade)
+  challengeWorkId String
 }
 
 model Feedback {

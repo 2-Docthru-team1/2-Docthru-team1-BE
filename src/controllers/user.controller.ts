@@ -1,13 +1,17 @@
-import type { NextFunction, Request, Response } from 'express';
+import { MonthlyType } from '@prisma/client';
+import type { NextFunction, Response } from 'express';
 import { assert } from 'superstruct';
 import type { UserService } from '#services/user.service.js';
+import type { Request } from '#types/common.types.js';
+import type { LikedUserRanking } from '#types/workLike.types.js';
 import MESSAGES from '#utils/constants/messages.js';
+import { getCurrentMonth, isValidMonth } from '#utils/monthHelper.js';
 import { Email, PatchUser, Uuid } from '#utils/struct.js';
 
 export class UserController {
   constructor(private userService: UserService) {}
 
-  getUserById = async (req: Request, res: Response, next: NextFunction) => {
+  getUserById = async (req: Request<{ params: { id: string } }>, res: Response, next: NextFunction) => {
     const { id } = req.params;
     assert(id, Uuid, MESSAGES.WRONG_ID_FORMAT);
 
@@ -16,7 +20,7 @@ export class UserController {
     res.json(user);
   };
 
-  getUserByEmail = async (req: Request, res: Response, next: NextFunction) => {
+  getUserByEmail = async (req: Request<{ body: { email: string } }>, res: Response, next: NextFunction) => {
     const { email } = req.body;
     assert(email, Email, MESSAGES.WRONG_EMAIL_FORMAT);
 
@@ -24,8 +28,14 @@ export class UserController {
 
     res.json(user);
   };
+  getTopUsersByLikeCountForMonth = async (req: Request<{ params: { month: string } }>, res: Response, next: NextFunction) => {
+    const { month } = req.params;
+    const validatedMonth = isValidMonth(month) ? (month as MonthlyType) : getCurrentMonth();
+    const topUsers = await this.userService.getTopUsersByLikeCount(validatedMonth);
+    res.json(topUsers);
+  };
 
-  patchUser = async (req: Request, res: Response, next: NextFunction) => {
+  patchUser = async (req: Request<{ params: { id: string } }>, res: Response, next: NextFunction) => {
     const { id } = req.params;
     assert(id, Uuid, MESSAGES.WRONG_ID_FORMAT);
 
@@ -36,7 +46,7 @@ export class UserController {
     // res.json(user);
   };
 
-  deleteUser = async (req: Request, res: Response, next: NextFunction) => {
+  deleteUser = async (req: Request<{ params: { id: string } }>, res: Response, next: NextFunction) => {
     const { id } = req.params;
     assert(id, Uuid, MESSAGES.WRONG_ID_FORMAT);
 

@@ -132,6 +132,7 @@ export class WorkService implements IWorkService {
     const userId = storage.userId;
     const userRole = storage.userRole;
     const foundWork = await this.workRepository.findById(id);
+
     if (!foundWork || foundWork.deletedAt) {
       throw new NotFound(MESSAGES.NOT_FOUND);
     }
@@ -162,13 +163,14 @@ export class WorkService implements IWorkService {
     if (!foundWork || foundWork?.deletedAt) {
       throw new NotFound(MESSAGES.NOT_FOUND);
     }
-
-    const isLike = foundWork!.likeUsers.some(user => user.id === userId);
+    const foundWorkWithWorkLikes = foundWork as ChallengeWork & { workLikes: { userId: string }[] };
+    const isLike = foundWorkWithWorkLikes!.workLikes.some(workLike => workLike.userId === userId);
     if (isLike) {
       throw new BadRequest(MESSAGES.ALREADY_LIKED_MESSAGE);
     }
 
     const updatedWork = await this.workRepository.addLike(id, userId);
+
     return updatedWork;
   };
 
@@ -180,8 +182,8 @@ export class WorkService implements IWorkService {
     if (!foundWork || foundWork?.deletedAt) {
       throw new NotFound(MESSAGES.NOT_FOUND);
     }
-
-    const isLike = foundWork!.likeUsers.some(user => user.id === userId);
+    const foundWorkWithWorkLikes = foundWork as ChallengeWork & { workLikes: { userId: string }[] };
+    const isLike = foundWorkWithWorkLikes!.workLikes.some(workLike => workLike.userId === userId);
     if (!isLike) {
       throw new BadRequest(MESSAGES.UNLIKE_NOT_CURRENTLY_LIKED);
     }
