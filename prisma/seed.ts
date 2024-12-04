@@ -5,6 +5,7 @@ import { ABORT_REASONS } from './mock/abortReasonMock.js';
 import { CHALLENGES } from './mock/challengeMock.js';
 import { CHALLENGE_WORKS, WORK_IMAGES } from './mock/challengeWorkMock.js';
 import USERS from './mock/userMock.js';
+import { WORK_LIKES } from './mock/workLikeMock.js';
 
 const prisma = new PrismaClient();
 
@@ -12,6 +13,7 @@ async function main() {
   await prisma.abortReason.deleteMany();
   await prisma.recipe.deleteMany();
   await prisma.feedback.deleteMany();
+  await prisma.workLike.deleteMany();
   await prisma.workImage.deleteMany();
   await prisma.challengeWork.deleteMany();
   await prisma.challenge.deleteMany();
@@ -23,7 +25,7 @@ async function main() {
   });
 
   for (const challenge of CHALLENGES) {
-    if (!['canceled', 'aborted', 'denied', 'pending'].includes(challenge.status)) {
+    if (!['canceled', 'aborted', 'denied'].includes(challenge.status)) {
       await prisma.challenge.create({
         data: {
           ...challenge,
@@ -54,6 +56,11 @@ async function main() {
 
   await prisma.workImage.createMany({
     data: WORK_IMAGES,
+    skipDuplicates: true,
+  });
+
+  await prisma.workLike.createMany({
+    data: WORK_LIKES,
     skipDuplicates: true,
   });
 

@@ -125,6 +125,7 @@ export class WorkService implements IWorkService {
     const userId = storage.userId;
     const userRole = storage.userRole;
     const foundWork = await this.workRepository.findById(id);
+
     assertExist(foundWork);
     if (userId !== foundWork.ownerId && userRole !== Role.admin) {
       throw new Forbidden(MESSAGES.FORBIDDEN);
@@ -151,13 +152,15 @@ export class WorkService implements IWorkService {
 
     const foundWork = await this.workRepository.findById(id); // 여기서 가져와서 체크
     assertExist(foundWork);
+    const foundWorkWithWorkLikes = foundWork as ChallengeWork & { workLikes: { userId: string }[] };
+    const isLike = foundWorkWithWorkLikes!.workLikes.some(workLike => workLike.userId === userId);
 
-    const isLike = foundWork!.likeUsers.some(user => user.id === userId);
     if (isLike) {
       throw new BadRequest(MESSAGES.ALREADY_LIKED_MESSAGE);
     }
 
     const updatedWork = await this.workRepository.addLike(id, userId);
+
     return updatedWork;
   };
 
@@ -167,8 +170,9 @@ export class WorkService implements IWorkService {
 
     const foundWork = await this.workRepository.findById(id);
     assertExist(foundWork);
+    const foundWorkWithWorkLikes = foundWork as ChallengeWork & { workLikes: { userId: string }[] };
+    const isLike = foundWorkWithWorkLikes.workLikes.some(workLike => workLike.userId === userId);
 
-    const isLike = foundWork!.likeUsers.some(user => user.id === userId);
     if (!isLike) {
       throw new BadRequest(MESSAGES.UNLIKE_NOT_CURRENTLY_LIKED);
     }
