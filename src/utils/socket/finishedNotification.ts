@@ -6,7 +6,7 @@ export const finishedNotification = async (io: Server, socket: Socket, userId: s
     const unreadNotifications = await notificationService.getUnreadNotifications(userId);
 
     for (const notification of unreadNotifications) {
-      socket.emit('challengeStatusChangedFinished', {
+      socket.emit('storedNotifications', {
         message: notification.message,
         challengeId: notification.challengeId,
         createdAt: notification.createdAt,
