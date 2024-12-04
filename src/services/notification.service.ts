@@ -1,17 +1,24 @@
+import type { Notification } from '@prisma/client';
+import type { INotificationService } from '#interfaces/services/notification.service.interface.js';
+import { getStorage } from '#middlewares/asyncLocalStorage.js';
 import type { NotificationRepository } from '#repositories/notification.repository.js';
+import { NotFound } from '#types/http-error.types.js';
+import MESSAGES from '#utils/constants/messages.js';
 
-export class NotificationService {
+export class NotificationService implements INotificationService {
   constructor(private notificationRepository: NotificationRepository) {}
 
-  getUnreadNotifications = async (userId: string) => {
-    return await this.notificationRepository.findUnreadNotifications(userId);
+  getNotifications = async (): Promise<Notification[] | null> => {
+    const storage = getStorage();
+    const userId = storage.userId;
+    const notifications = await this.notificationRepository.getNotifications(userId);
+    if (!notifications || notifications.length === 0) {
+      throw new NotFound(MESSAGES.NOT_FOUND);
+    }
+    return notifications;
   };
 
-  updateNotificationAsRead = async (notificationId: string) => {
-    return await this.notificationRepository.updateNotificationAsRead(notificationId);
-  };
-
-  createNotification = async (userId: string, message: string, challengeId: string) => {
+  createNotification = async (userId: string, message: string, challengeId: string): Promise<Notification> => {
     return await this.notificationRepository.createNotification(userId, message, challengeId);
   };
 }

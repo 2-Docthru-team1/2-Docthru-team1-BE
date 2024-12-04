@@ -1,4 +1,4 @@
-import type { AbortReason } from '@prisma/client';
+import type { AbortReason, Challenge } from '@prisma/client';
 import { MonthlyType } from '@prisma/client';
 import type { IChallengeService } from '#interfaces/services/challenge.service.interface.js';
 import { getStorage } from '#middlewares/asyncLocalStorage.js';
@@ -6,6 +6,7 @@ import type { ChallengeRepository } from '#repositories/challenge.repository.js'
 import type {
   ChallengeInput,
   ChallengeStatusInput,
+  ChallengeWithParticipants,
   CreateChallengeDTO,
   CustomChallenge,
   GetMonthlyChallengeOption,
@@ -245,11 +246,13 @@ export class ChallengeService implements IChallengeService {
   };
 
   // socket
-  getChallengesToFinish = async () => {
-    return await this.challengeRepository.findChallengesToFinish();
+  getChallengesToFinish = async (): Promise<ChallengeWithParticipants[]> => {
+    const challenges = await this.challengeRepository.findChallengesToFinish();
+    return challenges;
   };
 
-  updateChallengesToFinished = async (challengeIds: string[]) => {
-    return await this.challengeRepository.updateChallengesToFinished(challengeIds);
+  updateChallengesToFinished = async (challengeIds: string[]): Promise<Challenge[]> => {
+    const challenges = await this.challengeRepository.updateChallengesToFinished(challengeIds);
+    return challenges;
   };
 }
