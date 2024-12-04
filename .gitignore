@@ -7,3 +7,4 @@ dist
 *.csv
 *.pem
 ec2.txt
+logs/
