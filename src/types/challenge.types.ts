@@ -76,3 +76,7 @@ export interface ValidateUpdateStatusInput {
   userId: string;
   userRole?: Role;
 }
+
+export interface ChallengeWithParticipants extends Challenge {
+  participants: { id: string }[];
+}

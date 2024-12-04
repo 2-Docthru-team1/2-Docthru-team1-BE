@@ -4,6 +4,7 @@ import type { IChallengeRepository } from '#interfaces/repositories/challenge.re
 import type {
   ChallengeInput,
   ChallengeStatusInput,
+  ChallengeWithParticipants,
   GetMonthlyChallengeOption,
   UpdateChallengeDTO,
   getChallengesOptions,
@@ -193,5 +194,26 @@ export class ChallengeRepository implements IChallengeRepository {
     });
 
     return challenge;
+  };
+
+  // socket
+  findChallengesToFinish = async (): Promise<ChallengeWithParticipants[]> => {
+    const now = new Date();
+    return await this.challenge.findMany({
+      where: {
+        deadline: { lte: now },
+        status: { in: ['pending', 'onGoing'] },
+      },
+      include: {
+        participants: { select: { id: true } },
+      },
+    });
+  };
+
+  updateChallengesToFinished = async (challengeIds: string[]) => {
+    return await this.challenge.updateMany({
+      where: { id: { in: challengeIds } },
+      data: { status: 'finished' },
+    });
   };
 }

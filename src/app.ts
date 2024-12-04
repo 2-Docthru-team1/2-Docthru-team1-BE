@@ -11,14 +11,12 @@ import setupMiddlewares from './app.middlewares.js';
 import setupRoutes from './app.routes.js';
 
 export const app = express();
-const server = createServer(app);
-const io = new Server(server);
 
-startJob(io);
 setupMiddlewares(app);
 setupRoutes(app);
 app.use(errorHandler);
 
+let server;
 if (port === '443') {
   let sslOptions;
 
@@ -45,7 +43,8 @@ if (port === '443') {
   });
 
   // HTTPS 서버 생성 (미들웨어 밖으로 이동)
-  https.createServer(options, app).listen(443, () => {
+  server = https.createServer(options, app);
+  server.listen(443, () => {
     console.log('HTTPS Server is running on port 443');
   });
 
@@ -55,7 +54,11 @@ if (port === '443') {
   });
 } else {
   // 개발 환경에서는 일반 HTTP 서버로 실행
-  app.listen(port, () => {
+  server = createServer(app);
+  server.listen(port, () => {
     console.log(`Server is running on port ${port}`);
   });
 }
+
+const io = new Server(server);
+startJob(io);

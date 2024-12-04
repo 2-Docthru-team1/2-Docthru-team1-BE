@@ -251,4 +251,13 @@ export class ChallengeService implements IChallengeService {
     const filteredMonthlyChallenge = await Promise.all(returnDownloadUrls);
     return filteredMonthlyChallenge;
   };
+
+  // socket
+  getChallengesToFinish = async () => {
+    return await this.challengeRepository.findChallengesToFinish();
+  };
+
+  updateChallengesToFinished = async (challengeIds: string[]) => {
+    return await this.challengeRepository.updateChallengesToFinished(challengeIds);
+  };
 }
