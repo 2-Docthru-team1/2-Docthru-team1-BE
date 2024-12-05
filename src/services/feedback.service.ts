@@ -38,6 +38,7 @@ export class FeedbackService implements IFeedbackService {
 
   createFeedback = async (feedbackData: CreateFeedbackDTO): Promise<Feedback> => {
     const feedback = await this.feedbackRepository.create(feedbackData);
+    assertExist(feedback);
     const workId = feedback.workId;
     const work = await this.workRepository.findById(workId);
     assertExist(work);
@@ -46,19 +47,19 @@ export class FeedbackService implements IFeedbackService {
     const ownerId = feedback.ownerId;
     const ownerSocketId = userSocketMap.get(ownerId!);
 
-    if (feedback) {
-      const message = 'New feedback has been provided on the work.';
-      const userId = feedback.ownerId;
-      const workId = feedback.workId;
-      await this.notificationRepository.createNotification(userId!, challengeId, message, workId);
-    }
+    const message = 'New feedback has been provided on the work.';
+    const userId = feedback.ownerId;
+    const notification = await this.notificationRepository.createNotification(userId!, challengeId, message, workId);
+    const notificationId = notification.id;
 
     if (ownerSocketId) {
       io.to(ownerSocketId).emit('newFeedback', {
+        id: notificationId,
         message: 'New feedback has been provided on the work.',
         challengeId: challengeId,
         workId: feedback.workId,
         createdAt: new Date(),
+        isRead: false,
       });
     }
 
