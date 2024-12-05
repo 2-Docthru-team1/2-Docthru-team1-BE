@@ -1,4 +1,4 @@
-import type { AbortReason } from '@prisma/client';
+import type { AbortReason, Challenge } from '@prisma/client';
 import type {
   ChallengeStatusInput,
   CreateChallengeDTO,
@@ -21,4 +21,6 @@ export interface IChallengeService {
   updateStatus(data: ChallengeStatusInput): Promise<CustomChallenge | null>;
   getAbortReason(id: string): Promise<AbortReason | null>;
   getMonthlyChallenge(option: GetMonthlyChallengeOption): Promise<CustomChallenge[] | null>;
+  getChallengesToFinish(): Promise<Challenge[]>;
+  updateChallengesToFinished(challengeIds: string[]): Promise<Challenge[]>;
 }

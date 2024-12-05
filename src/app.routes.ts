@@ -2,6 +2,7 @@ import express from 'express';
 import authRouter from '#routes/auth.route.js';
 import challengeRouter from '#routes/challenge.route.js';
 import feedbackRouter from '#routes/feedback.route.js';
+import notificationRouter from '#routes/notification.route.js';
 import recipeRouter from '#routes/recipe.route.js';
 import userRouter from '#routes/user.route.js';
 import workRouter from '#routes/work.route.js';
@@ -13,6 +14,7 @@ export default function setupRoutes(app: express.Application) {
   app.use('/feedbacks', feedbackRouter);
   app.use('/works', workRouter);
   app.use('/recipes', recipeRouter);
+  app.use('/notifications', notificationRouter);
 
   app.get('/hello', (req, res) => {
     res.send('Hello World');

@@ -210,10 +210,15 @@ export class ChallengeRepository implements IChallengeRepository {
     });
   };
 
-  updateChallengesToFinished = async (challengeIds: string[]) => {
-    return await this.challenge.updateMany({
-      where: { id: { in: challengeIds } },
-      data: { status: 'finished' },
-    });
+  updateChallengesToFinished = async (challengeIds: string[]): Promise<Challenge[]> => {
+    const updatedChallenges: Challenge[] = [];
+    for (const id of challengeIds) {
+      const challenge = await this.challenge.update({
+        where: { id },
+        data: { status: 'finished' },
+      });
+      updatedChallenges.push(challenge);
+    }
+    return updatedChallenges;
   };
 }
