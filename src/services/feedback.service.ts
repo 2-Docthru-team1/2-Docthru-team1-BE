@@ -2,17 +2,21 @@ import type { Feedback } from '@prisma/client';
 import type { IFeedbackService } from '#interfaces/services/feedback.service.interface.js';
 import { getStorage } from '#middlewares/asyncLocalStorage.js';
 import type { FeedbackRepository } from '#repositories/feedback.repository.js';
+import { NotificationRepository } from '#repositories/notification.repository.js';
 import type { WorkRepository } from '#repositories/work.repository.js';
 import type { BasicOptions } from '#types/common.types.js';
 import type { CreateFeedbackDTO, UpdateFeedbackDTO } from '#types/feedback.types.js';
 import { Forbidden } from '#types/http-error.types.js';
 import assertExist from '#utils/assertExist.js';
 import MESSAGES from '#utils/constants/messages.js';
+import { userSocketMap } from '#utils/socket/socket.utils.js';
+import { io } from '../app.js';
 
 export class FeedbackService implements IFeedbackService {
   constructor(
     private feedbackRepository: FeedbackRepository,
     private workRepository: WorkRepository,
+    private notificationRepository: NotificationRepository,
   ) {}
 
   getFeedbacks = async (options: BasicOptions, workId: string): Promise<{ totalCount: number; list: Feedback[] | null }> => {
@@ -34,6 +38,30 @@ export class FeedbackService implements IFeedbackService {
 
   createFeedback = async (feedbackData: CreateFeedbackDTO): Promise<Feedback> => {
     const feedback = await this.feedbackRepository.create(feedbackData);
+    assertExist(feedback);
+    const workId = feedback.workId;
+    const work = await this.workRepository.findById(workId);
+    assertExist(work);
+    const challengeId = work.challengeId;
+
+    const ownerId = feedback.ownerId;
+    const ownerSocketId = userSocketMap.get(ownerId!);
+
+    const message = 'New feedback has been provided on the work.';
+    const userId = feedback.ownerId;
+    const notification = await this.notificationRepository.createNotification(userId!, challengeId, message, workId);
+    const notificationId = notification.id;
+
+    if (ownerSocketId) {
+      io.to(ownerSocketId).emit('newFeedback', {
+        id: notificationId,
+        message: 'New feedback has been provided on the work.',
+        challengeId: challengeId,
+        workId: feedback.workId,
+        createdAt: new Date(),
+        isRead: false,
+      });
+    }
 
     return feedback;
   };

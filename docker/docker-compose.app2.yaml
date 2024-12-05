@@ -1,0 +1,18 @@
+services:
+  app2:
+    image: '${DOCKER_FILE_IMAGE}'
+    container_name: app2
+    ports:
+      - '${SECOND_PORT}:${SECOND_PORT}'
+    environment:
+      PORT: ${SECOND_PORT}
+      DATABASE_URL: ${DATABASE_URL}
+      JWT_SECRET: ${JWT_SECRET}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_REGION: ${AWS_REGION}
+      BUCKET_NAME: ${BUCKET_NAME}
+      GOOGLE_MAIL_PASS: ${GOOGLE_MAIL_PASS}
+    restart: always
+    volumes:
+      - ./src/logs:/app/src/logs
