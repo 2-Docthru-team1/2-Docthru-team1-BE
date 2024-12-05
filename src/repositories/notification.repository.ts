@@ -23,12 +23,13 @@ export class NotificationRepository implements INotificationRepository {
     });
   };
 
-  createNotification = async (userId: string, challengeId: string, message: string): Promise<Notification> => {
+  createNotification = async (userId: string, challengeId: string, message: string, workId?: string): Promise<Notification> => {
     return await this.notification.create({
       data: {
         userId,
         challengeId,
         message,
+        workId,
         createdAt: new Date(),
         isRead: false,
       },

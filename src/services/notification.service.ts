@@ -23,8 +23,8 @@ export class NotificationService implements INotificationService {
     return notifications;
   };
 
-  createNotification = async (userId: string, message: string, challengeId: string): Promise<Notification> => {
-    return await this.notificationRepository.createNotification(userId, message, challengeId);
+  createNotification = async (userId: string, challengeId: string, message: string): Promise<Notification> => {
+    return await this.notificationRepository.createNotification(userId, challengeId, message);
   };
 
   updateNotification = async (id: string, notificationData: UpdateNotificationDTO): Promise<Notification> => {
