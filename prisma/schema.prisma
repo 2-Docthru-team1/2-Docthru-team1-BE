@@ -78,10 +78,11 @@ model ChallengeWork {
   workLikes WorkLike[]
   feedbacks Feedback[]
 
-  owner       User?     @relation(name: "ownership", fields: [ownerId], references: [id], onDelete: SetNull)
-  ownerId     String?
-  challenge   Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
-  challengeId String
+  owner         User?          @relation(name: "ownership", fields: [ownerId], references: [id], onDelete: SetNull)
+  ownerId       String?
+  challenge     Challenge      @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  challengeId   String
+  notifications Notification[]
 }
 
 model WorkImage {
@@ -161,16 +162,18 @@ model Recipe {
 }
 
 model Notification {
-  id          String    @id @default(uuid())
+  id          String         @id @default(uuid())
   message     String
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
   deletedAt   DateTime?
-  isRead      Boolean   @default(false)
-  user        User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  isRead      Boolean        @default(false)
+  user        User?          @relation(fields: [userId], references: [id], onDelete: SetNull)
   userId      String?
-  challenge   Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  challenge   Challenge      @relation(fields: [challengeId], references: [id], onDelete: Cascade)
   challengeId String
+  work        ChallengeWork? @relation(fields: [workId], references: [id], onDelete: Cascade)
+  workId      String?
 }
 
 enum Role {

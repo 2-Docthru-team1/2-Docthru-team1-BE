@@ -5,7 +5,7 @@ import { notificationService } from '#containers/notification.container.js';
 import { userSocketMap } from '#utils/socket/socket.utils.js';
 
 export const scheduleChallengeStatus = (io: Server) => {
-  cron.schedule('0 0 * * *', async () => {
+  cron.schedule('* * * * *', async () => {
     const challengesToFinish = await challengeService.getChallengesToFinish();
 
     if (!challengesToFinish) {
@@ -21,7 +21,8 @@ export const scheduleChallengeStatus = (io: Server) => {
 
       for (const participantId of participantIds) {
         const notificationMessage = `The challenge "${challenge.title}" has been completed.`;
-        await notificationService.createNotification(participantId, challenge.id, notificationMessage);
+        const notification = await notificationService.createNotification(participantId, challenge.id, notificationMessage);
+        const notificationId = notification.id;
 
         const participantSocketId = userSocketMap.get(participantId);
         if (participantSocketId) {
@@ -30,9 +31,11 @@ export const scheduleChallengeStatus = (io: Server) => {
           if (participantSocket) {
             participantSocket.join(roomName);
             io.to(roomName).emit('challengeStatusChangedFinished', {
+              id: notificationId,
               message: notificationMessage,
               challengeId: challenge.id,
               createdAt: new Date(),
+              isRead: false,
             });
           }
         }
