@@ -39,9 +39,6 @@ export class FeedbackService implements IFeedbackService {
 
     const ownerId = feedback.ownerId;
     const ownerSocketId = userSocketMap.get(ownerId as string);
-    if (!ownerSocketId) {
-      throw new Error(MESSAGES.NOT_FOUND);
-    }
 
     if (ownerSocketId) {
       io.to(ownerSocketId).emit('newFeedback', {
