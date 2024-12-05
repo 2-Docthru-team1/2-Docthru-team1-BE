@@ -9,9 +9,16 @@ export class NotificationRepository implements INotificationRepository {
     this.notification = client.notification;
   }
 
-  getNotifications = async (userId: string): Promise<Notification[] | null> => {
+  getNotifications = async (
+    userId: string,
+    options: { limit: number; orderBy: string; orderDirection: 'desc' },
+  ): Promise<Notification[] | null> => {
+    const { limit, orderBy, orderDirection } = options;
+
     return await this.notification.findMany({
       where: { userId },
+      orderBy: { [orderBy]: orderDirection },
+      take: limit,
     });
   };
 

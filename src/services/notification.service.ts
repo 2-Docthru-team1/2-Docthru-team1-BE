@@ -11,7 +11,11 @@ export class NotificationService implements INotificationService {
   getNotifications = async (): Promise<Notification[] | null> => {
     const storage = getStorage();
     const userId = storage.userId;
-    const notifications = await this.notificationRepository.getNotifications(userId);
+    const notifications = await this.notificationRepository.getNotifications(userId, {
+      limit: 15,
+      orderBy: 'createdAt',
+      orderDirection: 'desc',
+    });
     if (!notifications || notifications.length === 0) {
       throw new NotFound(MESSAGES.NOT_FOUND);
     }
