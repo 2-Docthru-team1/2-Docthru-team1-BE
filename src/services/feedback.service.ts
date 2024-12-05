@@ -8,6 +8,8 @@ import type { CreateFeedbackDTO, UpdateFeedbackDTO } from '#types/feedback.types
 import { Forbidden } from '#types/http-error.types.js';
 import assertExist from '#utils/assertExist.js';
 import MESSAGES from '#utils/constants/messages.js';
+import { userSocketMap } from '#utils/socket/socket.utils.js';
+import { io } from '../app.js';
 
 export class FeedbackService implements IFeedbackService {
   constructor(
@@ -34,6 +36,20 @@ export class FeedbackService implements IFeedbackService {
 
   createFeedback = async (feedbackData: CreateFeedbackDTO): Promise<Feedback> => {
     const feedback = await this.feedbackRepository.create(feedbackData);
+
+    const ownerId = feedback.ownerId;
+    const ownerSocketId = userSocketMap.get(ownerId as string);
+    if (!ownerSocketId) {
+      throw new Error(MESSAGES.NOT_FOUND);
+    }
+
+    if (ownerSocketId) {
+      io.to(ownerSocketId).emit('newFeedback', {
+        message: '새로운 댓글이 등록되었습니다.',
+        workId: feedback.workId,
+        createdAt: new Date(),
+      });
+    }
 
     return feedback;
   };
