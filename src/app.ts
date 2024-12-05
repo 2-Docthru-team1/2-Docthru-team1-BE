@@ -44,7 +44,8 @@ if (port === '443') {
   });
 
   // HTTPS 서버 생성 (미들웨어 밖으로 이동)
-  https.createServer(options, app).listen(443, () => {
+  server = https.createServer(options, app);
+  server.listen(443, () => {
     console.log('HTTPS Server is running on port 443');
   });
 
