@@ -66,7 +66,7 @@ if (port === '443') {
   });
 }
 
-const io = new Server(server, {
+export const io = new Server(server, {
   cors: {
     origin: ['http://localhost:3000', 'http://15.165.57.191', 'http://43.203.221.149:3000/'],
   },
