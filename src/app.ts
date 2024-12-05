@@ -44,9 +44,13 @@ if (port === '443') {
   });
 
   // HTTPS 서버 생성 (미들웨어 밖으로 이동)
-  server = https.createServer(options, app);
-  server.listen(443, () => {
+  https.createServer(options, app).listen(443, () => {
     console.log('HTTPS Server is running on port 443');
+  });
+
+  // HTTP 서버 생성
+  createServer(app).listen(80, () => {
+    console.log('HTTP Server is running on port 80');
   });
 
   // HTTP 서버 생성 (미들웨어 밖으로 이동)
@@ -61,7 +65,11 @@ if (port === '443') {
   });
 }
 
-const io = new Server(server);
+const io = new Server(server, {
+  cors: {
+    origin: ['http://localhost:3000', 'http://15.165.57.191', 'http://43.203.221.149:3000/'],
+  },
+});
 
 try {
   startSocket(io);
