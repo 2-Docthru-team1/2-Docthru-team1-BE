@@ -11,6 +11,7 @@ import type {
   GetWorksOptions,
   ResultChallengeWork,
   UpdateWorkDTO,
+  WorkCustomResponse,
   WorkResponseWithUploadUrls,
 } from '#types/work.types.js';
 import { generatePresignedDownloadUrl } from '#utils/S3/generate-presigned-download-url.js';
