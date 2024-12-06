@@ -52,3 +52,11 @@ export interface WorkResponseWithUploadUrls {
   work: Omit<ChallengeWork, 'ownerId'>;
   uploadUrls: { uploadUrl: string }[];
 }
+export interface WorkCustomResponse extends Omit<ChallengeWork, 'ownerId'> {
+  ownerId?: string | null;
+  imagesData?: { s3Key: string; uploadUrl: string }[];
+  imageCount?: number;
+  imageUrls?: { imageUrl: string[] };
+  uploadUrls?: { uploadUrl: string[] };
+  images?: WorkImage[];
+}
