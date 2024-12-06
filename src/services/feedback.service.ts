@@ -44,11 +44,11 @@ export class FeedbackService implements IFeedbackService {
     assertExist(work);
     const challengeId = work.challengeId;
 
-    const ownerId = feedback.ownerId;
+    const ownerId = work.ownerId;
     const ownerSocketId = userSocketMap.get(ownerId!);
 
     const message = 'New feedback has been provided on the work.';
-    const userId = feedback.ownerId;
+    const userId = work.ownerId;
     const notification = await this.notificationRepository.createNotification(userId!, challengeId, message, workId);
     const notificationId = notification.id;
 
