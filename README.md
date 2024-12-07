@@ -46,6 +46,15 @@
       <br />
       Backend
     </td>
+        <td align="center" width="200">
+      <a href="https://github.com/galaxy-78">
+        <img src="https://avatars.githubusercontent.com/u/81586230?v=4" alt="김재원" width="100" />
+        <br />
+        <b>김재원</b>
+      </a>
+      <br />
+      Backend
+    </td>
   </tr>
 </table>
 
@@ -101,6 +110,10 @@
 - 백엔드 깃허브 README.md
 - 시연영상 녹화 + 편집
 
+**김재원**
+
+- 발표자료 제작
+
 ## 팀원별 구현 기능 상세
 
 **김태영**
@@ -145,3 +158,7 @@
 - deadline 도달시 챌린지 finish 자동 처리 스케쥴링 (node-cron 활용)
 - 자동 변경 스케줄링으로 인한 상태 변경시 (finished) 실시간 알림 (socket.io 활용)
 - 내 작업물에 피드백 달리면 실시간 알림 (socket.io 활용)
+
+**김재원**
+
+- 로그인 구현
