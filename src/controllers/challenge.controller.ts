@@ -93,6 +93,7 @@ export class ChallengeController {
       page: Number(page),
       pageSize: Number(pageSize),
       keyword,
+      monthly: true,
     };
     const { totalCount, list } = await this.challengeService.getChallenges(options);
 

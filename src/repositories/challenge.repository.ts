@@ -22,7 +22,7 @@ export class ChallengeRepository implements IChallengeRepository {
   }
 
   findMany = async (options: getChallengesOptions): Promise<Challenge[] | null> => {
-    const { status, mediaType, orderBy, keyword, page = 1, pageSize = 4, admin, requestUserId, participantId } = options;
+    const { status, mediaType, orderBy, keyword, page = 1, pageSize = 4, admin, requestUserId, participantId, monthly } = options;
 
     const applyOrderBy: {
       deadline?: 'asc' | 'desc';
@@ -47,7 +47,6 @@ export class ChallengeRepository implements IChallengeRepository {
       status?: { in: Status[] };
       title?: { contains: string };
       isHidden?: boolean;
-      monthly: MonthlyType | null;
     } = {
       ...(Array.isArray(mediaType) ? { mediaType: { in: mediaType } } : {}),
       ...(Array.isArray(status) ? { status: { in: status } } : {}),
@@ -55,7 +54,7 @@ export class ChallengeRepository implements IChallengeRepository {
       ...(admin ? {} : { isHidden: false }),
       ...(requestUserId ? { requestUserId } : {}),
       ...(participantId ? { participants: { some: { id: participantId } } } : {}),
-      monthly: null,
+      ...(monthly ? { monthly: { not: null } } : {}),
     };
 
     const challenges = await this.challenge.findMany({
