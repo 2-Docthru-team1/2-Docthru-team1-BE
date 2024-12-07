@@ -1,13 +1,11 @@
 services:
-  server:
-    container_name: server
-    build:
-      context: ./
-      dockerfile: ./docker/Dockerfile
+  app1:
+    image: '${DOCKER_FILE_IMAGE}'
+    container_name: app1
     ports:
-      - '${HOST_PORT}:${PORT}'
+      - '${FIRST_PORT}:${FIRST_PORT}'
     environment:
-      PORT: ${PORT}
+      PORT: ${FIRST_PORT}
       DATABASE_URL: ${DATABASE_URL}
       JWT_SECRET: ${JWT_SECRET}
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}

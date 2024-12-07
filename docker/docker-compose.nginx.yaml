@@ -1,0 +1,7 @@
+services:
+  nginx:
+    image: nginx:latest # Nginx의 최신 이미지 사용
+    ports:
+      - '${NGINX_PORT}:${NGINX_PORT}' # HTTP 포트 매핑
+    volumes:
+      - /etc/nginx/nginx.conf:/etc/nginx/nginx.conf:ro # 설정 파일을 컨테이너에 마운트
