@@ -2,7 +2,7 @@
 
 ## 프로젝트 소개
 
-소개<br>
+외국인들을 대상으로 하는 한국 요리 도전 웹 사이트<br><br>
 <b>[HanCook 사이트 바로가기](<https://www.figma.com/design/CdALCm6ocpye0ldqTfVAvf/%5BTEAM-1%5D-HanCook-(Copy)?node-id=0-1&node-type=canvas&t=DWSDbH9clBOT8QhG-0>)</b><br>
 <b>[HanCook API 명세서](https://app.swaggerhub.com/apis-docs/CHESHIREBIZZ/HanCook/1.0.3#/)</b> <br>
 <b>[HanCook 팀 협업 문서 Notion](https://www.notion.so/ca92bf8470a145829f4dd4e966f78c4c)</b> <br>
@@ -104,12 +104,43 @@
 
 **김태영**
 
-- 유저, 인가
+- 회원가입 구현
+- 리프레시 토큰을 이용해 액세스 토큰 재발급 및 슬라이딩 세션 구현
+- 액세스 토큰을 통해 로그인 유저 정보 조회
+- 레시피 관련 CRUD
+- 피드백 관련 CRUD
+- 레시피 좋아요 구현
+- DeepL을 이용한 번역 메소드 구현(미사용)
+- Nodemailer를 통해 회원가입 인증 메일 구현
+- 레코드 논리 삭제을 구현 및 prismaClient 확장을 통해 전체에 후처리 적용
+- 레시피 및 피드백 mock데이터 생성 및 수정
+- async local storage를 통한 비동기적 전역 상태 관리 구현
+- s3에서 download 및 upload presigned Url을 받아오는 메소드 구현
+- express Request 객체를 제네릭 타입을 통해 확장
 
 **김태연**
 
-- 챌린지, 챌린지 작업물
+- 작업물 CRUD
+- 작업물 생성/수정시 이미지 처리
+- 작업물 좋아요 구현
+- 챌린지 목록 조회시 일반리스트와 관리자리스트 분리
+- 관리자의 작업물 관리 권한 설정
+- 작업물 관련 목데이터 생성/수정
+- winston을 통한 로그 관리
+- 이달의 유저 랭킹 구현
+- 도커 파일 작성
+- nginx를 이용한 컴포즈 로드 밸런싱 배포
+- 데이터베이스 서버 배포
 
 **김민선**
 
-- 챌린지
+- 챌린지 CRUD
+- 챌린지 반려시 AbortReason 생성/조회
+- 챌린지 관련 인가
+- 챌린지 생성시 s3 활용 이미지 처리
+- 이달의 챌린지 관련 구현
+- 알림 생성 조회 수정
+- 챌린지 관련 목데이터 생성/수정
+- deadline 도달시 챌린지 finish 자동 처리 스케쥴링 (node-cron 활용)
+- 자동 변경 스케줄링으로 인한 상태 변경시 (finished) 실시간 알림 (socket.io 활용)
+- 내 작업물에 피드백 달리면 실시간 알림 (socket.io 활용)
