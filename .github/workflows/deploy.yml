@@ -37,7 +37,7 @@ jobs:
             npm install
             export DATABASE_URL="$DATABASE_URL"
             # npx prisma migrate deploy
-            npx prisma migrate reset
+            npx prisma migrate reset --force
             npx prisma db seed
             npx tsc
 
