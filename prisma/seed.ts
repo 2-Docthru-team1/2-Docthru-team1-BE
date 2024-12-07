@@ -25,7 +25,7 @@ async function main() {
   });
 
   for (const challenge of CHALLENGES) {
-    if (!['canceled', 'aborted', 'denied'].includes(challenge.status)) {
+    if (!['pending', 'onGoing', 'canceled', 'aborted', 'denied'].includes(challenge.status)) {
       await prisma.challenge.create({
         data: {
           ...challenge,
