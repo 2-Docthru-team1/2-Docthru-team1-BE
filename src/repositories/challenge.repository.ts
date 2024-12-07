@@ -118,6 +118,15 @@ export class ChallengeRepository implements IChallengeRepository {
     return challenge;
   };
 
+  findBiggestNumber = async (): Promise<number> => {
+    const challenge = await this.challenge.findMany({
+      orderBy: { number: 'desc' },
+      take: 1,
+    });
+
+    return challenge[0]?.number || 0;
+  };
+
   create = async (data: ChallengeInput): Promise<Challenge> => {
     const challenge = await this.challenge.create({
       data: {
