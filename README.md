@@ -38,7 +38,7 @@
       Backend
     </td>
     <td align="center" width="200">
-      <a href="https://github.com/orgs/2-Docthru-team1/people/alscksdlek">
+      <a href="https://github.com/alscksdlek">
         <img src="https://avatars.githubusercontent.com/u/164968618?v=4" alt="김민선" width="100" />
         <br />
         <b>김민선</b>
