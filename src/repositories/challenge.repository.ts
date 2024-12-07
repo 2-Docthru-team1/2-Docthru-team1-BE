@@ -200,6 +200,7 @@ export class ChallengeRepository implements IChallengeRepository {
         },
       },
       include: { requestUser: { select: { id: true, name: true } } },
+      take: 3,
     });
 
     return challenge;

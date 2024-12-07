@@ -443,18 +443,4 @@ export const CHALLENGES = [
     monthly: MonthlyType.December,
     requestUserId: 'a666a76c-46a1-4aa2-9741-bdbb20785fc4',
   },
-  {
-    title: 'Biggest Test',
-    description: 'Description forBiggest Test',
-    number: 999,
-    status: Status.onGoing,
-    deadline: new Date('2025-12-05T09:15:00.000Z'),
-    isHidden: false,
-    imageUrl: 'monthlybibibibibi.png',
-    imageUrl2: null,
-    embedUrl: 'https://m.blog.naver.com/es1975/222681705656',
-    mediaType: MediaType.blog,
-    monthly: MonthlyType.December,
-    requestUserId: 'a666a76c-46a1-4aa2-9741-bdbb20785fc4',
-  },
 ];
