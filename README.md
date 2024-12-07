@@ -2,7 +2,8 @@
 
 ## 프로젝트 소개
 
-외국인들을 대상으로 하는 한국 요리 도전 웹 사이트<br><br>
+외국인들을 대상으로 하는 한국 요리 도전 웹 사이트<br>
+외국인을 위한 한국 요리 도전 웹사이트는 한국 요리를 배우고 만들어 보는 과정을 통해 외국인들이 한국 문화를 더 깊이 경험하고 이해할 수 있도록 돕는 플랫폼입니다.<br><br>
 <b>[HanCook 사이트 바로가기](<https://www.figma.com/design/CdALCm6ocpye0ldqTfVAvf/%5BTEAM-1%5D-HanCook-(Copy)?node-id=0-1&node-type=canvas&t=DWSDbH9clBOT8QhG-0>)</b><br>
 <b>[HanCook API 명세서](https://app.swaggerhub.com/apis-docs/CHESHIREBIZZ/HanCook/1.0.3#/)</b> <br>
 <b>[HanCook 팀 협업 문서 Notion](https://www.notion.so/ca92bf8470a145829f4dd4e966f78c4c)</b> <br>
