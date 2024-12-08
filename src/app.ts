@@ -68,7 +68,7 @@ if (port === '443') {
 
 export const io = new Server(server, {
   cors: {
-    origin: ['http://localhost:3000', 'http://15.165.57.191', 'http://43.203.221.149:3000'],
+    origin: ['http://localhost:3000', 'http://3.36.133.107:3000'],
     credentials: true,
   },
 });
