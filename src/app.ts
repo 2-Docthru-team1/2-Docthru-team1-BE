@@ -71,9 +71,8 @@ export const io = new Server(server, {
     origin: [
       'http://localhost:3000',
       'http://15.165.57.191',
-      'http://43.203.221.149:3000',
       'ec2-43-200-2-208.ap-northeast-2.compute.amazonaws.com',
-      'http://3.39.236.234:3000/',
+      'http://3.39.236.234:3000',
     ],
     credentials: true,
   },
