@@ -39,7 +39,8 @@ export class AuthController {
 
     const user = await this.authService.verifyUser(id);
 
-    res.json(user);
+    // res.json(user);
+    res.redirect('http://3.39.236.234:3000/signIn');
   };
 
   refreshToken = async (req: Request, res: Response, next: NextFunction) => {
