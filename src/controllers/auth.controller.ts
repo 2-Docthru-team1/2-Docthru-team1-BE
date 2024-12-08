@@ -29,7 +29,6 @@ export class AuthController {
     assert(req.body, CreateUser, MESSAGES.WRONG_FORMAT);
     const user = await this.authService.createUser(req.body);
 
-    // sendVerificationMail(user.id);
     sendVerificationMail(user.id, user.email);
     res.json({ message: `입력한 주소의 인증 메일을 확인해주세요.` });
   };
