@@ -37,7 +37,7 @@ HanCook은 이러한 문제를 해결하기 위해 탄생했습니다.
 
 ### 관련 링크
 
-<b>[HanCook 사이트 바로가기](http://43.203.221.149:3000/)</b><br>
+<b>[HanCook 사이트 바로가기](http://13.124.179.12:3000)</b><br>
 <b>[HanCook Figma 바로가기](<https://www.figma.com/design/CdALCm6ocpye0ldqTfVAvf/%5BTEAM-1%5D-HanCook-(Copy)?m=auto&t=mysMLQtwUW72DsvI-6>)</b><br>
 <b>[HanCook API 명세서](https://app.swaggerhub.com/apis-docs/CHESHIREBIZZ/HanCook/1.0.4#/)</b> <br>
 <b>[HanCook 팀 협업 문서 Notion](https://funky-rhinoceros-89e.notion.site/FS-2-3-1-15533a16b2a0804ab45ac685c6b8f7d9)</b> <br>
