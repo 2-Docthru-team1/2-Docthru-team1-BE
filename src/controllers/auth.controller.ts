@@ -29,7 +29,6 @@ export class AuthController {
     assert(req.body, CreateUser, MESSAGES.WRONG_FORMAT);
     const user = await this.authService.createUser(req.body);
 
-    // sendVerificationMail(user.id);
     sendVerificationMail(user.id, user.email);
     res.json({ message: `입력한 주소의 인증 메일을 확인해주세요.` });
   };
@@ -40,7 +39,8 @@ export class AuthController {
 
     const user = await this.authService.verifyUser(id);
 
-    res.json(user);
+    // res.json(user);
+    res.redirect('http://3.39.236.234:3000/signIn');
   };
 
   refreshToken = async (req: Request, res: Response, next: NextFunction) => {
