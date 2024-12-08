@@ -4,7 +4,7 @@ import fs from 'fs';
 import https from 'https';
 import { createServer } from 'node:http';
 import { Server } from 'socket.io';
-import { port } from '#configs/common.config.js';
+import { clientUrl, port } from '#configs/common.config.js';
 import errorHandler from '#middlewares/error-handler.js';
 import { startJob } from '#utils/jobs/index.js';
 import { startSocket } from '#utils/socket/index.js';
@@ -68,7 +68,7 @@ if (port === '443') {
 
 export const io = new Server(server, {
   cors: {
-    origin: ['http://localhost:3000', 'http://3.39.236.234:3000'],
+    origin: ['http://localhost:3000', clientUrl],
     credentials: true,
   },
 });
