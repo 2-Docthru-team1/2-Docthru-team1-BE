@@ -1,9 +1,10 @@
-import { baseUrlEC2 } from '#configs/url.config.js';
+import { baseUrlLocal } from '#configs/url.config.js';
 import transporter from '#utils/nodemailer/transporter.js';
 import verificationTemplate from '#utils/nodemailer/verificationTemplate.js';
 
 export default function sendVerificationMail(id: string, target: string = 'forCodeitFS2nd@gmail.com') {
-  const verificationLink = `${baseUrlEC2}/${id}/auth/verify`;
+  // const verificationLink = `${baseUrlEC2}/auth/${id}/verify`;
+  const verificationLink = `${baseUrlLocal}/auth/${id}/verify`;
 
   const verificationMessage = {
     from: 'forCodeitFS2nd@gmail.com',
