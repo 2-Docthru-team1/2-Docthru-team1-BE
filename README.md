@@ -104,17 +104,19 @@ HanCook은 이러한 문제를 해결하기 위해 탄생했습니다.
 ![Nodemailer](https://img.shields.io/badge/Nodemailer-CC0000?style=flat&logo=nodemailer&logoColor=white)
 ![Socket.io](https://img.shields.io/badge/Socket.io-010101?style=flat&logo=socket.io&logoColor=white)
 ![Node-cron](https://img.shields.io/badge/Node--cron-777BB4?style=flat&logo=node-schedule&logoColor=white)
+![Winston](https://img.shields.io/badge/Winston-4B0082?style=flat&logo=winston&logoColor=white)
 
 **Database** <br>
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-336791?style=flat&logo=postgresql&logoColor=white)
 
-**Cloud & Deployment** <br>
+**Infra** <br>
 ![Amazon AWS](https://img.shields.io/badge/Amazon%20AWS-232F3E?style=flat&logo=amazonaws&logoColor=white)
 ![S3](https://img.shields.io/badge/S3-569A31?style=flat&logo=amazon-s3&logoColor=white)
 ![EC2](https://img.shields.io/badge/EC2-FF9900?style=flat&logo=amazon-ec2&logoColor=white)
 ![Render](https://img.shields.io/badge/Render-0466C8?style=flat&logo=render&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white)
 ![Nginx](https://img.shields.io/badge/Nginx-009639?style=flat&logo=nginx&logoColor=white)
+![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-2088FF?style=flat&logo=GitHubActions&logoColor=black)
 
 **Tools** <br>
 ![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white)
@@ -122,12 +124,14 @@ HanCook은 이러한 문제를 해결하기 위해 탄생했습니다.
 ![Discord](https://img.shields.io/badge/Discord-5865F2?style=flat&logo=discord&logoColor=white)
 ![Notion](https://img.shields.io/badge/Notion-000000?style=flat&logo=notion&logoColor=white)
 ![Gather](https://img.shields.io/badge/Gather-3A2EDE?style=flat&logo=gather&logoColor=white)
-![Winston](https://img.shields.io/badge/Winston-4B0082?style=flat&logo=winston&logoColor=white)
+![Zoom](https://img.shields.io/badge/Zoom-0B5CFF?style=flat&logo=Zoom&logoColor=white)
 
 **Etc** <br>
 ![3-Tier Architecture](https://img.shields.io/badge/3--Tier%20Architecture-0052CC?style=flat&logo=architect&logoColor=white)
 ![Singleton Pattern](https://img.shields.io/badge/Singleton%20Pattern-0052CC?style=flat&logo=patterns&logoColor=white)
 ![Dependency Injection (DI)](https://img.shields.io/badge/Dependency%20Injection-0052CC?style=flat&logo=injection&logoColor=white)
+![Prettier](https://img.shields.io/badge/Prettier-F7B93E?style=flat&logo=Prettier&logoColor=black)
+![ESLint](https://img.shields.io/badge/ESLint-4B32C3?style=flat&logo=ESLint&logoColor=white)
 
 ## R&R
 
