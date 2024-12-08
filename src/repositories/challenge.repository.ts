@@ -1,4 +1,4 @@
-import { type AbortReason, type Challenge, type MediaType, MonthlyType, type Status } from '@prisma/client';
+import { type AbortReason, type Challenge, type MediaType, Prisma, type Status } from '@prisma/client';
 import baseClient from '#connection/postgres.connection.js';
 import type { IChallengeRepository } from '#interfaces/repositories/challenge.repository.interface.js';
 import type {
@@ -22,7 +22,7 @@ export class ChallengeRepository implements IChallengeRepository {
   }
 
   findMany = async (options: getChallengesOptions): Promise<Challenge[] | null> => {
-    const { status, mediaType, orderBy, keyword, page = 1, pageSize = 4, admin, requestUserId, participantId } = options;
+    const { status, mediaType, orderBy, keyword, page = 1, pageSize = 4, admin, requestUserId, participantId, monthly } = options;
 
     const applyOrderBy: {
       deadline?: 'asc' | 'desc';
@@ -41,13 +41,13 @@ export class ChallengeRepository implements IChallengeRepository {
       default:
         applyOrderBy.createdAt = 'desc';
     }
+    const orderByArray = [applyOrderBy, { number: Prisma.SortOrder.desc }];
 
     const whereCondition: {
       mediaType?: { in: MediaType[] };
       status?: { in: Status[] };
       title?: { contains: string };
       isHidden?: boolean;
-      monthly: MonthlyType | null;
     } = {
       ...(Array.isArray(mediaType) ? { mediaType: { in: mediaType } } : {}),
       ...(Array.isArray(status) ? { status: { in: status } } : {}),
@@ -55,14 +55,14 @@ export class ChallengeRepository implements IChallengeRepository {
       ...(admin ? {} : { isHidden: false }),
       ...(requestUserId ? { requestUserId } : {}),
       ...(participantId ? { participants: { some: { id: participantId } } } : {}),
-      monthly: null,
+      ...(monthly ? {} : { monthly: null }),
     };
 
     const challenges = await this.challenge.findMany({
       skip: (page - 1) * pageSize,
       take: pageSize,
       where: whereCondition,
-      orderBy: applyOrderBy,
+      orderBy: orderByArray,
       include: { requestUser: { select: { id: true, name: true } } },
     });
 
@@ -70,14 +70,13 @@ export class ChallengeRepository implements IChallengeRepository {
   };
 
   totalCount = async (options: getChallengesOptions): Promise<number | null> => {
-    const { status, mediaType, keyword, admin, requestUserId, participantId, allRecords } = options;
+    const { status, mediaType, keyword, admin, requestUserId, participantId, allRecords, monthly } = options;
 
     const whereCondition: {
       mediaType?: { in: MediaType[] };
       status?: { in: Status[] };
       title?: { contains: string };
       isHidden?: boolean;
-      monthly: MonthlyType | null;
     } = {
       ...(Array.isArray(mediaType) ? { mediaType: { in: mediaType } } : {}),
       ...(Array.isArray(status) ? { status: { in: status } } : {}),
@@ -85,7 +84,7 @@ export class ChallengeRepository implements IChallengeRepository {
       ...(admin ? {} : { isHidden: false }),
       ...(requestUserId ? { requestUserId } : {}),
       ...(participantId ? { participants: { some: { id: participantId } } } : {}),
-      monthly: null,
+      ...(monthly ? {} : { monthly: null }),
     };
 
     // NOTE allRecords일 경우 모든 레코드를 카운트
@@ -200,6 +199,7 @@ export class ChallengeRepository implements IChallengeRepository {
         },
       },
       include: { requestUser: { select: { id: true, name: true } } },
+      take: 3,
     });
 
     return challenge;
