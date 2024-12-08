@@ -61,19 +61,19 @@ export class ChallengeService implements IChallengeService {
   };
 
   getNextChallenge = async (id: string): Promise<CustomChallenge | null> => {
-    const totalCount = (await this.challengeRepository.totalCount({ allRecords: true })) || 0;
+    const maximum = await this.challengeRepository.findBiggestNumber();
     const challenge = await this.challengeRepository.findById(id);
     assertExist(challenge);
 
     let nextChallenge;
     let i = 1;
     do {
-      if (i > totalCount) {
+      if (i > maximum) {
         throw new NotFound(MESSAGES.NOT_FOUND);
       }
       nextChallenge = await this.challengeRepository.findByNumber(challenge.number + i);
       i += 1;
-    } while (!nextChallenge || nextChallenge.deletedAt || nextChallenge.monthly);
+    } while (!nextChallenge || nextChallenge.deletedAt);
 
     const CustomChallenge = filterChallenge(nextChallenge);
     return CustomChallenge;

@@ -20,13 +20,12 @@ model User {
   deletedAt DateTime?
 
   name         String
-  email        String @unique
+  email        String  @unique
   password     String
   salt         String
-  refreshToken String @default("")
-  role         Role   @default(normal)
-  // TODO 전문가 유저는 랭킹 시스템에 연동되는 고도화 내용
-  // 랭킹 시스템과 연동되기 떄문에 나중에 추천수 필드를 유저에 만들어야됨
+  refreshToken String  @default("")
+  role         Role    @default(normal)
+  isVerified   Boolean @default(false)
 
   requests      Challenge[]     @relation(name: "requests")
   participation Challenge[]     @relation(name: "participation")
@@ -78,10 +77,11 @@ model ChallengeWork {
   workLikes WorkLike[]
   feedbacks Feedback[]
 
-  owner       User?     @relation(name: "ownership", fields: [ownerId], references: [id], onDelete: SetNull)
-  ownerId     String?
-  challenge   Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
-  challengeId String
+  owner         User?          @relation(name: "ownership", fields: [ownerId], references: [id], onDelete: SetNull)
+  ownerId       String?
+  challenge     Challenge      @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  challengeId   String
+  notifications Notification[]
 }
 
 model WorkImage {
@@ -161,16 +161,18 @@ model Recipe {
 }
 
 model Notification {
-  id          String    @id @default(uuid())
+  id          String         @id @default(uuid())
   message     String
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
   deletedAt   DateTime?
-  isRead      Boolean   @default(false)
-  user        User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  isRead      Boolean        @default(false)
+  user        User?          @relation(fields: [userId], references: [id], onDelete: SetNull)
   userId      String?
-  challenge   Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  challenge   Challenge      @relation(fields: [challengeId], references: [id], onDelete: Cascade)
   challengeId String
+  work        ChallengeWork? @relation(fields: [workId], references: [id], onDelete: Cascade)
+  workId      String?
 }
 
 enum Role {

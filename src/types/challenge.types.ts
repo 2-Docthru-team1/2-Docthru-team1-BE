@@ -25,6 +25,7 @@ export interface getChallengesOptions {
   requestUserId?: string;
   participantId?: string;
   allRecords?: boolean;
+  monthly?: boolean;
 }
 
 export interface GetMonthlyChallengeOption {
